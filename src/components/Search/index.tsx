@@ -54,15 +54,16 @@ class _Search extends React.Component<IProps> {
         const {isHeader} = this.props;
         return isHeader
             ? <div css={css`display: flex; align-items: center; width: 490px;white-space: nowrap`}>
-                <div css={[fonts.descriptionFont,css`margin-right: 8px`]}>Smart Contract:</div>
+                <div css={[fonts.descriptionFont, css`margin-right: 8px`]}>Smart Contract:</div>
                 <Input
                     defaultValue={window.location.pathname.replace('/', '')}
                     onSubmit={this.handleSearch}
+                    uncontrolled
                 />
             </div>
             : <div css={styles.bg}>
                 <div css={[fonts.searchTitleFont, styles.title]}>Search for Smart Contract</div>
-                <Input onSubmit={this.handleSearch} withSearchIcon/>
+                <Input onSubmit={this.handleSearch} withSearchIcon uncontrolled/>
             </div>
     }
 

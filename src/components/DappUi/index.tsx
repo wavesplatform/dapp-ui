@@ -12,19 +12,35 @@ import Search from "@components/Search";
 import EmptyDapp from "@components/DappUi/EmptyDapp";
 import DappBody from "@components/DappUi/DappBody";
 import { fonts } from "@src/styles";
+import ScrollIntoView from 'react-scroll-into-view'
+import Footer from "@components/Footer";
 
 const styles = {
     root: css`
 background: linear-gradient(152.04deg, #FFFFFF 9.12%, #F0F7FC 104.06%);
-height: 100%;
-width: 100%;
+min-height: calc(100vh - 60px) ;
 display: flex;
 padding: 30px 10% 30px 0`,
+    menuItem: css`
+height: 40px;
+width: calc(100% - 20px);
+display: flex;
+align-items: center;
+justify-content: flex-end;  
+padding-right: 20px;
+cursor: pointer;
+${fonts.menuFont}
+:hover{
+color: #3A3E46;
+background: #E9EFFF;
+}
+`
 };
 
 interface IInjectedProps {
     accountStore?: AccountStore
     dappStore?: DappStore
+    scrollTo?: (opts: any) => void
 }
 
 interface IProps extends IInjectedProps {
@@ -47,25 +63,11 @@ width: 20%
 `;
 
 
-const MenuItem = styled.div`
-height: 40px;
-width: calc(100% - 20px);
-display: flex;
-align-items: center;
-justify-content: flex-end;  
-padding-right: 20px;
-${fonts.menuFont}
-:hover{
-color: #3A3E46;
-background: #E9EFFF;
-}
-`;
-
-const MainPanel = styled.div`width: 70%`;
+const MainPanel = styled.div`width: 70%; display: flex; justify-content: space-between; flex-direction: column`;
 
 @inject('accountStore', 'dappStore')
 @observer
-export default class DappUi extends React.Component<IProps, IState> {
+class DappUi extends React.Component<IProps, IState> {
     state: IState = {};
 
     async componentDidMount() {
@@ -116,13 +118,17 @@ export default class DappUi extends React.Component<IProps, IState> {
         return <div css={styles.root}>
             <LeftPanel>
                 <Header><Logo/></Header>
-                {meta && Object.keys(meta.callableFuncTypes).map(key => <MenuItem key={key}>{key}</MenuItem>)}
+                {meta && Object.keys(meta.callableFuncTypes).map(key =>
+                    <ScrollIntoView css={styles.menuItem} key={key} selector={`#${key}`}>{key}</ScrollIntoView>)}
             </LeftPanel>
             <MainPanel>
                 <Header><Search isHeader/><Account/></Header>
                 {this.body}
+                <Footer/>
             </MainPanel>
         </div>
     }
 
 }
+
+export default DappUi

@@ -1,7 +1,7 @@
 /** @jsx jsx  **/
 import React from "react";
 import { SearchIcn } from "@src/assets/icons/SearchIcn";
-import { css, jsx, SerializedStyles } from "@emotion/core";
+import { css, jsx } from "@emotion/core";
 import styled from "@emotion/styled";
 
 const _Input = styled.input`
@@ -25,6 +25,14 @@ interface IProps {
     withSearchIcon?: boolean
     onSubmit?: (value: string) => void
     defaultValue?: string
+    value?: string
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+    css?: any
+    min?: number
+    type?: 'number'
+    uncontrolled?: boolean
+    disabled?: boolean
+
 }
 
 interface IState {
@@ -33,7 +41,7 @@ interface IState {
 
 export default class Input extends React.Component<IProps, IState> {
 
-    state = {value: this.props.defaultValue || ''};
+    state = {value:  this.props.defaultValue || ''};
 
     handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && this.props.onSubmit) {
@@ -44,15 +52,17 @@ export default class Input extends React.Component<IProps, IState> {
     handleChangeValue = ({target: {value}}: React.ChangeEvent<HTMLInputElement>) => this.setState({value});
 
     render() {
-        const {withSearchIcon, onSubmit} = this.props;
+        const {withSearchIcon, onSubmit, css, uncontrolled, ...others} = this.props;
         const {value} = this.state;
-        return <div css={styles.root}>
-            <_Input
-                css={[withSearchIcon && onSubmit && styles.withSearchIconStyle]}
-                onKeyPress={this.handleKeyPress}
-                value={value}
-                onChange={this.handleChangeValue}
-            />
+        return <div css={[styles.root, css]}>
+            {uncontrolled ? <_Input
+                    css={[withSearchIcon && onSubmit && styles.withSearchIconStyle]}
+                    onKeyPress={this.handleKeyPress}
+                    value={value}
+                    onChange={this.handleChangeValue}
+                />
+                : <_Input css={[withSearchIcon && onSubmit && styles.withSearchIconStyle]}{...others}/>
+            }
             {withSearchIcon && onSubmit && <SearchIcn onClick={() => onSubmit(value)}/>}
         </div>;
     }

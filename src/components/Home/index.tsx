@@ -5,13 +5,8 @@ import { jsx } from "@emotion/core";
 import { Bg } from "@src/assets/icons/Bg";
 import Search from "@components/Search";
 
-const styles = {}
-
-export default class Home extends React.Component {
+export default class Home extends React.Component{
     render() {
-        return <Bg>
-            <Head/>
-            <Search />
-        </Bg>
+        return <Bg><Head/><Search/></Bg>
     }
 }

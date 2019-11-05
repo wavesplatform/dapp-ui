@@ -1,11 +1,15 @@
 import React from "react";
 import { ICallableArgumentType } from "@stores/DappStore";
+import Input from "@components/Input";
+import Select from "@components/DappUi/Select";
+import { css } from "@emotion/core";
 
 interface IArgumentInputProps {
     name: string
     type: ICallableArgumentType
     onChange: (name: string, type: ICallableArgumentType, value?: string) => void
     value?: string
+    css?: any
 }
 
 interface IArgumentInputState {
@@ -23,51 +27,44 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
         this.props.onChange(this.props.name, this.props.type, value);
 
     render() {
-        const {type, value} = this.props;
+        const {type, value, css: style} = this.props;
         const {byteVectorType} = this.state;
         switch (type) {
             case "Boolean":
-                return <select></select>
-                // <Select className={styles.argumentFieldInput} onChange={this.handleChange} value={value}>
-                //     <Select.Option value="true">true</Select.Option>
-                //     <Select.Option value="false">false</Select.Option>
-                // </Select>;
+            return <Select css={style} onChange={(e) => this.handleChange(e.target.value)} value={value}>
+                <option/>
+                <option value="false">false</option>
+                <option value="true">true</option>
+            </Select>;
+
             case "ByteVector":
-                return <select></select>
-            {/*<div className={styles.byteVectorField}>*/}
-                {/*    <Select*/}
-                        // className={styles.byteVectorSwitch}
-                        // value={byteVectorType}
-                        // onChange={this.handleChangeByteVectorType}
-                    // >
-                        {/*<Select.Option value="base58">base58</Select.Option>*/}
-                        {/*<Select.Option value="base64">base64</Select.Option>*/}
-                    // </Select>
-                    {/*<Input*/}
-                        // className={styles.byteVectorInput}
-                        // onChange={(e) => this.handleChange(e.target.value)}
-                        // value={value}
-                    // />
-                // </div>;
+                return <>
+                    <Select
+                        value={byteVectorType}
+                        onChange={(e) => this.handleChangeByteVectorType(e.target.value as 'base58' | 'base64')}
+                        css={[style, css`margin-right: 8px`]}
+                    >
+                        <option value="base58">base58</option>
+                        <option value="base64">base64</option>
+                    </Select>
+                    <Input onChange={(e) => this.handleChange(e.target.value)} value={value} css={style}/>
+                </>;
+
             case "Int":
-                return <input type="text"/>
-                {/*<InputNumber*/}
-                    // min={0}
-                    // type="number"
-                    // value={value ? +value : undefined}
-                    // className={styles.argumentFieldInput}
-                    // onChange={(v) => this.handleChange(v && !isNaN(v) ? String(v) : undefined)}
-                // />;
+                return <Input
+                    min={0}
+                    type="number"
+                    value={value}
+                    css={style}
+                    onChange={({target: {value: v}}: React.ChangeEvent<HTMLInputElement>) =>
+                        this.handleChange(!isNaN(+v) ? String(v) : undefined)
+                    }
+                />;
+
             case "String":
-                return <input type="text"/>
-            {/*<Input*/}
-                    // onChange={(e) => this.handleChange(e.target.value)}
-                    // className={styles.argumentFieldInput}
-                    // value={value}
-                // />;
+                return <Input onChange={(e) => this.handleChange(e.target.value)} value={value} css={style}/>;
             default:
-                return<input type="text"/>
-                    // <Input className={styles.argumentFieldInput} disabled/>;
+                return <Input css={style} disabled/>;
         }
     }
 }

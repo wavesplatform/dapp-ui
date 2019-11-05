@@ -7,6 +7,7 @@ import App from '@components/App';
 import { loadState, saveState } from "@utils/index";
 import { autorun } from "mobx";
 import './index.css'
+import 'rc-notification/assets/index.css'
 const initState = loadState();
 const mobXStore = new RootStore(initState);
 autorun(() => {

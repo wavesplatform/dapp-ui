@@ -1,11 +1,13 @@
 import React from 'react';
 import { inject, observer } from 'mobx-react';
 import { AccountStore, SettingsStore } from "@stores";
-import { Router, Route } from 'react-router-dom';
+import { Route, Router } from 'react-router-dom';
 import { History } from 'history';
 import DappUi from "@components/DappUi";
 import NotificationsStore from "@stores/NotificationStore";
 import Home from "@components/Home";
+import styled from "@emotion/styled";
+import { fonts } from "@src/styles";
 
 interface IProps {
     accountStore?: AccountStore
@@ -18,6 +20,8 @@ interface IState {
     collapsedSidebar: boolean
 }
 
+
+
 @inject('accountStore', 'settingsStore')
 @observer
 class App extends React.Component<IProps, IState> {
@@ -25,9 +29,6 @@ class App extends React.Component<IProps, IState> {
     state = {
         collapsedSidebar: true
     };
-
-    toggleSidebar = () => this.setState({collapsedSidebar: !this.state.collapsedSidebar});
-
 
     componentDidMount(): void {
         const accountStore = this.props.accountStore!;
@@ -45,12 +46,14 @@ class App extends React.Component<IProps, IState> {
 
     render() {
         const {wavesKeeperAccount, network} = this.props.accountStore!;
-        const address = wavesKeeperAccount && wavesKeeperAccount.address;
-        console.log(window.location.origin === window.location.pathname);
-        return <Router history={this.props.history}>
-            <Route exact path="/" component={Home}/>
-            <Route path="/:string" component={DappUi}/>
-        </Router>
+        // const address = wavesKeeperAccount && wavesKeeperAccount.address;
+        // console.log(window.location.origin === window.location.pathname);
+        return <>
+            <Router history={this.props.history}>
+                <Route exact path="/" component={Home}/>
+                <Route path="/:string" component={DappUi}/>
+            </Router>
+        </>
     }
 }
 
