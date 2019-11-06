@@ -19,10 +19,10 @@ interface IWavesKeeperAccount {
     }
 }
 
-interface INetwork {
+export interface INetwork {
     code: string,
     server: string,
-    matcher: string
+    matcher?: string
 }
 
 interface IKeeperError {
