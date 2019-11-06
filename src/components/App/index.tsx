@@ -10,7 +10,7 @@ import Home from "@components/Home";
 interface IProps {
     accountStore?: AccountStore
     settingsStore?: SettingsStore
-    notificationsStore?: NotificationsStore
+    notificationStore?: NotificationsStore
     history: History
 }
 
@@ -19,7 +19,7 @@ interface IState {
 }
 
 
-@inject('accountStore', 'settingsStore')
+@inject('accountStore', 'settingsStore', 'notificationStore')
 @observer
 class App extends React.Component<IProps, IState> {
 
@@ -32,7 +32,7 @@ class App extends React.Component<IProps, IState> {
         if (accountStore.isBrowserSupportsWavesKeeper) {
             accountStore.setupWavesKeeper();
         } else {
-            this.props.notificationsStore!.notify('you use unsupported browser', {
+            this.props.notificationStore!.notify('you use unsupported browser', {
                 type: 'warning',
                 link: "https://wavesplatform.com/technology/keeper",
                 linkTitle: 'more'
