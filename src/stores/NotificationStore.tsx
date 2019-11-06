@@ -55,16 +55,15 @@ class NotificationStore extends SubStore {
         if (opts.key) {
             this._instance.removeNotice(opts.key);
         }
-
         const type = opts.type || 'info';
 
         this._instance && this._instance.notice({
             ...opts,
-            content: getAlert(content, type, opts.title || type),
+            content: getAlert(content, {...opts, type}),
             style: {...styles[type], ...opts.style},
             duration: opts.duration || 10,
             key: opts.key,
-            closable: opts.closable
+            closable: true
         });
     }
 }

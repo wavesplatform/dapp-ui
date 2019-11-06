@@ -36,7 +36,7 @@ class App extends React.Component<IProps, IState> {
             accountStore.setupWavesKeeper();
         } else {
             this.props.notificationsStore!.notify('you use unsupported browser', {
-                type: 'error',
+                type: 'warning',
                 link: "https://wavesplatform.com/technology/keeper",
                 linkTitle: 'more'
             });

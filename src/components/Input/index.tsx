@@ -29,6 +29,7 @@ interface IProps {
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
     css?: any
     min?: number
+    step?: number
     type?: 'number'
     uncontrolled?: boolean
     disabled?: boolean

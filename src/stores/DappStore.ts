@@ -82,7 +82,7 @@ class DappStore extends SubStore {
         args.filter(({value}) => value != undefined)
             .map(({type, value}) => ({type, value: this.convertArgValue(type, value)}));
 
-    callCallableFunction = (address: string, func: string, args: IArgumentInput[], payment?: IKeeperTransactionPayment) => {
+    callCallableFunction = (address: string, func: string, args: IArgumentInput[], payment: IKeeperTransactionPayment[]) => {
         const {accountStore} = this.rootStore;
         const transactionData: IKeeperTransactionData = {
             dApp: address,
@@ -91,10 +91,8 @@ class DappStore extends SubStore {
                 args: this.convertArgs(args)
             },
             fee: {tokens: '0.005', assetId: 'WAVES'},
-            payment: []
+            payment
         };
-
-        if (payment) transactionData.payment.push(payment);
 
         const tx: IKeeperTransaction = {
             type: 16,
@@ -102,7 +100,7 @@ class DappStore extends SubStore {
         };
 
         if (!accountStore.isApplicationAuthorizedInWavesKeeper) {
-            this.rootStore.notificationStore.notify('Application is not authorized in WavesKeeper', {type: 'error'});
+            this.rootStore.notificationStore.notify('Application is not authorized in WavesKeeper', {type: 'warning'});
             return
         }
         window['WavesKeeper'].signAndPublishTransaction(tx).then((tx: any) => {
@@ -112,7 +110,7 @@ class DappStore extends SubStore {
             this.rootStore.notificationStore
                 .notify(`${accountStore.network!.server}\n do not forget to choose a network`,
                     {
-                        type: 'success',
+                        type: 'info',
                         link: `https://wavesexplorer.com/${network === 'mainnet' ? '' : `${network}/`}tx/${transaction.id}`,
                         linkTitle: 'show in explorer'
                     })

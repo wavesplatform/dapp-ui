@@ -107,7 +107,7 @@ interface IProps extends IInjectedProps {
 
 interface IState {
     args: { [name: string]: IArgumentInput }
-    payments: { asset: string, count: number }[]
+    payments: { assetId: string, tokens: number }[]
 }
 
 @inject('dappStore', 'accountStore')
@@ -117,14 +117,13 @@ export default class Card extends React.Component<IProps, IState> {
     get isInvalid() {
         const {args, payments} = this.state;
         const {funcArgs} = this.props;
-        const invalidPayment = payments.some(({asset, count}) => !asset || !count);
+        const invalidPayment = payments.some(({assetId, tokens}) => !assetId || !tokens);
         const invalidArgs = Object.keys(funcArgs).length !== Object.keys(args).length || Object.values(args)
             .some(({value}) => value === undefined || value === '');
-        console.log('invalidPayment', invalidPayment, 'invalidArgs', invalidArgs)
         return invalidPayment || invalidArgs
     }
 
-    handleAddAttach = () => this.setState({payments: [...this.state.payments, {asset: 'WAVES', count: 0}]});
+    handleAddAttach = () => this.setState({payments: [...this.state.payments, {assetId: 'WAVES', tokens: 0}]});
 
     handleRemoveAttach = (i: number) => () => {
         const payments = this.state.payments;
@@ -140,13 +139,13 @@ export default class Card extends React.Component<IProps, IState> {
     handleChangePaymentCount = (i: number) => ({target: {value: v}}: React.ChangeEvent<HTMLInputElement>) => {
         if (isNaN(+v)) return;
         const payments = this.state.payments;
-        payments[i].count = +v;
+        payments[i].tokens = +v;
         this.setState({payments})
     };
 
     handleChangePaymentAsset = (i: number) => ({target: {value: v}}: React.ChangeEvent<HTMLSelectElement>) => {
         const payments = this.state.payments;
-        payments[i].asset = v;
+        payments[i].assetId = v;
         this.setState({payments})
     };
 
@@ -159,11 +158,7 @@ export default class Card extends React.Component<IProps, IState> {
 
         const {dappStore, address, funcName: func} = this.props;
         const args = Object.values(this.state.args);
-        const payment = undefined;
-        // isSwitchedAttachPayment && payCount
-        //     ? {assetId: blockchain, tokens: payCount}
-        //     : undefined;
-        dappStore!.callCallableFunction(address, func, args, payment);
+        dappStore!.callCallableFunction(address, func, args, this.state.payments);
     };
 
 
@@ -196,13 +191,13 @@ export default class Card extends React.Component<IProps, IState> {
             </ArgumentsLayout>
             <FlexBlock>
                 <AttachPaymentItems>
-                    {this.state.payments.map(({asset, count}, i) =>
+                    {this.state.payments.map(({assetId, tokens}, i) =>
                         <AttachPaymentItem key={i}>
-                            <Select onChange={this.handleChangePaymentAsset(i)} value={asset}>
+                            <Select onChange={this.handleChangePaymentAsset(i)} value={assetId}>
                                 {accountStore!.assets.map(({assetId, name}) =>
                                     <option key={assetId} value={assetId}>{name}</option>)}
                             </Select>
-                            <Input type="number" onChange={this.handleChangePaymentCount(i)} value={String(count)}/>
+                            <Input type="number" min={0} step={0.00000001} onChange={this.handleChangePaymentCount(i)} value={String(tokens)}/>
                             <Close onClick={this.handleRemoveAttach(i)}/>
                         </AttachPaymentItem>)}
                 </AttachPaymentItems>
