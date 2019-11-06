@@ -1,5 +1,6 @@
 {
   "name": "new-dapui",
+  "homepage": "https://wavesplatform.github.io/dapp-ui",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -31,6 +32,7 @@
     "eslint-plugin-react-hooks": "^1.6.1",
     "file-loader": "3.0.1",
     "fs-extra": "7.0.1",
+    "gh-pages": "^2.1.1",
     "html-webpack-plugin": "4.0.0-beta.5",
     "identity-img": "^2.0.0",
     "identity-obj-proxy": "3.0.0",
@@ -73,7 +75,9 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "react-app"
