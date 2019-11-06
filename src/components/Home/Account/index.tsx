@@ -16,18 +16,31 @@ interface IProps {
     accountStore?: AccountStore
 }
 
+const ErrorText = styled.div`
+color: #EF7362
+`
+
 @inject('accountStore')
 @observer
 export default class Account extends React.Component<IProps> {
     render() {
         const {wavesKeeperAccount, network} = this.props.accountStore!;
+        const pathname = window.location.pathname.replace('/', '');
+        const networkByAddress = this.props.accountStore!.getNetworkByAddress(pathname)
+
+        const isInvalidServer = networkByAddress && network && networkByAddress.server !== network.server
+
+
         return wavesKeeperAccount && network
             ? <Root>
                 <AccountDescription>
                     <div css={fonts.addressFont}>{wavesKeeperAccount.address}</div>
-                    <div css={[fonts.descriptionFont, css`display: flex;justify-content: flex-end`]}>
+                    <div
+                        css={[fonts.descriptionFont, css`display: flex;justify-content: flex-end; align-items: center`]}>
                         <Wifi/>
-                        {getNetwork(network.server)}</div>
+                        {getNetwork(network.server)}
+                        {isInvalidServer && <ErrorText>&nbsp;invalid network</ErrorText>}
+                    </div>
                 </AccountDescription>
                 <Avatar address={wavesKeeperAccount.address}/>
             </Root>
@@ -43,7 +56,12 @@ export default class Account extends React.Component<IProps> {
 const getNetwork = (url: string) => {
     switch (url) {
         case 'https://pool.testnet.wavesnodes.com/':
+        case  'https://testnodes.wavesnodes.com/':
             return <p css={css`border-bottom:1px  #9BA6B1  dashed;`}>TestNet</p>;
+        case 'https://nodes.wavesplatform.com/':
+            return <p css={css`border-bottom:1px  #9BA6B1  dashed;`}>MainNet</p>;
+        case 'https://nodes-stagenet.wavesnodes.com/':
+            return <p css={css`border-bottom:1px  #9BA6B1  dashed;`}>StageNet</p>;
         default:
             return ''
     }

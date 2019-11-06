@@ -1,7 +1,4 @@
-const bs58 = require('bs58');
-
-
-export const checkSlash = (url) => url[url.length -1] === '/' ? url : url + '/';
+export const checkSlash = (url) => url[url.length - 1] === '/' ? url : url + '/';
 
 export function getCurrentBrowser() {
     // Opera 8.0+
@@ -50,7 +47,7 @@ export const loadState = () => {
         return state || undefined;
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return undefined;
     }
 
@@ -60,11 +57,3 @@ export const saveState = (state) => {
     localStorage.setItem('store', JSON.stringify(state));
 };
 
-export const getNetworkByAddress = (address) => {
-    switch (String.fromCharCode(bs58.decode(address)[1])) {
-        case 'T': return {server: 'https://nodes-testnet.wavesnodes.com', code: 'T'};
-        case 'S': return {server: 'https://nodes-stagenet.wavesnodes.com', code: 'S'};
-        case 'W': return {server: 'https://nodes.wavesplatform.com', code: 'W'};
-        default: return null;
-    }
-}

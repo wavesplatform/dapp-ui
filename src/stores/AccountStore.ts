@@ -1,6 +1,6 @@
 import { action, autorun, computed, observable, set } from 'mobx';
 import { SubStore } from './SubStore';
-
+import bs58 from 'bs58';
 import { checkSlash, getCurrentBrowser } from '@utils';
 
 interface IWavesKeeperAccount {
@@ -59,7 +59,7 @@ class AccountStore extends SubStore {
         const server = publicState.network.server;
         const path = `${checkSlash(server)}assets/balance/${publicState.account.address}`;
         const resp = await fetch(path);
-        const assets: {balances: {assetId: string, issueTransaction: {name: string}}[]} = await (resp).json();
+        const assets: { balances: { assetId: string, issueTransaction: { name: string } }[] } = await (resp).json();
         if ('balances' in assets) {
             this.assets = [
                 {name: 'WAVES', assetId: 'WAVES'},
@@ -172,6 +172,24 @@ class AccountStore extends SubStore {
             });
         });
     }
+
+    getNetworkByAddress = (address: string): INetwork | null => {
+        try {
+            switch (String.fromCharCode(bs58.decode(address)[1])) {
+                case 'T':
+                    return {server: 'https://nodes-testnet.wavesnodes.com', code: 'T'};
+                case 'S':
+                    return {server: 'https://nodes-stagenet.wavesnodes.com', code: 'S'};
+                case 'W':
+                    return {server: 'https://nodes.wavesplatform.com', code: 'W'};
+            }
+
+        } catch (e) {
+            this.rootStore.notificationStore.notify(e.message, {type: 'error'})
+        }
+        return null
+    }
+
 }
 
 export default AccountStore;

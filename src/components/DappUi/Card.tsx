@@ -195,7 +195,7 @@ export default class Card extends React.Component<IProps, IState> {
                         <AttachPaymentItem key={i}>
                             <Select onChange={this.handleChangePaymentAsset(i)} value={assetId}>
                                 {accountStore!.assets.map(({assetId, name}) =>
-                                    <option key={assetId} value={assetId}>{name}</option>)}
+                                    <option key={assetId} value={assetId}>{name}({assetId})</option>)}
                             </Select>
                             <Input type="number" min={0} step={0.00000001} onChange={this.handleChangePaymentCount(i)} value={String(tokens)}/>
                             <Close onClick={this.handleRemoveAttach(i)}/>

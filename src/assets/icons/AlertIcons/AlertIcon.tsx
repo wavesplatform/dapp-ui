@@ -1,8 +1,8 @@
 import styled from "@emotion/styled";
 import err from './err.svg'
 import suc from './succ.svg'
-import info from './info.svg'//todo fix
-import warn from './warning.svg'//todo fix
+import info from './info.svg'
+import warn from './warning.svg'
 
 export const ErrorIcn =  styled.div`
 width: 58px;

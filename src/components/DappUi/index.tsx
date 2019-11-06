@@ -14,8 +14,6 @@ import DappBody from "@components/DappUi/DappBody";
 import { fonts } from "@src/styles";
 import ScrollIntoView from 'react-scroll-into-view'
 import Footer from "@components/Footer";
-import { getNetworkByAddress } from "@utils/index";
-import { INetwork } from "@stores/AccountStore";
 
 const styles = {
     root: css`
@@ -81,8 +79,7 @@ class DappUi extends React.Component<IProps, IState> {
         const pathname = window.location.pathname
             .replace('/', '');
         autorun((reaction) => {
-            let {network} = this.props.accountStore!;
-            if(!network) network = getNetworkByAddress(pathname) as INetwork | null;
+            const network = this.props.accountStore!.getNetworkByAddress(pathname);
             if (network) {
                 this.setState({server: network.server});
                 this.props.dappStore!.getDappMeta(pathname, network.server).then(res => {
@@ -106,7 +103,7 @@ class DappUi extends React.Component<IProps, IState> {
         const accountStore = this.props.accountStore!;
         let server = accountStore.network && accountStore.network.server;
         if(!server){
-            const network =  getNetworkByAddress(pathname) as INetwork | null;
+            const network =  this.props.accountStore!.getNetworkByAddress(pathname);
             if(network) server  = network.server
         }
         if (server !== this.state.server) this.updateMeta();

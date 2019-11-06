@@ -64,6 +64,7 @@ declare module '*.module.sass' {
 }
 
 declare module 'rc-notification';
+declare module 'bs58';
 declare module 'react-scroll-into-view';
 declare interface Window {
     WavesKeeper: any
