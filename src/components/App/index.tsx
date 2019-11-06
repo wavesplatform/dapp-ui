@@ -6,8 +6,6 @@ import { History } from 'history';
 import DappUi from "@components/DappUi";
 import NotificationsStore from "@stores/NotificationStore";
 import Home from "@components/Home";
-import styled from "@emotion/styled";
-import { fonts } from "@src/styles";
 
 interface IProps {
     accountStore?: AccountStore
@@ -19,7 +17,6 @@ interface IProps {
 interface IState {
     collapsedSidebar: boolean
 }
-
 
 
 @inject('accountStore', 'settingsStore')
@@ -45,15 +42,10 @@ class App extends React.Component<IProps, IState> {
     }
 
     render() {
-        const {wavesKeeperAccount, network} = this.props.accountStore!;
-        // const address = wavesKeeperAccount && wavesKeeperAccount.address;
-        // console.log(window.location.origin === window.location.pathname);
-        return <>
-            <Router history={this.props.history}>
-                <Route exact path="/" component={Home}/>
-                <Route path="/:string" component={DappUi}/>
-            </Router>
-        </>
+        return <Router history={this.props.history}>
+            <Route exact path="/" component={Home}/>
+            <Route path="/:string" component={DappUi}/>
+        </Router>
     }
 }
 
