@@ -42,7 +42,9 @@ class App extends React.Component<IProps, IState> {
     }
 
     render() {
-        const path = window.location.origin.includes('https://wavesplatform.github.io') ? '/dapp-ui' : '';
+        let path = '';
+        if(window.location.origin.includes('https://wavesplatform.github.io') &&
+            !window.location.origin.includes('https://wavesplatform.github.io/dapp-ui')) path = '/dapp-ui'
         return <Router history={this.props.history}>
             <Route exact path={`${path}/`} component={Home}/>
             <Route path={`${path}/:string`} component={DappUi}/>
