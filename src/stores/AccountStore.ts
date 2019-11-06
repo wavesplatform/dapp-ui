@@ -115,7 +115,7 @@ class AccountStore extends SubStore {
                     reaction.dispose();
                     console.error('keeper is not installed');
                     this.rootStore.notificationStore.notify('keeper is not installed', {
-                        type: 'error',
+                        type: 'warning',
                         link: "https://wavesplatform.com/technology/keeper",
                         linkTitle: 'install waves keeper'
                     });
