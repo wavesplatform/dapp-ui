@@ -76,8 +76,7 @@ class DappUi extends React.Component<IProps, IState> {
 
     updateMeta() {
         const pathname = window.location.pathname
-            .replace('/', '')
-            .replace('dapp-ui', '');
+            .replace('/', '');
         autorun((reaction) => {
             const {network} = this.props.accountStore!;
             if (network) {
