@@ -1,7 +1,7 @@
 import React from "react";
 import { ICallableArgumentType } from "@stores/DappStore";
 import Input from "@components/Input";
-import Select from "@components/DappUi/Select";
+import Select from "@components/Select";
 import { css } from "@emotion/core";
 
 interface IArgumentInputProps {

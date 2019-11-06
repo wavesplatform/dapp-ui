@@ -3,7 +3,7 @@ import React from "react";
 import { css, jsx } from "@emotion/core";
 import styled from "@emotion/styled";
 
-const _Select = styled.select`
+const Root = styled.select`
 outline: none;
 border: none;
 background: #F4F6FA;
@@ -34,9 +34,9 @@ export default class Select extends React.Component<IProps, IState> {
     render() {
         const { css, children, ...others} = this.props;
         return <div css={[styles.root, css]}>
-            <_Select css={[css]} {...others}>
+            <Root css={[css]} {...others}>
                 {children}
-            </_Select>
+            </Root>
         </div>;
     }
 }

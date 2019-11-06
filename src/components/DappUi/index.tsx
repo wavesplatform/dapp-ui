@@ -104,10 +104,14 @@ class DappUi extends React.Component<IProps, IState> {
         const {isFailed, meta} = this.state;
         const pathname = window.location.pathname.replace('/', '');
         const accountStore = this.props.accountStore!;
-        const server = accountStore.network && accountStore.network.server;
+        let server = accountStore.network && accountStore.network.server;
+        if(!server){
+            const network =  getNetworkByAddress(pathname) as INetwork | null;
+            if(network) server  = network.server
+        }
         if (server !== this.state.server) this.updateMeta();
         switch (true) {
-            case isFailed || !pathname || !accountStore.isWavesKeeperInstalled || !accountStore.network:
+            case isFailed || !pathname || !this.state.server:
                 return <EmptyDapp/>;
             case meta !== undefined:
                 return <DappBody address={pathname} callableFuncTypes={(meta as IMeta).callableFuncTypes}/>;

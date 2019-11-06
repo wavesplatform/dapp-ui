@@ -10,7 +10,7 @@ import Close from "@src/assets/icons/Close";
 import Input from "@components/Input";
 import { inject, observer } from "mobx-react";
 import AccountStore from "@stores/AccountStore";
-import Select from "@components/DappUi/Select";
+import Select from "@components/Select";
 
 const flexStyle = css`display: flex;width: 100%;`;
 

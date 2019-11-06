@@ -1,4 +1,3 @@
-import React from "react";
 import icon from './close.svg';
 import styled from "@emotion/styled";
 

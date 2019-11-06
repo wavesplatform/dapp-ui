@@ -7,6 +7,7 @@ import { inject, observer } from "mobx-react";
 import AccountStore from "@stores/AccountStore";
 import NotificationsStore from "@stores/NotificationStore";
 import { RouteComponentProps, withRouter } from "react-router";
+import { getNetworkByAddress } from "@utils/index";
 
 const styles = {
     bg: css`
@@ -28,7 +29,7 @@ const styles = {
 
 interface IInjectedProps {
     accountStore?: AccountStore
-    notificationsStore?: NotificationsStore
+    notificationStore?: NotificationsStore
 }
 
 interface IProps extends IInjectedProps, RouteComponentProps {
@@ -36,14 +37,15 @@ interface IProps extends IInjectedProps, RouteComponentProps {
 }
 
 
-@inject('accountStore')
+@inject('accountStore', 'notificationStore')
 @observer
-class _Search extends React.Component<IProps> {
+class SearchTemp extends React.Component<IProps> {
 
     handleSearch = (value: string) => {
-        const network = this.props.accountStore!.network;
+        let network = this.props.accountStore!.network;
+        if (!network) network = getNetworkByAddress(value);
         if (network == null) {
-            this.props.notificationsStore!.notify('Cannot find network', {type: 'error'});
+            this.props.notificationStore!.notify('Cannot find network', {type: 'error'});
             return;
         }
         const history = this.props.history;
@@ -69,5 +71,5 @@ class _Search extends React.Component<IProps> {
 
 }
 
-const Search = withRouter((props: IProps) => <_Search {...props}/>);
+const Search = withRouter((props: IProps) => <SearchTemp {...props}/>);
 export default Search;

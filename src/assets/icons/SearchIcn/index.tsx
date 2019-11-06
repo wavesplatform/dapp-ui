@@ -19,7 +19,8 @@ interface IProps {
 
 export const SearchIcn: React.FunctionComponent<IProps> = ({onClick}) =>
     <div css={rootStyle} onClick={onClick}>
-        <img src={vector} alt={'image'}/>
+        {/* eslint-disable-next-line jsx-a11y/img-redundant-alt */}
+        <img src={vector} alt="image"/>
     </div>;
 
 

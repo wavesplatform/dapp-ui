@@ -1,6 +1,4 @@
 import { action, autorun, computed, observable, set } from 'mobx';
-
-import { RootStore } from '@stores';
 import { SubStore } from './SubStore';
 
 import { checkSlash, getCurrentBrowser } from '@utils';
@@ -47,10 +45,6 @@ class AccountStore extends SubStore {
 
     @observable network: INetwork | null = null;
     @observable assets: IAsset[] = [{name: 'WAVES', assetId: 'WAVES'}];
-
-    constructor(rootStore: RootStore) {
-        super(rootStore);
-    }
 
     @computed
     get isBrowserSupportsWavesKeeper(): boolean {

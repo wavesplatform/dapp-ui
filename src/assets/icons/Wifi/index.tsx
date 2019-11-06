@@ -1,8 +1,13 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core'
+import { jsx } from '@emotion/core'
 import React from "react";
 import wifi from './wifi.svg'
+import styled from "@emotion/styled";
 
-export const Wifi: React.FunctionComponent = () => <img css={css`margin-right: 8px;`} src={wifi} alt={'image'}/>;
+const Root = styled.img`margin-right: 8px;`;
+
+
+export const Wifi: React.FunctionComponent = () =>
+    <Root src={wifi} alt="image"/>;
 
 

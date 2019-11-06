@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
-import * as React from 'react';
+import React from 'react';
 import * as avatar from 'identity-img';
 
 const styles = css`
@@ -23,7 +23,7 @@ interface IProps {
     onClick?: () => void
 }
 
-const Avatar = (props: IProps) => {
+const Avatar: React.FunctionComponent<IProps> = (props) => {
     const {size = SIZE, address, onClick} = props;
     avatar.config({rows: 8, cells: 8});
     const src = address ? avatar.create(address, {size: size * 3}) : '';

@@ -1,5 +1,4 @@
 import { SubStore } from './SubStore';
-import { RootStore } from '@stores';
 import { checkSlash } from '@utils'
 
 export interface IArgumentInput {
@@ -59,12 +58,6 @@ export interface IKeeperTransaction {
 
 class DappStore extends SubStore {
 
-
-    constructor(rootStore: RootStore) {
-        super(rootStore);
-    }
-
-
     getDappMeta = async (address: string, server: string) => {
         const path = `${checkSlash(server)}addresses/scriptInfo/${address}/meta`;
         const resp = await fetch(path);
@@ -72,14 +65,17 @@ class DappStore extends SubStore {
     };
 
     private convertArgValue = (type: ICallableArgumentType, value?: string): (string | number | boolean) => {
-        if (value === undefined) throw 'value is undefined';
+        if (value === undefined){
+            this.rootStore.notificationStore.notify('value is undefined', {type: 'error'});
+            return ''
+        }
         if (type === 'Boolean' && ['true', 'false'].includes(value)) return value === 'true';
         if (type === 'Int' && !isNaN(+value)) return +value;
         else return value
     };
 
     private convertArgs = (args: IArgumentInput[]): IKeeperTransactionDataCallArg[] =>
-        args.filter(({value}) => value != undefined)
+        args.filter(({value}) => value !== undefined)
             .map(({type, value}) => ({type, value: this.convertArgValue(type, value)}));
 
     callCallableFunction = (address: string, func: string, args: IArgumentInput[], payment: IKeeperTransactionPayment[]) => {

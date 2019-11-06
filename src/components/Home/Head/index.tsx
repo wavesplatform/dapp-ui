@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core'
+import { jsx } from '@emotion/core'
 import React from "react";
 import { AccountStore } from "@stores/index";
 import { Logo } from "@src/assets/icons/Logo";

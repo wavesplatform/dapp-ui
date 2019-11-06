@@ -1,4 +1,3 @@
-import React from "react";
 import styled from "@emotion/styled";
 import attach from './attach.svg'
 import attachActive from './attachActive.svg'

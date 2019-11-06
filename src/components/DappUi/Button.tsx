@@ -8,7 +8,7 @@ interface IProps {
     children?: any
 }
 
-const _Button = styled.button`
+const Root = styled.button`
 background: #7CA1FD;
 border-radius: 4px;
 width: 150px;
@@ -25,6 +25,6 @@ cursor: not-allowed;
 `
 
 const Button: FunctionComponent<IProps> = ({onClick, disabled, children}) =>
-    <_Button onClick={onClick} disabled={disabled}>{children}</_Button>;
+    <Root onClick={onClick} disabled={disabled}>{children}</Root>;
 
 export default Button

@@ -4,7 +4,7 @@ import { SearchIcn } from "@src/assets/icons/SearchIcn";
 import { css, jsx } from "@emotion/core";
 import styled from "@emotion/styled";
 
-const _Input = styled.input`
+const Root = styled.input`
 outline: none;
 border: none;
 background: #F4F6FA;
@@ -56,13 +56,13 @@ export default class Input extends React.Component<IProps, IState> {
         const {withSearchIcon, onSubmit, css, uncontrolled, ...others} = this.props;
         const {value} = this.state;
         return <div css={[styles.root, css]}>
-            {uncontrolled ? <_Input
+            {uncontrolled ? <Root
                     css={[withSearchIcon && onSubmit && styles.withSearchIconStyle]}
                     onKeyPress={this.handleKeyPress}
                     value={value}
                     onChange={this.handleChangeValue}
                 />
-                : <_Input css={[withSearchIcon && onSubmit && styles.withSearchIconStyle]}{...others}/>
+                : <Root css={[withSearchIcon && onSubmit && styles.withSearchIconStyle]}{...others}/>
             }
             {withSearchIcon && onSubmit && <SearchIcn onClick={() => onSubmit(value)}/>}
         </div>;
