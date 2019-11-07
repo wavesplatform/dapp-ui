@@ -28,8 +28,7 @@ export default class Account extends React.Component<IProps> {
         const pathname = window.location.pathname.replace('/', '');
         const networkByAddress = this.props.accountStore!.getNetworkByAddress(pathname)
 
-        const isInvalidServer = networkByAddress && network && networkByAddress.server !== network.server
-
+        const isInvalidServer = networkByAddress && network && networkByAddress.code !== network.code
 
         return wavesKeeperAccount && network
             ? <Root>
