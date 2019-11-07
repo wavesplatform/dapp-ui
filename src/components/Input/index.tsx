@@ -1,5 +1,5 @@
 /** @jsx jsx  **/
-import React from "react";
+import React, { FocusEventHandler } from "react";
 import { SearchIcn } from "@src/assets/icons/SearchIcn";
 import { css, jsx } from "@emotion/core";
 import styled from "@emotion/styled";
@@ -24,6 +24,7 @@ const styles = {
 interface IProps {
     withSearchIcon?: boolean
     onSubmit?: (value: string) => void
+    onBlur?: (e: React.ChangeEvent<HTMLInputElement>) => void
     defaultValue?: string
     value?: string
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void

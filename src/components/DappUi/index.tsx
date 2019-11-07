@@ -124,8 +124,11 @@ class DappUi extends React.Component<IProps, IState> {
         return <div css={styles.root}>
             <LeftPanel>
                 <Header><Logo/></Header>
+                <div css={css` flex: 0; width: 100%; position: sticky; top: 10px;`}>
+
                 {meta && Object.keys(meta.callableFuncTypes).map(key =>
                     <ScrollIntoView css={styles.menuItem} key={key} selector={`#${key}`}>{key}</ScrollIntoView>)}
+                </div>
             </LeftPanel>
             <MainPanel>
                 <Header><Search isHeader/><Account/></Header>

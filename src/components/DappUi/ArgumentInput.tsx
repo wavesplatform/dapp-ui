@@ -52,7 +52,6 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
 
             case "Int":
                 return <Input
-                    min={0}
                     type="number"
                     value={value}
                     css={style}

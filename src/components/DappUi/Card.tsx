@@ -107,7 +107,7 @@ interface IProps extends IInjectedProps {
 
 interface IState {
     args: { [name: string]: IArgumentInput }
-    payments: { assetId: string, tokens: number }[]
+    payments: { assetId: string, tokens: string }[]
 }
 
 @inject('dappStore', 'accountStore')
@@ -123,7 +123,12 @@ export default class Card extends React.Component<IProps, IState> {
         return invalidPayment || invalidArgs
     }
 
-    handleAddAttach = () => this.setState({payments: [...this.state.payments, {assetId: 'WAVES', tokens: 0}]});
+    handleAddAttach = () => this.setState({
+        payments: [...this.state.payments, {
+            assetId: 'WAVES',
+            tokens: (0).toFixed(8)
+        }]
+    });
 
     handleRemoveAttach = (i: number) => () => {
         const payments = this.state.payments;
@@ -137,9 +142,14 @@ export default class Card extends React.Component<IProps, IState> {
 
 
     handleChangePaymentCount = (i: number) => ({target: {value: v}}: React.ChangeEvent<HTMLInputElement>) => {
-        if (isNaN(+v)) return;
+        if (isNaN(+v) || +v < 0) return;
         const payments = this.state.payments;
-        payments[i].tokens = +v;
+        payments[i].tokens = v;
+        this.setState({payments})
+    };
+    handleBlurPaymentCount = (i: number) => ({target: {value: v}}: React.ChangeEvent<HTMLInputElement>) => {
+        const payments = this.state.payments;
+        payments[i].tokens = (+v).toFixed(this.props.accountStore!.assets[payments[i].assetId].decimals || 1e-8);
         this.setState({payments})
     };
 
@@ -155,10 +165,9 @@ export default class Card extends React.Component<IProps, IState> {
     };
 
     handleCall = () => {
-
         const {dappStore, address, funcName: func} = this.props;
         const args = Object.values(this.state.args);
-        dappStore!.callCallableFunction(address, func, args, this.state.payments);
+        dappStore!.callCallableFunction(address, func, args, this.state.payments.map(p => ({...p, tokens: +p.tokens})));
     };
 
 
@@ -191,15 +200,24 @@ export default class Card extends React.Component<IProps, IState> {
             </ArgumentsLayout>
             <FlexBlock>
                 <AttachPaymentItems>
-                    {this.state.payments.map(({assetId, tokens}, i) =>
-                        <AttachPaymentItem key={i}>
+                    {this.state.payments.map(({assetId, tokens}, i) => {
+                        const decimals = accountStore!.assets[assetId].decimals || 8;
+                        return <AttachPaymentItem key={i}>
                             <Select onChange={this.handleChangePaymentAsset(i)} value={assetId}>
-                                {accountStore!.assets.map(({assetId, name}) =>
+                                {Object.values(accountStore!.assets).map(({assetId, name}) =>
                                     <option key={assetId} value={assetId}>{name}({assetId})</option>)}
                             </Select>
-                            <Input type="number" min={0} step={0.00000001} onChange={this.handleChangePaymentCount(i)} value={String(tokens)}/>
+                            <Input
+                                type="number"
+                                min={0}
+                                step={10 ** -decimals}
+                                onChange={this.handleChangePaymentCount(i)}
+                                value={String(tokens)}
+                                // onBlur={this.handleBlurPaymentCount(i)}
+                            />
                             <Close onClick={this.handleRemoveAttach(i)}/>
-                        </AttachPaymentItem>)}
+                        </AttachPaymentItem>
+                    })}
                 </AttachPaymentItems>
                 <AttachPaymentBtn><Attach onClick={this.handleAddAttach}/></AttachPaymentBtn>
             </FlexBlock>

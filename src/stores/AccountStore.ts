@@ -1,7 +1,7 @@
 import { action, autorun, computed, observable, set } from 'mobx';
 import { SubStore } from './SubStore';
-import bs58 from 'bs58';
 import { checkSlash, getCurrentBrowser } from '@utils';
+import { base58Decode } from '@waves/ts-lib-crypto'
 
 interface IWavesKeeperAccount {
     address: string
@@ -29,9 +29,10 @@ interface IKeeperError {
     message: string
 }
 
-interface IAsset {
+export interface IAsset {
     assetId: string
     name: string
+    decimals: number
 }
 
 class AccountStore extends SubStore {
@@ -44,7 +45,7 @@ class AccountStore extends SubStore {
     @observable isApplicationAuthorizedInWavesKeeper: boolean = false;
 
     @observable network: INetwork | null = null;
-    @observable assets: IAsset[] = [{name: 'WAVES', assetId: 'WAVES'}];
+    @observable assets: { [name: string]: IAsset } = {'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8}};
 
     @computed
     get isBrowserSupportsWavesKeeper(): boolean {
@@ -59,12 +60,14 @@ class AccountStore extends SubStore {
         const server = publicState.network.server;
         const path = `${checkSlash(server)}assets/balance/${publicState.account.address}`;
         const resp = await fetch(path);
-        const assets: { balances: { assetId: string, issueTransaction: { name: string } }[] } = await (resp).json();
+        const assets: { balances: { assetId: string, issueTransaction: { name: string, decimals: number } }[] } = await (resp).json();
         if ('balances' in assets) {
-            this.assets = [
-                {name: 'WAVES', assetId: 'WAVES'},
-                ...assets.balances.map(({assetId, issueTransaction: {name}}) => ({assetId, name}))
-            ];
+
+            this.assets = {
+                'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8},
+                ...assets.balances.reduce((acc, {assetId, issueTransaction: {name, decimals}}) =>
+                    ({...acc, [assetId]: {assetId, name, decimals}}), {})
+            };
         }
     }
 
@@ -175,7 +178,7 @@ class AccountStore extends SubStore {
 
     getNetworkByAddress = (address: string): INetwork | null => {
         try {
-            switch (String.fromCharCode(bs58.decode(address)[1])) {
+            switch (String.fromCharCode(base58Decode(address)[1])) {
                 case 'T':
                     return {server: 'https://nodes-testnet.wavesnodes.com', code: 'T'};
                 case 'S':

@@ -104,11 +104,11 @@ class DappStore extends SubStore {
             const {network} = accountStore.wavesKeeperAccount!;
             console.log(transaction);
             this.rootStore.notificationStore
-                .notify(`${accountStore.network!.server}\n do not forget to choose a network`,
+                .notify(`Transaction sent: ${transaction.id}\n`,
                     {
-                        type: 'info',
+                        type: 'success',
                         link: `https://wavesexplorer.com/${network === 'mainnet' ? '' : `${network}/`}tx/${transaction.id}`,
-                        linkTitle: 'show in explorer'
+                        linkTitle: 'View transaction'
                     })
 
         }).catch((error: any) => {
