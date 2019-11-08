@@ -125,13 +125,15 @@ class DappUi extends React.Component<IProps, IState> {
             if (network) server = network.server
         }
         if (server !== this.state.server) this.updateMeta();
+
         switch (true) {
             case isFailed || !pathname || !this.state.server:
                 return <EmptyDapp/>;
             case meta !== undefined:
                 return <DappBody address={pathname} callableFuncTypes={(meta as IMeta).callableFuncTypes}/>;
             case meta === undefined:
-                return <div css={css`margin: 40%;`}>loading</div>;
+                return <div
+                    css={css`flex: 1;display: flex;justify-content: center;align-items: center;`}>loading</div>;
             default:
                 return null;
         }
