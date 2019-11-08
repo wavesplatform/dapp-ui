@@ -22,7 +22,7 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
 
     state: IArgumentInputState = {byteVectorType: 'base58'};
 
-    handleChangeByteVectorType = (byteVectorType: 'base58' | 'base64') =>{
+    handleChangeByteVectorType = (byteVectorType: 'base58' | 'base64') => {
         this.setState({byteVectorType});
         this.props.onChangeByteVectorType(this.props.name, byteVectorType)
     };
@@ -35,11 +35,11 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
         const {byteVectorType} = this.state;
         switch (type) {
             case "Boolean":
-            return <Select css={style} onChange={(e) => this.handleChange(e.target.value)} value={value}>
-                <option/>
-                <option value="false">false</option>
-                <option value="true">true</option>
-            </Select>;
+                return <Select css={style} onChange={(e) => this.handleChange(e.target.value)} value={value}>
+                    <option/>
+                    <option value="false">false</option>
+                    <option value="true">true</option>
+                </Select>;
 
             case "ByteVector":
                 return <>
@@ -51,7 +51,10 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
                         <option value="base58">base58</option>
                         <option value="base64">base64</option>
                     </Select>
-                    <Input onChange={(e) => this.handleChange(e.target.value)} value={value} css={style}/>
+                    <Input
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
+                        value={value} css={style}
+                    />
                 </>;
 
             case "Int":
@@ -65,10 +68,13 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
                 />;
 
             case "String":
-                return <Input onChange={(e) => this.handleChange(e.target.value)} value={value} css={style}/>;
+                return <Input
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
+                    value={value} css={style}
+                    />;
             default:
-                return <Input css={style} disabled/>;
-        }
-    }
-}
+            return <Input css={style} disabled/>;
+            }
+            }
+            }
 

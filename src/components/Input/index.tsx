@@ -10,7 +10,7 @@ width: 100%;
 padding: 0 10px;
 font-family: Roboto;
 font-size: 16px;
-${props => props.css}
+${(props: any) => props.css}
 `;
 
 export default Input
