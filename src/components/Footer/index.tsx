@@ -9,6 +9,6 @@ text-decoration: none;
 `;
 
 const Footer = () =>
-    <Root rel="noopener, noreferrer" href={'wavesplatform.com'} target="_blank">wavesplatform.com</Root>;
+    <Root rel="noopener, noreferrer" href={'https://wavesplatform.com'} target="_blank">wavesplatform.com</Root>;
 
 export default Footer

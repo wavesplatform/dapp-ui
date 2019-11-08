@@ -19,8 +19,8 @@ const styles = {
     root: css`
 background: linear-gradient(152.04deg, #FFFFFF 9.12%, #F0F7FC 104.06%);
 min-height: calc(100vh - 60px) ;
-display: flex;
-padding: 30px 10% 30px 0`,
+//display: flex;
+padding: 30px 0`,
     menuItem: css`
 height: 40px;
 width: calc(100% - 20px);
@@ -59,11 +59,29 @@ const LeftPanel = styled.div`
 display: flex;
 flex-direction: column;
 align-items: center;
-width: 20%
+width: 20%;
+overflow-y: scroll;
+::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
 `;
 
 
-const MainPanel = styled.div`width: 70%; display: flex; justify-content: space-between; flex-direction: column`;
+const MainPanel = styled.div`
+max-height: calc(100vh - 130px);
+overflow-y: scroll;
+width: 100%; 
+padding-right: 10%;
+display: flex; 
+justify-content: space-between; 
+flex-direction: column
+`;
 
 
 @inject('accountStore', 'dappStore')
@@ -102,9 +120,9 @@ class DappUi extends React.Component<IProps, IState> {
         const pathname = window.location.pathname.replace('/', '');
         const accountStore = this.props.accountStore!;
         let server = accountStore.network && accountStore.network.server;
-        if(!server){
-            const network =  this.props.accountStore!.getNetworkByAddress(pathname);
-            if(network) server  = network.server
+        if (!server) {
+            const network = this.props.accountStore!.getNetworkByAddress(pathname);
+            if (network) server = network.server
         }
         if (server !== this.state.server) this.updateMeta();
         switch (true) {
@@ -122,19 +140,28 @@ class DappUi extends React.Component<IProps, IState> {
     render() {
         const {meta} = this.state;
         return <div css={styles.root}>
-            <LeftPanel>
-                <Header><Logo/></Header>
-                <div css={css` flex: 0; width: 100%; position: sticky; top: 10px;`}>
+            <div css={css`display: flex;position: sticky;width: 100%;top: 10px;`}>
+                <LeftPanel>
+                    <Header><Logo/></Header>
+                </LeftPanel>
+                <MainPanel>
+                    <Header><Search isHeader/><Account/></Header>
+                </MainPanel>
+            </div>
+            <div css={css`display: flex`}>
+                <LeftPanel>
+                    <div css={css`height: calc(100vh - 130px);width: 100%;`}>
+                        {meta && Object.keys(meta.callableFuncTypes).map(key =>
+                            <ScrollIntoView css={styles.menuItem} key={key}
+                                            selector={`#${key}`}>{key}</ScrollIntoView>)}
+                    </div>
+                </LeftPanel>
+                <MainPanel>
+                    {this.body}
+                    <Footer/>
+                </MainPanel>
+            </div>
 
-                {meta && Object.keys(meta.callableFuncTypes).map(key =>
-                    <ScrollIntoView css={styles.menuItem} key={key} selector={`#${key}`}>{key}</ScrollIntoView>)}
-                </div>
-            </LeftPanel>
-            <MainPanel>
-                <Header><Search isHeader/><Account/></Header>
-                {this.body}
-                <Footer/>
-            </MainPanel>
         </div>
     }
 

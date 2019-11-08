@@ -8,14 +8,13 @@ const Root = styled.div`
 padding: 18px 25px 16px 25px;
 display: flex;
 flex-direction: column;
- width: 400px;
-  height: 120px;
+width: 400px;
+height:fit-content;
 `;
 
 const Body = styled.div`
 display: flex;
 ${fonts.alertBodyFont};
-height: 100vh;
 align-items: center;
 
 `;
@@ -30,6 +29,8 @@ display: flex;
 flex-direction: column;
 height: 100%;
 flex:4;
+word-wrap: break-word;
+width: 80%;
 `;
 
 const Link = styled.a`
@@ -53,7 +54,7 @@ const getAlert = (content: string | JSX.Element, {type, title, link, linkTitle}:
 
 const Icon: React.FunctionComponent<{ type: 'error' | 'info' | 'warning' | 'success' }> = ({type}) => {
     let icon = null;
-    const Root = styled.div`margin-right: 16px; flex: 1`
+    const Root = styled.div`margin-right: 16px; flex: 1`;
     switch (type) {
         case "error":
             icon = <ErrorIcn/>;

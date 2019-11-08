@@ -2,13 +2,13 @@
 import React from "react";
 import { css, jsx } from '@emotion/core'
 import { fonts } from "@src/styles";
-import Input from "@components/Input";
 import { inject, observer } from "mobx-react";
 import AccountStore from "@stores/AccountStore";
 import NotificationsStore from "@stores/NotificationStore";
 import { RouteComponentProps, withRouter } from "react-router";
 import { base58Decode } from '@waves/ts-lib-crypto'
 import { _hashChain } from '@waves/ts-lib-crypto/crypto/hashing'
+import UncontrolledInput from "@components/Input/UncontrolledInput";
 
 const styles = {
     bg: css`
@@ -76,15 +76,14 @@ class SearchTemp extends React.Component<IProps> {
         return isHeader
             ? <div css={css`display: flex; align-items: center; width: 490px;white-space: nowrap`}>
                 <div css={[fonts.descriptionFont, css`margin-right: 8px`]}>Smart Contract:</div>
-                <Input
+                <UncontrolledInput
                     defaultValue={window.location.pathname.replace('/', '')}
                     onSubmit={this.handleSearch}
-                    uncontrolled
                 />
             </div>
             : <div css={styles.bg}>
                 <div css={[fonts.searchTitleFont, styles.title]}>Search for Smart Contract</div>
-                <Input onSubmit={this.handleSearch} withSearchIcon uncontrolled/>
+                <UncontrolledInput onSubmit={this.handleSearch} withSearchIcon/>
             </div>
     }
 

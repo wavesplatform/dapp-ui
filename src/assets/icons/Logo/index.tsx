@@ -7,6 +7,6 @@ interface IProps {
     css?: SerializedStyles
 }
 export const Logo: React.FunctionComponent<IProps> = (props) =>
-    <img css={[props.css]} src={logo} alt={'Logo'}/>;
+    <a href="/"><img css={[props.css]} src={logo} alt={'Logo'}/></a>
 
 

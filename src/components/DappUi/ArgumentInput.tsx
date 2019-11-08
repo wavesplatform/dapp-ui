@@ -8,6 +8,7 @@ interface IArgumentInputProps {
     name: string
     type: ICallableArgumentType
     onChange: (name: string, type: ICallableArgumentType, value?: string) => void
+    onChangeByteVectorType: (name: string, byteVectorType: 'base58' | 'base64') => void
     value?: string
     css?: any
 }
@@ -21,7 +22,10 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
 
     state: IArgumentInputState = {byteVectorType: 'base58'};
 
-    handleChangeByteVectorType = (byteVectorType: 'base58' | 'base64') => this.setState({byteVectorType});
+    handleChangeByteVectorType = (byteVectorType: 'base58' | 'base64') =>{
+        this.setState({byteVectorType});
+        this.props.onChangeByteVectorType(this.props.name, byteVectorType)
+    };
 
     handleChange = (value?: string) =>
         this.props.onChange(this.props.name, this.props.type, value);

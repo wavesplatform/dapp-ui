@@ -15,7 +15,7 @@ import Select from "@components/Select";
 const flexStyle = css`display: flex;width: 100%;`;
 
 const Root = styled.div`
-${flexStyle};
+display: flex;
 background: white;
 box-shadow: 0 5px 16px rgba(134, 142, 164, 0.05);
 border-radius: 4px;
@@ -90,6 +90,7 @@ const Title = styled.div`${fonts.cardTitleFont}`;
 export interface IArgumentInput {
     type: ICallableArgumentType,
     value: string | undefined
+    byteVectorType?: 'base58' | 'base64'
 }
 
 
@@ -114,6 +115,16 @@ interface IState {
 @observer
 export default class Card extends React.Component<IProps, IState> {
 
+    constructor(props: IProps) {
+        super(props);
+        this.state = {
+            args: Object.entries(this.props.funcArgs).reduce((acc, [k, v]) =>
+                ({...acc, [k]: {type: v, byteVectorType: v === 'ByteVector' ? 'base58' : undefined}}), {}),
+            payments: []
+        };
+    }
+
+
     get isInvalid() {
         const {args, payments} = this.state;
         const {funcArgs} = this.props;
@@ -136,10 +147,11 @@ export default class Card extends React.Component<IProps, IState> {
         this.setState({payments});
     };
 
-
     handleChangeValue = (name: string, type: ICallableArgumentType, value?: string) =>
-        this.setState({args: {...this.state.args, [name]: {type, value}}});
+        this.setState({args: {...this.state.args, [name]: {...this.state.args[name], type, value}}});
 
+    handleChangeByteVectorType = (name: string, byteVectorType: 'base58' | 'base64') =>
+        this.setState({args: {...this.state.args, [name]: {...this.state.args[name], byteVectorType}}});
 
     handleChangePaymentCount = (i: number) => ({target: {value: v}}: React.ChangeEvent<HTMLInputElement>) => {
         if (isNaN(+v) || +v < 0) return;
@@ -147,6 +159,7 @@ export default class Card extends React.Component<IProps, IState> {
         payments[i].tokens = v;
         this.setState({payments})
     };
+
     handleBlurPaymentCount = (i: number) => ({target: {value: v}}: React.ChangeEvent<HTMLInputElement>) => {
         const payments = this.state.payments;
         payments[i].tokens = (+v).toFixed(this.props.accountStore!.assets[payments[i].assetId].decimals || 1e-8);
@@ -159,10 +172,6 @@ export default class Card extends React.Component<IProps, IState> {
         this.setState({payments})
     };
 
-    state: IState = {
-        args: {},
-        payments: []
-    };
 
     handleCall = () => {
         const {dappStore, address, funcName: func} = this.props;
@@ -172,7 +181,7 @@ export default class Card extends React.Component<IProps, IState> {
 
 
     render() {
-        const {funcName: title, funcArgs, accountStore} = this.props;
+        const {funcName: title, accountStore} = this.props;
         const {args} = this.state;
         return <Root id={title}>
             <Header>
@@ -180,8 +189,8 @@ export default class Card extends React.Component<IProps, IState> {
                 <Button onClick={this.handleCall} disabled={this.isInvalid}>{title}</Button>
             </Header>
             <ArgumentsLayout>
-                {Object.keys(funcArgs).length > 0 &&
-                Object.entries(funcArgs).map(([argName, type]: [string, ICallableArgumentType], i: number) =>
+                {Object.keys(args).length > 0 &&
+                Object.entries(args).map(([argName, {type}], i: number) =>
                     <ArgumentItem key={i}>
                         <ArgumentTitle>
                             <ArgumentTitleVarName>{argName}:</ArgumentTitleVarName>
@@ -194,6 +203,7 @@ export default class Card extends React.Component<IProps, IState> {
                             name={argName}
                             type={type}
                             onChange={this.handleChangeValue}
+                            onChangeByteVectorType={this.handleChangeByteVectorType}
                         />
                     </ArgumentItem>
                 )}
@@ -213,7 +223,7 @@ export default class Card extends React.Component<IProps, IState> {
                                 step={10 ** -decimals}
                                 onChange={this.handleChangePaymentCount(i)}
                                 value={String(tokens)}
-                                // onBlur={this.handleBlurPaymentCount(i)}
+                                onBlur={this.handleBlurPaymentCount(i)}
                             />
                             <Close onClick={this.handleRemoveAttach(i)}/>
                         </AttachPaymentItem>
@@ -224,3 +234,4 @@ export default class Card extends React.Component<IProps, IState> {
         </Root>
     }
 }
+
