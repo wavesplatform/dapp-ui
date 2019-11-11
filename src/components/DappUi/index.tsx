@@ -50,6 +50,7 @@ interface IState {
     meta?: IMeta,
     isFailed?: boolean,
     server?: string
+    byte?: string
 }
 
 
@@ -99,7 +100,7 @@ class DappUi extends React.Component<IProps, IState> {
         autorun((reaction) => {
             const network = this.props.accountStore!.getNetworkByAddress(pathname);
             if (network) {
-                this.setState({server: network.server});
+                this.setState({server: network.server, byte: network.code});
                 this.props.dappStore!.getDappMeta(pathname, network.server).then(res => {
                     if ('error' in res) {
                         this.setState({isFailed: true});
@@ -120,11 +121,15 @@ class DappUi extends React.Component<IProps, IState> {
         const pathname = window.location.pathname.replace('/', '');
         const accountStore = this.props.accountStore!;
         let server = accountStore.network && accountStore.network.server;
-        if (!server) {
+        let byte = accountStore.network && accountStore.network.code;
+        if (!server || !byte) {
             const network = this.props.accountStore!.getNetworkByAddress(pathname);
-            if (network) server = network.server
+            if (network) {
+                server = network.server;
+                byte = network.code;
+            }
         }
-        if (server !== this.state.server) this.updateMeta();
+        if (byte !== this.state.byte) this.updateMeta();
 
         switch (true) {
             case isFailed || !pathname || !this.state.server:
