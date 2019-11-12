@@ -119,12 +119,6 @@ class AccountStore extends SubStore {
                 } else if (window['WavesKeeper']) {
                     reaction.dispose();
                     this.isWavesKeeperInstalled = true;
-                    window['WavesKeeper'].publicState()
-                        .then((state: any) => this.updateNetwork(state))
-                        .catch((e: any) => {
-                            console.error(e);
-                            this.rootStore.notificationStore.notify(e.message, {type: 'error'});
-                        });
                 } else {
                     attemptsCount += 1;
                 }

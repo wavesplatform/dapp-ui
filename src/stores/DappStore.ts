@@ -68,7 +68,6 @@ class DappStore extends SubStore {
         }
         if (type === 'Boolean' && ['true', 'false'].includes(value)) return value === 'true';
         if (type === 'Int' && !isNaN(+value)) return +value;
-        console.log(type, byteVectorType)
         if (byteVectorType === 'base58') return`base64:${b58strTob64Str(value)}`;
         if (byteVectorType === 'base64') return`base64:${value}`;
         else return value
@@ -100,7 +99,6 @@ class DappStore extends SubStore {
             console.error(e);
             this.rootStore.notificationStore.notify(e, {type: 'error'});
         }
-        console.log(args)
         const transactionData: IKeeperTransactionData = {
             dApp: address,
             call: {
