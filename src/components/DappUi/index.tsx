@@ -76,7 +76,7 @@ overflow-y: scroll;
 
 const MainPanel = styled.div`
 max-height: calc(100vh - 130px);
-overflow-y: scroll;
+overflow-y: auto;
 width: 100%; 
 padding-right: 10%;
 display: flex; 
