@@ -63,20 +63,29 @@ align-items: center;
 width: 20%;
 overflow-y: scroll;
 ::-webkit-scrollbar {
-    width: 0;
+    width: 0 !important;
     height: 0;
     background: transparent;
-}
+};
 ::-webkit-scrollbar-thumb {
     background: transparent;
-}
+};
+scrollbar-width: none;
+-ms-overflow-style: none;
 
 `;
+
+const LeftHeaderCol = styled.div`
+display: flex;
+flex-direction: column;
+align-items: center;
+width: 20%;
+`
 
 
 const MainPanel = styled.div`
 max-height: calc(100vh - 130px);
-overflow-y: auto;
+overflow-y: scroll;
 width: 100%; 
 padding-right: 10%;
 display: flex; 
@@ -84,6 +93,11 @@ justify-content: space-between;
 flex-direction: column
 `;
 
+
+const RightHeaderRow = styled.div`
+width: 100%; 
+padding-right: 10%;
+`
 
 @inject('accountStore', 'dappStore')
 @observer
@@ -148,12 +162,12 @@ class DappUi extends React.Component<IProps, IState> {
         const {meta} = this.state;
         return <div css={styles.root}>
             <div css={css`display: flex;position: sticky;width: 100%;top: 10px;`}>
-                <LeftPanel>
+                <LeftHeaderCol>
                     <Header><Logo/></Header>
-                </LeftPanel>
-                <MainPanel>
+                </LeftHeaderCol>
+                <RightHeaderRow>
                     <Header><Search isHeader/><Account/></Header>
-                </MainPanel>
+                </RightHeaderRow>
             </div>
             <div css={css`display: flex`}>
                 <LeftPanel>
