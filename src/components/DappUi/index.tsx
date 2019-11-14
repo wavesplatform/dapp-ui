@@ -113,7 +113,6 @@ class DappUi extends React.Component<IProps, IState> {
             .replace('/', '');
         autorun((reaction) => {
             const network = this.props.accountStore!.getNetworkByAddress(pathname);
-            console.log(network)
             if (network) {
                 this.setState({server: network.server, byte: network.code});
                 this.props.dappStore!.getDappMeta(pathname, network.server).then(res => {
