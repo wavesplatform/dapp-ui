@@ -37,7 +37,7 @@ export default class Account extends React.Component<IProps> {
                     <div
                         css={[fonts.descriptionFont, css`display: flex;justify-content: flex-end; align-items: center`]}>
                         <Wifi/>
-                        {getNetwork(network.server)}
+                        {getNetwork(network.code)}
                         {isInvalidServer && <ErrorText>&nbsp;invalid network</ErrorText>}
                     </div>
                 </AccountDescription>
@@ -54,15 +54,14 @@ export default class Account extends React.Component<IProps> {
 
 const getNetwork = (url: string) => {
     switch (url) {
-        case 'https://pool.testnet.wavesnodes.com/':
-        case  'https://testnodes.wavesnodes.com/':
+        case 'T':
             return <p css={css`border-bottom:1px  #9BA6B1  dashed;`}>TestNet</p>;
-        case 'https://nodes.wavesplatform.com/':
+        case 'W':
             return <p css={css`border-bottom:1px  #9BA6B1  dashed;`}>MainNet</p>;
-        case 'https://nodes-stagenet.wavesnodes.com/':
+        case 'S':
             return <p css={css`border-bottom:1px  #9BA6B1  dashed;`}>StageNet</p>;
         default:
-            return ''
+            return <p css={css`border-bottom:1px  #9BA6B1  dashed;`}>Custom</p>
     }
 };
 

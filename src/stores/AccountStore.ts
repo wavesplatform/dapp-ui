@@ -179,6 +179,10 @@ class AccountStore extends SubStore {
                     return {server: 'https://nodes-stagenet.wavesnodes.com', code: 'S'};
                 case 'W':
                     return {server: 'https://nodes.wavesplatform.com', code: 'W'};
+                case 'D':
+                    return {server: 'http://localhost:3000', code: 'D'};
+                case 'R':
+                    return {server: 'http://localhost:6869', code: 'R'};
             }
 
         } catch (e) {

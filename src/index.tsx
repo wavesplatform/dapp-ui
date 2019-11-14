@@ -4,16 +4,9 @@ import { createBrowserHistory } from 'history';
 import { Provider as MobxProvider } from 'mobx-react';
 import { RootStore } from '@stores';
 import App from '@components/App';
-import { loadState, saveState } from "@utils/index";
-import { autorun } from "mobx";
 import './index.css'
 import 'rc-notification/assets/index.css'
-const initState = loadState();
-const mobXStore = new RootStore(initState);
-autorun(() => {
-    console.dir(mobXStore);
-    saveState(mobXStore.serialize());
-}, {delay: 1000});
+const mobXStore = new RootStore();
 
 const history = createBrowserHistory();
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { inject, observer } from 'mobx-react';
-import { AccountStore, SettingsStore } from "@stores";
+import { AccountStore } from "@stores";
 import { Route, Router } from 'react-router-dom';
 import { History } from 'history';
 import DappUi from "@components/DappUi";
@@ -9,7 +9,6 @@ import Home from "@components/Home";
 
 interface IProps {
     accountStore?: AccountStore
-    settingsStore?: SettingsStore
     notificationStore?: NotificationsStore
     history: History
 }
@@ -19,7 +18,7 @@ interface IState {
 }
 
 
-@inject('accountStore', 'settingsStore', 'notificationStore')
+@inject('accountStore', 'notificationStore')
 @observer
 class App extends React.Component<IProps, IState> {
 

@@ -11,8 +11,10 @@ export default class DappBody extends React.Component<IProps> {
     render() {
         const {callableFuncTypes, address} = this.props;
         return callableFuncTypes
-            ? Object.entries(callableFuncTypes).map(([funcName, args]: [string, ICallableFuncArgument]) =>
-                <Card address={address} funcName={funcName} funcArgs={args} key={funcName}/>)
+            ? <div>
+                {Object.entries(callableFuncTypes).map(([funcName, args]: [string, ICallableFuncArgument]) =>
+                    <Card address={address} funcName={funcName} funcArgs={args} key={funcName}/>)}
+            </div>
             : null
     }
 }
