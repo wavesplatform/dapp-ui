@@ -2,6 +2,7 @@ import { SubStore } from './SubStore';
 import { checkSlash } from '@utils'
 import { IArgumentInput } from "@components/DappUi/Card";
 import { base58Decode, base64Encode } from '@waves/ts-lib-crypto'
+import { getExplorerLink } from "@utils/index";
 
 export type ICallableArgumentType =
     'Int' | 'String' | 'ByteVector' | 'Boolean'
@@ -16,7 +17,8 @@ export interface ICallableFuncTypes {
 }
 
 export interface IMeta {
-    callableFuncTypes: ICallableFuncTypes
+    callableFuncTypes?: ICallableFuncTypes
+    version?: number
 }
 
 
@@ -68,8 +70,8 @@ class DappStore extends SubStore {
         }
         if (type === 'Boolean' && ['true', 'false'].includes(value)) return value === 'true';
         if (type === 'Int' && !isNaN(+value)) return +value;
-        if (byteVectorType === 'base58') return`base64:${b58strTob64Str(value)}`;
-        if (byteVectorType === 'base64') return`base64:${value}`;
+        if (byteVectorType === 'base58') return `base64:${b58strTob64Str(value)}`;
+        if (byteVectorType === 'base64') return `base64:${value}`;
         else return value
     };
     private convertArgType = (type: ICallableArgumentType): string => {
@@ -123,12 +125,9 @@ class DappStore extends SubStore {
             const {network} = accountStore.wavesKeeperAccount!;
             console.log(transaction);
             this.rootStore.notificationStore
-                .notify(`Transaction sent: ${transaction.id}\n`,
-                    {
-                        type: 'success',
-                        link: `https://wavesexplorer.com/${network === 'mainnet' ? '' : `${network}/`}tx/${transaction.id}`,
-                        linkTitle: 'View transaction'
-                    })
+                .notify(
+                    `Transaction sent: ${transaction.id}\n`,
+                    {type: 'success', link: getExplorerLink(network, transaction.id), linkTitle: 'View transaction'})
 
         }).catch((error: any) => {
             console.error(error);

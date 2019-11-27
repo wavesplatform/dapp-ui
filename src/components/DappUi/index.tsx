@@ -14,6 +14,8 @@ import DappBody from "@components/DappUi/DappBody";
 import { fonts } from "@src/styles";
 import ScrollIntoView from 'react-scroll-into-view'
 import Footer from "@components/Footer";
+import NotificationStore from "@stores/NotificationStore";
+import { getExplorerLink } from "@utils/index";
 
 const styles = {
     root: css`
@@ -40,6 +42,7 @@ background: #E9EFFF;
 interface IInjectedProps {
     accountStore?: AccountStore
     dappStore?: DappStore
+    notificationStore?: NotificationStore
     scrollTo?: (opts: any) => void
 }
 
@@ -49,6 +52,7 @@ interface IProps extends IInjectedProps {
 interface IState {
     meta?: IMeta,
     isFailed?: boolean,
+    invalidMeta?: boolean,
     server?: string
     byte?: string
 }
@@ -99,7 +103,7 @@ width: 100%;
 padding-right: 10%;
 `
 
-@inject('accountStore', 'dappStore')
+@inject('accountStore', 'dappStore', 'notificationStore')
 @observer
 class DappUi extends React.Component<IProps, IState> {
     state: IState = {};
@@ -116,11 +120,12 @@ class DappUi extends React.Component<IProps, IState> {
             if (network) {
                 this.setState({server: network.server, byte: network.code});
                 this.props.dappStore!.getDappMeta(pathname, network.server).then(res => {
-                    if (!('meta' in res) || !('callableFuncTypes' in res.meta)) {
+                    if (!('meta' in res)) {
                         this.setState({isFailed: true});
+                    } else if (!('callableFuncTypes' in res.meta)) {
+                        this.setState({isFailed: true, invalidMeta: true})
                     } else {
-                        console.log(res.meta)
-                        this.setState({meta: res.meta, isFailed: false});
+                        this.setState({meta: res.meta, isFailed: false, invalidMeta: false});
                     }
                 }).catch(() => {
                     this.setState({isFailed: true});
@@ -132,7 +137,7 @@ class DappUi extends React.Component<IProps, IState> {
 
     @computed
     get body() {
-        const {isFailed, meta} = this.state;
+        const {isFailed, meta, invalidMeta} = this.state;
         const pathname = window.location.pathname.replace('/', '');
         const accountStore = this.props.accountStore!;
         let server = accountStore.network && accountStore.network.server;
@@ -145,10 +150,14 @@ class DappUi extends React.Component<IProps, IState> {
             }
         }
         if (byte !== this.state.byte) this.updateMeta();
-
         switch (true) {
             case isFailed || !pathname || !this.state.server:
-                return <EmptyDapp/>;
+                const link = <a target="_blank" href={getExplorerLink(server, pathname)}>Browse in WavesExplorer</a>;
+                return <EmptyDapp description={
+                    invalidMeta
+                        ? <div>The deployed dApp doesn't contain meta information about its content.<br/>{link}</div>
+                        : <div>The address doesn't contain dApp script.<br/>{link}</div>
+                }/>;
             case meta !== undefined:
                 return <DappBody address={pathname} callableFuncTypes={(meta as IMeta).callableFuncTypes}/>;
             case meta === undefined:
@@ -173,7 +182,7 @@ class DappUi extends React.Component<IProps, IState> {
             <div css={css`display: flex`}>
                 <LeftPanel>
                     <div css={css`height: calc(100vh - 130px);width: 100%;`}>
-                        {meta && Object.keys(meta.callableFuncTypes).map(key =>
+                        {meta && meta.callableFuncTypes && Object.keys(meta.callableFuncTypes).map(key =>
                             <ScrollIntoView css={styles.menuItem} key={key}
                                             selector={`#${key}`}>{key}</ScrollIntoView>)}
                     </div>

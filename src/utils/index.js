@@ -53,6 +53,9 @@ export const loadState = () => {
 
 };
 
+export const getExplorerLink = (server, address) => `https://wavesexplorer.com/${server === 'mainnet' ? '' : `${server}/`}tx/${address}`;
+
+
 export const saveState = (state) => {
     localStorage.setItem('store', JSON.stringify(state));
 };
