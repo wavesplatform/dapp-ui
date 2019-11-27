@@ -116,9 +116,10 @@ class DappUi extends React.Component<IProps, IState> {
             if (network) {
                 this.setState({server: network.server, byte: network.code});
                 this.props.dappStore!.getDappMeta(pathname, network.server).then(res => {
-                    if ('error' in res) {
+                    if (!('meta' in res) || !('callableFuncTypes' in res.meta)) {
                         this.setState({isFailed: true});
                     } else {
+                        console.log(res.meta)
                         this.setState({meta: res.meta, isFailed: false});
                     }
                 }).catch(() => {
