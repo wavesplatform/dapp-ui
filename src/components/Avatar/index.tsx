@@ -6,7 +6,7 @@ import * as avatar from 'identity-img';
 const styles = css`
   display: flex;
   overflow: hidden;
-  cursor: pointer;
+  //cursor: pointer;
   align-items: center;
   padding: 0 0 0 15px;
   img {

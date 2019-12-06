@@ -2,9 +2,10 @@
 import { jsx } from '@emotion/core'
 import React from "react";
 import { AccountStore } from "@stores/index";
-import { Logo } from "@src/assets/icons/Logo";
+import Logo from "@src/assets/icons/Logo";
 import Account from "@components/Home/Account";
 import styled from "@emotion/styled";
+
 interface IProps {
     accountStore?: AccountStore
 

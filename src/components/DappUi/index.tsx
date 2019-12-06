@@ -6,7 +6,7 @@ import styled from "@emotion/styled";
 import { autorun, computed } from "mobx";
 import { AccountStore, DappStore } from "@stores/index";
 import { IMeta } from "@stores/DappStore";
-import { Logo } from "@src/assets/icons/Logo";
+import Logo  from "@src/assets/icons/Logo";
 import Account from "@components/Home/Account";
 import Search from "@components/Search";
 import EmptyDapp from "@components/DappUi/EmptyDapp";

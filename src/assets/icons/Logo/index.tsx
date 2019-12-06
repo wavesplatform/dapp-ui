@@ -3,10 +3,13 @@ import { jsx } from '@emotion/core'
 import React from "react";
 import { SerializedStyles } from "@emotion/core";
 import logo from './logo.svg'
-interface IProps {
+import { RouteComponentProps, withRouter } from "react-router";
+interface IProps extends RouteComponentProps{
     css?: SerializedStyles
 }
-export const Logo: React.FunctionComponent<IProps> = (props) =>
-    <a href="/"><img css={[props.css]} src={logo} alt={'Logo'}/></a>
+const _Logo: React.FunctionComponent<IProps> = ({css, history}) =>
+     <img css={[css]} src={logo} alt={'Logo'} onClick={() => history.push('/')}/>
 
 
+const Logo = withRouter((props: IProps) => <_Logo {...props}/>);
+export default Logo
