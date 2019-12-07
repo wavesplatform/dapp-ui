@@ -145,14 +145,13 @@ class DappUi extends React.Component<IProps, IState> {
         if (!server || !byte) {
             const network = this.props.accountStore!.getNetworkByAddress(pathname);
             if (network) {
-                server = network.server;
                 byte = network.code;
             }
         }
         if (byte !== this.state.byte) this.updateMeta();
         switch (true) {
             case isFailed || !pathname || !this.state.server:
-                const link = <a target="_blank" href={getExplorerLink(server, pathname)}>Browse in WavesExplorer</a>;
+                const link = <a target="_blank" href={getExplorerLink(byte, pathname, 'address')}>Browse in WavesExplorer</a>;
                 return <EmptyDapp description={
                     invalidMeta
                         ? <div>The deployed dApp doesn't contain meta information about its content.<br/>{link}</div>

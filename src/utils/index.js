@@ -53,7 +53,18 @@ export const loadState = () => {
 
 };
 
-export const getExplorerLink = (server, address) => `https://wavesexplorer.com/${server === 'mainnet' ? '' : `${server}/`}tx/${address}`;
+export const getExplorerLink = (chainId, address, type) => {
+    switch (chainId) {
+        case 'W':
+            return `https://wavesexplorer.com/${type}/${address}`;
+        case 'T':
+            return `https://wavesexplorer.com/testnet/${type}/${address}`;
+        case 'S':
+            return `https://wavesexplorer.com/stagenet/${type}/${address}`;
+        default:
+            return `https://wavesexplorer.com/custom/${type}/${address}`;
+    }
+};
 
 
 export const saveState = (state) => {

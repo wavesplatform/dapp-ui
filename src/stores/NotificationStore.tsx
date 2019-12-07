@@ -9,8 +9,8 @@ export type TNotifyOptions = Partial<{
     key: string
 
     type: 'error' | 'info' | 'warning' | 'success'
-    link: string
-    linkTitle: string
+    link?: string
+    linkTitle?: string
     title: string
     style: { [key: string]: string | number }
 }>;

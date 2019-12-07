@@ -122,12 +122,13 @@ class DappStore extends SubStore {
         }
         window['WavesKeeper'].signAndPublishTransaction(tx).then((tx: any) => {
             const transaction = JSON.parse(tx);
-            const {network} = accountStore.wavesKeeperAccount!;
+            const {network} = accountStore;
+            const link = network  ? getExplorerLink(network!.code, transaction.id, 'tx') : undefined;
             console.log(transaction);
             this.rootStore.notificationStore
                 .notify(
                     `Transaction sent: ${transaction.id}\n`,
-                    {type: 'success', link: getExplorerLink(network, transaction.id), linkTitle: 'View transaction'})
+                    {type: 'success', link, linkTitle: 'View transaction'})
 
         }).catch((error: any) => {
             console.error(error);
