@@ -107,7 +107,7 @@ class DappStore extends SubStore {
                 function: func,
                 args
             },
-            fee: {tokens: '0.005', assetId: 'WAVES'},
+            fee: {tokens:  this.rootStore.accountStore.scripted ? '0.009' : '0.005', assetId: 'WAVES'},
             payment
         };
 

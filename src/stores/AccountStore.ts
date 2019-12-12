@@ -2,6 +2,7 @@ import { action, autorun, computed, observable, set } from 'mobx';
 import { SubStore } from './SubStore';
 import { checkSlash, getCurrentBrowser } from '@utils';
 import { base58Decode } from '@waves/ts-lib-crypto'
+import { nodeInteraction } from "@waves/waves-transactions";
 
 interface IWavesKeeperAccount {
     address: string
@@ -47,6 +48,8 @@ class AccountStore extends SubStore {
     @observable network: INetwork | null = null;
     @observable assets: { [name: string]: IAsset } = {'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8}};
 
+    @observable scripted = false;
+
     @computed
     get isBrowserSupportsWavesKeeper(): boolean {
         const browser = getCurrentBrowser();
@@ -72,9 +75,10 @@ class AccountStore extends SubStore {
     }
 
     @action
-    updateWavesKeeperAccount = (account: IWavesKeeperAccount) => {
+    updateWavesKeeperAccount = async (publicState: any) => {
+        this.scripted = (await nodeInteraction.scriptInfo(publicState.account.address, publicState.network.server)).script != null;
         this.wavesKeeperAccount && set(this.wavesKeeperAccount, {
-            ...account
+            ...publicState.account
         });
     };
 
@@ -89,7 +93,7 @@ class AccountStore extends SubStore {
         this.updateAccountAssets(publicState);
         if (this.wavesKeeperAccount) {
             publicState.account
-                ? this.updateWavesKeeperAccount(publicState.account)
+                ? this.updateWavesKeeperAccount(publicState)
                 : this.resetWavesKeeperAccount();
         } else {
             this.wavesKeeperAccount = publicState.account;
