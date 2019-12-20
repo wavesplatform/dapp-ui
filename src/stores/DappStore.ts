@@ -140,7 +140,7 @@ class DappStore extends SubStore {
 
 function b58strTob64Str(str = ''): string {
     const error = 'incorrect base58';
-    if (str === '') throw error
+    if (str === '') throw error;
     try {
         return base64Encode(base58Decode(str));
     } catch (e) {

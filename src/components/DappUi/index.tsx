@@ -6,9 +6,9 @@ import styled from "@emotion/styled";
 import { autorun, computed } from "mobx";
 import { AccountStore, DappStore } from "@stores/index";
 import { IMeta } from "@stores/DappStore";
-import Logo  from "@src/assets/icons/Logo";
+// import Logo  from "@src/assets/icons/Logo";
 import Account from "@components/Home/Account";
-import Search from "@components/Search";
+// import Search from "@components/Search";
 import EmptyDapp from "@components/DappUi/EmptyDapp";
 import DappBody from "@components/DappUi/DappBody";
 import { fonts } from "@src/styles";
@@ -172,10 +172,10 @@ class DappUi extends React.Component<IProps, IState> {
         return <div css={styles.root}>
             <div css={css`display: flex;position: sticky;width: 100%;top: 10px;`}>
                 <LeftHeaderCol>
-                    <Header><Logo/></Header>
+                    {/*<Header><Logo/></Header>*/}
                 </LeftHeaderCol>
                 <RightHeaderRow>
-                    <Header><Search isHeader/><Account/></Header>
+                    {/*<Header><Search isHeader/><Account/></Header>*/}
                 </RightHeaderRow>
             </div>
             <div css={css`display: flex`}>

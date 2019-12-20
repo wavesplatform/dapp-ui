@@ -4,6 +4,7 @@ import { createBrowserHistory } from 'history';
 import { Provider as MobxProvider } from 'mobx-react';
 import { RootStore } from '@stores';
 import App from '@components/App';
+import 'normalize.css'
 import './index.css'
 import 'rc-notification/assets/index.css'
 const mobXStore = new RootStore();

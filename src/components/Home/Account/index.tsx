@@ -10,7 +10,13 @@ import { AccountStore } from "@stores/index";
 import SignBtn from "@components/SignBtn";
 
 const AccountDescription = styled.div`display: flex;flex-direction: column;justify-content: space-between;height: 100%;`;
-const Root = styled.div`display: flex;height: 38px;justify-content: space-between;align-items: center;`;
+const Root = styled.div`
+flex:1;
+display: flex;
+height: 38px;
+justify-content: flex-end;
+align-items: center;
+`;
 
 interface IProps {
     accountStore?: AccountStore

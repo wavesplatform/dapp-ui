@@ -6,6 +6,9 @@ import { History } from 'history';
 import DappUi from "@components/DappUi";
 import NotificationsStore from "@stores/NotificationStore";
 import Home from "@components/Home";
+import Head from "@components/Head";
+import { Bg } from "@src/assets/icons/Bg";
+import { jsx } from "@emotion/core";
 
 interface IProps {
     accountStore?: AccountStore
@@ -42,6 +45,7 @@ class App extends React.Component<IProps, IState> {
 
     render() {
         return <Router history={this.props.history}>
+
             <Route exact path="/" component={Home}/>
             <Route path="/:string" component={DappUi}/>
         </Router>
