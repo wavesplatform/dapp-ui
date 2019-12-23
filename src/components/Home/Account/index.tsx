@@ -34,24 +34,26 @@ export default class Account extends React.Component<IProps> {
         const pathname = window.location.pathname.replace('/', '');
         const networkByAddress = this.props.accountStore!.getNetworkByAddress(pathname)
 
-        const isInvalidServer = networkByAddress && network && networkByAddress.code !== network.code
+        const isInvalidServer = networkByAddress && network && networkByAddress.code !== network.code;
 
-        return wavesKeeperAccount && network
-            ? <Root>
-                <AccountDescription>
-                    <div css={fonts.addressFont}>{wavesKeeperAccount.address}</div>
-                    <div
-                        css={[fonts.descriptionFont, css`display: flex;justify-content: flex-end; align-items: center`]}>
-                        <Wifi/>
-                        {getNetwork(network.code)}
-                        {isInvalidServer && <ErrorText>&nbsp;invalid network</ErrorText>}
-                    </div>
-                </AccountDescription>
-                <Avatar address={wavesKeeperAccount.address}/>
-            </Root>
-            : <SignBtn>
-                <div css={css`cursor: pointer`}>Sign in with wavesKeeper</div>
-            </SignBtn>
+        return <div css={css`@media(max-width: 768px){display: none }`}>{
+            wavesKeeperAccount && network
+                ? <Root>
+                    <AccountDescription>
+                        <div css={fonts.addressFont}>{wavesKeeperAccount.address}</div>
+                        <div
+                            css={[fonts.descriptionFont, css`display: flex;justify-content: flex-end; align-items: center`]}>
+                            <Wifi/>
+                            {getNetwork(network.code)}
+                            {isInvalidServer && <ErrorText>&nbsp;invalid network</ErrorText>}
+                        </div>
+                    </AccountDescription>
+                    <Avatar address={wavesKeeperAccount.address}/>
+                </Root>
+                : <SignBtn>
+                    <div css={css`cursor: pointer`}>Sign in with wavesKeeper</div>
+                </SignBtn>
+        }</div>
 
 
     }

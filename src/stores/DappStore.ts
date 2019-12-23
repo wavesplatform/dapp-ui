@@ -1,5 +1,4 @@
 import { SubStore } from './SubStore';
-import { checkSlash } from '@utils'
 import { IArgumentInput } from "@components/DappUi/Card";
 import { base58Decode, base64Encode } from '@waves/ts-lib-crypto'
 import { getExplorerLink } from "@utils/index";
@@ -16,10 +15,6 @@ export interface ICallableFuncTypes {
     [func: string]: ICallableFuncArgument
 }
 
-export interface IMeta {
-    callableFuncTypes?: ICallableFuncTypes
-    version?: number
-}
 
 
 interface IKeeperTransactionDataCallArg {
@@ -56,11 +51,6 @@ export interface IKeeperTransaction {
 
 class DappStore extends SubStore {
 
-    getDappMeta = async (address: string, server: string) => {//todo handle error
-        const path = `${checkSlash(server)}addresses/scriptInfo/${address}/meta`;
-        const resp = await fetch(path);
-        return await (resp).json();
-    };
 
     private convertArgValue = (arg: IArgumentInput): (string | number | boolean) => {
         const {value, type, byteVectorType} = arg;
@@ -74,23 +64,10 @@ class DappStore extends SubStore {
         if (byteVectorType === 'base64') return `base64:${value}`;
         else return value
     };
-    private convertArgType = (type: ICallableArgumentType): string => {
-        switch (type) {
-            case "Boolean":
-                return 'boolean';
-            case "ByteVector":
-                return 'binary';
-            case "Int":
-                return 'integer';
-            case "String":
-                return 'string';
-        }
-        return type
-    };
 
     private convertArgs = (args: IArgumentInput[]): IKeeperTransactionDataCallArg[] =>
         args.filter(({value}) => value !== undefined)
-            .map(arg => ({type: this.convertArgType(arg.type), value: this.convertArgValue(arg)}));
+            .map(arg => ({type: convertArgType(arg.type), value: this.convertArgValue(arg)}));
 
     callCallableFunction = (address: string, func: string, inArgs: IArgumentInput[], payment: IKeeperTransactionPayment[]) => {
         const {accountStore} = this.rootStore;
@@ -107,7 +84,7 @@ class DappStore extends SubStore {
                 function: func,
                 args
             },
-            fee: {tokens:  this.rootStore.accountStore.scripted ? '0.009' : '0.005', assetId: 'WAVES'},
+            fee: {tokens: this.rootStore.accountStore.scripted ? '0.009' : '0.005', assetId: 'WAVES'},
             payment
         };
 
@@ -123,7 +100,7 @@ class DappStore extends SubStore {
         window['WavesKeeper'].signAndPublishTransaction(tx).then((tx: any) => {
             const transaction = JSON.parse(tx);
             const {network} = accountStore;
-            const link = network  ? getExplorerLink(network!.code, transaction.id, 'tx') : undefined;
+            const link = network ? getExplorerLink(network!.code, transaction.id, 'tx') : undefined;
             console.log(transaction);
             this.rootStore.notificationStore
                 .notify(
@@ -136,7 +113,9 @@ class DappStore extends SubStore {
         });
     };
 
+
 }
+
 
 function b58strTob64Str(str = ''): string {
     const error = 'incorrect base58';
@@ -148,5 +127,17 @@ function b58strTob64Str(str = ''): string {
     }
 }
 
-
+function convertArgType(type: ICallableArgumentType): string {
+    switch (type) {
+        case "Boolean":
+            return 'boolean';
+        case "ByteVector":
+            return 'binary';
+        case "Int":
+            return 'integer';
+        case "String":
+            return 'string';
+    }
+    return type
+};
 export default DappStore;

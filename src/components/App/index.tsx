@@ -2,18 +2,15 @@ import React from 'react';
 import { inject, observer } from 'mobx-react';
 import { AccountStore } from "@stores";
 import { Route, Router } from 'react-router-dom';
-import { History } from 'history';
 import DappUi from "@components/DappUi";
 import NotificationsStore from "@stores/NotificationStore";
 import Home from "@components/Home";
-import Head from "@components/Head";
-import { Bg } from "@src/assets/icons/Bg";
-import { jsx } from "@emotion/core";
+import HistoryStore from "@stores/HistoryStore";
 
 interface IProps {
     accountStore?: AccountStore
     notificationStore?: NotificationsStore
-    history: History
+    historyStore?: HistoryStore
 }
 
 interface IState {
@@ -21,7 +18,7 @@ interface IState {
 }
 
 
-@inject('accountStore', 'notificationStore')
+@inject('accountStore', 'notificationStore', 'historyStore')
 @observer
 class App extends React.Component<IProps, IState> {
 
@@ -44,8 +41,7 @@ class App extends React.Component<IProps, IState> {
     }
 
     render() {
-        return <Router history={this.props.history}>
-
+        return <Router history={this.props.historyStore!.history}>
             <Route exact path="/" component={Home}/>
             <Route path="/:string" component={DappUi}/>
         </Router>

@@ -7,10 +7,8 @@ import App from '@components/App';
 import 'normalize.css'
 import './index.css'
 import 'rc-notification/assets/index.css'
+import 'react-perfect-scrollbar/dist/css/styles.css';
+
 const mobXStore = new RootStore();
 
-const history = createBrowserHistory();
-
-render(<MobxProvider {...mobXStore}>
-    <App history={history}/>
-</MobxProvider>, document.getElementById('root'));
+render(<MobxProvider {...mobXStore}><App/></MobxProvider>, document.getElementById('root'));

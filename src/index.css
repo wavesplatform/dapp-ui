@@ -37,3 +37,17 @@ code {
 .hideScrollbar::-webkit-scrollbar-thumb {
     background: transparent;
 }
+
+
+
+.ps__rail-y{
+    z-index: 2;
+}
+
+.ps__rail-y:hover{
+    background: transparent !important;
+}
+
+.ps__rail-y:hover .ps__thumb-y {
+    width: 6px !important;
+}

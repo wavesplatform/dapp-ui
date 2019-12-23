@@ -13,28 +13,31 @@ import { SearchIcn } from "@src/assets/icons/SearchIcn";
 import { UnregisterCallback } from "history";
 import { Bg } from "@src/assets/icons/Bg";
 import Head from "@components/Head";
+import styled from "@emotion/styled";
 
 
-const styles = {
-    bg: css`
+const FormBg = styled.div`
     height: 100px;
     background: white;
     margin: 0 15%; 
+    @media(max-width: 768px){
+      margin: 0 4%; 
+    }
     flex: 1;
     padding: 30px 40px;
     align-items: center;
-`,
-    littleRoot: css`
-    height: 100px;
-    background: white;
-   
-    padding: 30px 40px;
-    align-items: center;
-`,
-    title: css`margin-bottom: 20px;`,
-    input: css`display: flex; width: 100%`,
-    withSearchIconStyle: css`border-radius: 4px 0  0 4px;`
-};
+`;
+
+const Title = styled.div`
+  ${fonts.searchTitleFont};
+  margin-bottom: 20px;
+  @media(max-width: 768px){
+    text-align: center; 
+  }
+`;
+const   InputWrapper = styled.div`display: flex; width: 100%`;
+const withSearchIconStyle = css`border-radius: 4px 0  0 4px;`;
+
 
 interface IInjectedProps {
     accountStore?: AccountStore
@@ -67,7 +70,7 @@ function isValidAddress(address: string): boolean {
 
 @inject('accountStore', 'notificationStore')
 @observer
-class HomeTemp extends React.Component<IProps, IState> {
+class Home extends React.Component<IProps, IState> {
 
     historyUnregisterCallback: null | UnregisterCallback = null;
 
@@ -112,21 +115,20 @@ class HomeTemp extends React.Component<IProps, IState> {
                     <div css={[fonts.descriptionFont, css`margin-right: 8px`]}>Smart Contract:</div>
                     <Input onKeyPress={this.handleKeyPress} value={value} onChange={this.handleChange}/>
                 </div>
-                : <div css={styles.bg}>
-                    <div css={[fonts.searchTitleFont, styles.title]}>Search for Smart Contract</div>
-                    <div css={styles.input}>
-                        <Input onKeyPress={this.handleKeyPress} css={styles.withSearchIconStyle} value={value}
+                : <FormBg>
+                    <Title>Search for Smart Contract</Title>
+                    <InputWrapper>
+                        <Input onKeyPress={this.handleKeyPress} css={withSearchIconStyle} value={value}
                                onChange={this.handleChange}/>
                         <SearchIcn onClick={() => this.handleSearch(value)}/>
-                    </div>
-                </div>}
+                    </InputWrapper>
+                </FormBg>}
         </Bg>
     }
 
 }
 
 
-const Home = withRouter((props: IProps) => <HomeTemp {...props}/>);
 export default Home;
 
 
