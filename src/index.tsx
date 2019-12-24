@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { render } from 'react-dom';
-import { createBrowserHistory } from 'history';
 import { Provider as MobxProvider } from 'mobx-react';
 import { RootStore } from '@stores';
 import App from '@components/App';

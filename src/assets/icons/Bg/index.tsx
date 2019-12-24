@@ -1,4 +1,3 @@
-import React from "react";
 import bg from './bg.svg'
 import styled from "@emotion/styled";
 

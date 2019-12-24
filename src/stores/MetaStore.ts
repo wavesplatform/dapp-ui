@@ -44,7 +44,7 @@ class MetaStore extends SubStore {
             this.server = network.server;
             this.byte = network.code;
             await getDappMeta(pathname, network.server).then(res => {
-                console.log(res)
+                // console.log(res)
                 if (!('meta' in res)) {
                     this.isFailed = true;
                 } else if (!('callableFuncTypes' in res.meta)) {
@@ -59,11 +59,11 @@ class MetaStore extends SubStore {
                 this.isFailed = true
             });
         }
-        console.log(this.meta)
-        console.log(this.isFailed)
-        console.log(this.invalidMeta)
-        console.log(this.server)
-        console.log(this.byte)
+        // console.log(this.meta)
+        // console.log(this.isFailed)
+        // console.log(this.invalidMeta)
+        // console.log(this.server)
+        // console.log(this.byte)
     }
 
 }

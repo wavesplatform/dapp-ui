@@ -15,6 +15,7 @@ import Select from "@components/Select";
 const flexStyle = css`display: flex;width: 100%;`;
 
 const Root = styled.div`
+position: relative;
 display: flex;
 background: white;
 box-shadow: 0 5px 16px rgba(134, 142, 164, 0.05);
@@ -93,6 +94,11 @@ export interface IArgumentInput {
     byteVectorType?: 'base58' | 'base64'
 }
 
+
+const Anchor = styled.div`
+position:absolute;
+top:-100px;
+`;
 
 interface IInjectedProps {
     dappStore?: DappStore
@@ -183,7 +189,8 @@ export default class Card extends React.Component<IProps, IState> {
     render() {
         const {funcName: title, accountStore} = this.props;
         const {args} = this.state;
-        return <Root id={title}>
+        return <Root >
+            <Anchor id={title}/>
             <Header>
                 <Title>{title}</Title>
                 <Button onClick={this.handleCall} disabled={this.isInvalid}>{title}</Button>

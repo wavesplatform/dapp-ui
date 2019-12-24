@@ -5,20 +5,25 @@ import { computed, observable } from "mobx";
 
 
 class HistoryStore extends SubStore {
-
+    @observable
     public history = createBrowserHistory();
 
-    private pathname = window.location.pathname;
+    @observable
+    private location: Location = window.location;
 
     @computed
     get currentPath() {
-        return this.pathname.replace('/', '')
+        return this.location.pathname.replace('/', '')
+    }
+    @computed
+    get currentHash() {
+        return this.location.hash.replace('#', '')
     }
 
     constructor(rootStore: RootStore) {
         super(rootStore);
         this.history.listen((location) => {
-            this.pathname = location.pathname
+            this.location = location as any
         });
     }
 

@@ -5,7 +5,7 @@ import { fonts } from "@src/styles";
 import { inject, observer } from "mobx-react";
 import AccountStore from "@stores/AccountStore";
 import NotificationsStore from "@stores/NotificationStore";
-import { RouteComponentProps, withRouter } from "react-router";
+import { RouteComponentProps } from "react-router";
 import { base58Decode } from '@waves/ts-lib-crypto'
 import { _hashChain } from '@waves/ts-lib-crypto/crypto/hashing'
 import Input from "@components/Input";
