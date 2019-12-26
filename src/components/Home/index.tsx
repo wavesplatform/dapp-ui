@@ -6,14 +6,13 @@ import { inject, observer } from "mobx-react";
 import AccountStore from "@stores/AccountStore";
 import NotificationsStore from "@stores/NotificationStore";
 import { RouteComponentProps } from "react-router";
-import { base58Decode } from '@waves/ts-lib-crypto'
-import { _hashChain } from '@waves/ts-lib-crypto/crypto/hashing'
 import Input from "@components/Input";
 import { SearchIcn } from "@src/assets/icons/SearchIcn";
 import { UnregisterCallback } from "history";
 import { Bg } from "@src/assets/icons/Bg";
 import Head from "@components/Head";
 import styled from "@emotion/styled";
+import HistoryStore from "@stores/HistoryStore";
 
 
 const FormBg = styled.div`
@@ -42,6 +41,7 @@ const withSearchIconStyle = css`border-radius: 4px 0  0 4px;`;
 interface IInjectedProps {
     accountStore?: AccountStore
     notificationStore?: NotificationsStore
+    historyStore?: HistoryStore
 }
 
 interface IProps extends IInjectedProps, RouteComponentProps {
@@ -52,22 +52,8 @@ interface IState {
 }
 
 
-function isValidAddress(address: string): boolean {
 
-    try {
-        const addressBytes = base58Decode(address);
-        return (
-            addressBytes.length === 26 &&
-            addressBytes[0] === 1 &&
-            addressBytes.slice(-4).toString() === _hashChain(addressBytes.slice(0, 22)).slice(0, 4).toString()
-        )
-    } catch (e) {
-        console.error(e)
-    }
-    return false
-}
-
-@inject('accountStore', 'notificationStore')
+@inject('accountStore', 'notificationStore', 'historyStore')
 @observer
 class Home extends React.Component<IProps, IState> {
 
@@ -86,21 +72,9 @@ class Home extends React.Component<IProps, IState> {
         this.historyUnregisterCallback && this.historyUnregisterCallback()
     }
 
-    handleSearch = (value: string) => {
-        if (!isValidAddress(value)) {
-            this.props.notificationStore!.notify('invalid address', {type: 'error'});
-            return;
-        }
-        const network = this.props.accountStore!.getNetworkByAddress(value);
-        if (network == null) {
-            this.props.notificationStore!.notify('Cannot find network', {type: 'error'});
-            return;
-        }
-        const history = this.props.history;
-        history.push(value);
-    };
 
-    handleKeyPress = (e: React.KeyboardEvent) => e.key === 'Enter' && this.handleSearch(this.state.value || '');
+
+    handleKeyPress = (e: React.KeyboardEvent) => e.key === 'Enter' && this.props.historyStore!.handleSearch(this.state.value || '');
 
     handleChange = ({target: {value}}: React.ChangeEvent<HTMLInputElement>) => this.setState({value});
 
@@ -113,7 +87,7 @@ class Home extends React.Component<IProps, IState> {
                 <InputWrapper>
                     <Input onKeyPress={this.handleKeyPress} css={withSearchIconStyle} value={value}
                            onChange={this.handleChange}/>
-                    <SearchIcn onClick={() => this.handleSearch(value)}/>
+                    <SearchIcn onClick={() => this.props.historyStore!.handleSearch(value)}/>
                 </InputWrapper>
             </FormBg>
         </Bg>

@@ -1,20 +1,21 @@
 /** @jsx jsx */
 import React from "react";
 import { css, jsx } from '@emotion/core'
-import { AccountStore } from "@stores/index";
 import Account from "@components/Home/Account";
 import styled from "@emotion/styled";
 import logo from '@src/assets/icons/logo.svg'
 import { fonts } from "@src/styles";
 import Input from "@components/Input";
+import { inject, observer } from "mobx-react";
+import HistoryStore from "@stores/HistoryStore";
+import { autorun } from "mobx";
+
 interface IProps {
-    accountStore?: AccountStore
+    historyStore?: HistoryStore
     withSearch?: boolean
 }
 
-
 const LogoWrapper = styled.div`
-//flex:1;
 display: flex;
 width: 20%;
 justify-content: center; 
@@ -27,43 +28,44 @@ flex-shrink: 0;
 }
 `
 
-export default class Head extends React.Component<IProps> {
-
-    render() {
-
-        const blurredBg = css`background: linear-gradient(180deg, #F8F9FB 65.31%, rgba(248, 249, 251, 0) 100%);`
-
-        const Root = styled.div`
+const Root = styled.div`
           display: flex;
           justify-content: space-between;
           align-items: center;
           height: 100px;
           position: fixed;top: 0;left: 0;right: 0;
-          //padding: 0 10%;
-          ${this.props.withSearch === true && blurredBg};
-          //margin: -10px;
           z-index: 1;
-          //& > *{
-          //margin: 0 10px;
-          //}
-          
-          @media(max-width: 768px){
-          }
   `;
 
 
-        // handleKeyPress = (e: React.KeyboardEvent) => e.key === 'Enter' && this.handleSearch(this.state.value || '');
-        // handleChange = ({target: {value}}: React.ChangeEvent<HTMLInputElement>) => this.setState({value});
+@inject('historyStore')
+@observer
+export default class Head extends React.Component<IProps, { value: string }> {
 
-        return <Root>
-            <LogoWrapper ><a href="/"><img src={logo} alt={'Logo'} /></a></LogoWrapper>
-            { this.props.withSearch && <div css={css`display: flex; align-items: center; width: 100%;white-space: nowrap`}>
+    state = {value: this.props.historyStore!.currentPath};
+
+    componentDidMount() {
+        autorun(() => this.setState({value: this.props.historyStore!.currentPath}))
+    }
+
+
+    handleKeyPress = (e: React.KeyboardEvent) => e.key === 'Enter' && this.props.historyStore!.handleSearch(this.state.value || '');
+    handleChange = ({target: {value}}: React.ChangeEvent<HTMLInputElement>) => this.setState({value});
+
+    render() {
+        const {value} = this.state;
+        return <Root css={ css`background: ${this.props.withSearch
+            ? 'linear-gradient(180deg, #F8F9FB 65.31%, rgba(248, 249, 251, 0) 100%);'
+            : 'transparent'}`}>
+            <LogoWrapper><a href="/"><img src={logo} alt={'Logo'}/></a></LogoWrapper>
+            {this.props.withSearch &&
+            <div css={css`display: flex; align-items: center; width: 100%;white-space: nowrap`}>
                 <div css={[fonts.descriptionFont, css`margin-right: 8px`]}>Smart Contract:</div>
                 <Input
                     css={css``}
-                    // onKeyPress={this.handleKeyPress}
-                    // value={value}
-                    // onChange={this.handleChange}
+                    value={value}
+                    onKeyPress={this.handleKeyPress}
+                    onChange={this.handleChange}
                 />
             </div>}
             <Account/>

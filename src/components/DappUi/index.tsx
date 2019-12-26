@@ -147,7 +147,7 @@ class DappUi extends React.Component<IProps, IState> {
             h += clientHeight;
             if (container.scrollTop < h) {
                 ok = false;
-                (lastID && currentHash !== lastID) && history.push(`#${lastID}`)
+                (lastID && currentHash !== lastID) && history.replace({hash: `#${lastID}`})
             }
         })
     };
