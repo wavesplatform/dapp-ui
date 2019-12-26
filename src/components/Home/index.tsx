@@ -35,7 +35,7 @@ const Title = styled.div`
     text-align: center; 
   }
 `;
-const   InputWrapper = styled.div`display: flex; width: 100%`;
+const InputWrapper = styled.div`display: flex; width: 100%`;
 const withSearchIconStyle = css`border-radius: 4px 0  0 4px;`;
 
 
@@ -45,7 +45,6 @@ interface IInjectedProps {
 }
 
 interface IProps extends IInjectedProps, RouteComponentProps {
-    isHeader?: boolean
 }
 
 interface IState {
@@ -106,23 +105,17 @@ class Home extends React.Component<IProps, IState> {
     handleChange = ({target: {value}}: React.ChangeEvent<HTMLInputElement>) => this.setState({value});
 
     render() {
-        const {isHeader} = this.props;
         const {value} = this.state;
         return <Bg>
             <Head/>
-            {isHeader
-                ? <div css={css`display: flex; align-items: center; width: 490px;white-space: nowrap`}>
-                    <div css={[fonts.descriptionFont, css`margin-right: 8px`]}>Smart Contract:</div>
-                    <Input onKeyPress={this.handleKeyPress} value={value} onChange={this.handleChange}/>
-                </div>
-                : <FormBg>
-                    <Title>Search for Smart Contract</Title>
-                    <InputWrapper>
-                        <Input onKeyPress={this.handleKeyPress} css={withSearchIconStyle} value={value}
-                               onChange={this.handleChange}/>
-                        <SearchIcn onClick={() => this.handleSearch(value)}/>
-                    </InputWrapper>
-                </FormBg>}
+            <FormBg>
+                <Title>Search for Smart Contract</Title>
+                <InputWrapper>
+                    <Input onKeyPress={this.handleKeyPress} css={withSearchIconStyle} value={value}
+                           onChange={this.handleChange}/>
+                    <SearchIcn onClick={() => this.handleSearch(value)}/>
+                </InputWrapper>
+            </FormBg>
         </Bg>
     }
 

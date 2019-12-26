@@ -5,6 +5,8 @@ import { AccountStore } from "@stores/index";
 import Account from "@components/Home/Account";
 import styled from "@emotion/styled";
 import logo from '@src/assets/icons/logo.svg'
+import { fonts } from "@src/styles";
+import Input from "@components/Input";
 interface IProps {
     accountStore?: AccountStore
     withSearch?: boolean
@@ -12,10 +14,16 @@ interface IProps {
 
 
 const LogoWrapper = styled.div`
-flex:1;
+//flex:1;
 display: flex;
+width: 20%;
+justify-content: center; 
+padding-left: 10%;
+flex-shrink: 0;
 @media(max-width: 768px){
-  justify-content: center; 
+  padding-left: 0;
+  justify-content: center;
+  width: 100%; 
 }
 `
 
@@ -27,24 +35,37 @@ export default class Head extends React.Component<IProps> {
 
         const Root = styled.div`
           display: flex;
-          justify-content: center;
+          justify-content: space-between;
           align-items: center;
           height: 100px;
           position: fixed;top: 0;left: 0;right: 0;
-          padding: 0 10%;
+          //padding: 0 10%;
           ${this.props.withSearch === true && blurredBg};
-          margin: -10px;
+          //margin: -10px;
           z-index: 1;
-          & > *{
-          margin: 0 10px;
-          }
+          //& > *{
+          //margin: 0 10px;
+          //}
           
           @media(max-width: 768px){
           }
   `;
 
+
+        // handleKeyPress = (e: React.KeyboardEvent) => e.key === 'Enter' && this.handleSearch(this.state.value || '');
+        // handleChange = ({target: {value}}: React.ChangeEvent<HTMLInputElement>) => this.setState({value});
+
         return <Root>
             <LogoWrapper ><a href="/"><img src={logo} alt={'Logo'} /></a></LogoWrapper>
+            { this.props.withSearch && <div css={css`display: flex; align-items: center; width: 100%;white-space: nowrap`}>
+                <div css={[fonts.descriptionFont, css`margin-right: 8px`]}>Smart Contract:</div>
+                <Input
+                    css={css``}
+                    // onKeyPress={this.handleKeyPress}
+                    // value={value}
+                    // onChange={this.handleChange}
+                />
+            </div>}
             <Account/>
         </Root>;
     }

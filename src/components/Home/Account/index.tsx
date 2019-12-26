@@ -11,12 +11,21 @@ import SignBtn from "@components/SignBtn";
 
 const AccountDescription = styled.div`display: flex;flex-direction: column;justify-content: space-between;height: 100%;`;
 const Root = styled.div`
-flex:1;
 display: flex;
 height: 38px;
 justify-content: flex-end;
 align-items: center;
 `;
+
+const Wrapper = styled.div`
+width: 70%;
+padding-right: 10%;
+display: flex;
+justify-content: flex-end;
+@media(max-width: 768px){
+  display: none 
+}
+`
 
 interface IProps {
     accountStore?: AccountStore
@@ -36,7 +45,7 @@ export default class Account extends React.Component<IProps> {
 
         const isInvalidServer = networkByAddress && network && networkByAddress.code !== network.code;
 
-        return <div css={css`@media(max-width: 768px){display: none }`}>{
+        return <Wrapper>{
             wavesKeeperAccount && network
                 ? <Root>
                     <AccountDescription>
@@ -53,7 +62,7 @@ export default class Account extends React.Component<IProps> {
                 : <SignBtn>
                     <div css={css`cursor: pointer`}>Sign in with wavesKeeper</div>
                 </SignBtn>
-        }</div>
+        }</Wrapper>
 
 
     }
