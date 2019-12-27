@@ -3,12 +3,14 @@ import React from "react";
 import { css, jsx } from "@emotion/core";
 
 const style = css`
-    flex: 1;
     display: flex;
-    justify-content: center;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    justify-content: center;
+    align-items: center;
+    position: fixed;top: 0;left: 0;right: 0;bottom: 0;
+    
 `
 
 interface IProps {

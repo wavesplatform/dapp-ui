@@ -58,12 +58,15 @@ class MetaStore extends SubStore {
             }).catch(() => {
                 this.isFailed = true
             });
+        }else {
+            this.isFailed = true;
+            this.invalidMeta = true;
         }
-        // console.log(this.meta)
-        // console.log(this.isFailed)
-        // console.log(this.invalidMeta)
-        // console.log(this.server)
-        // console.log(this.byte)
+        console.log(this.meta)
+        console.log(this.isFailed)
+        console.log(this.invalidMeta)
+        console.log(this.server)
+        console.log(this.byte)
     }
 
 }

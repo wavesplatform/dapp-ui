@@ -9,12 +9,22 @@ import { inject, observer } from "mobx-react";
 import { AccountStore } from "@stores/index";
 import SignBtn from "@components/SignBtn";
 
-const AccountDescription = styled.div`display: flex;flex-direction: column;justify-content: space-between;height: 100%;`;
 const Root = styled.div`
 display: flex;
+margin-left: 30px;
 height: 38px;
 justify-content: flex-end;
 align-items: center;
+`;
+
+const AccountDescription = styled.div`
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+height: 100%;
+@media(max-width: 1000px){
+  display: none;
+}
 `;
 
 const Wrapper = styled.div`
@@ -22,6 +32,7 @@ width: 70%;
 padding-right: 10%;
 display: flex;
 justify-content: flex-end;
+
 @media(max-width: 768px){
   display: none 
 }
@@ -33,7 +44,14 @@ interface IProps {
 
 const ErrorText = styled.div`
 color: #EF7362
-`
+`;
+
+const AccountDetailWrapper = styled.div`
+${fonts.descriptionFont};
+display: flex;
+justify-content: flex-end; 
+align-items: center;
+`;
 
 @inject('accountStore')
 @observer
@@ -50,12 +68,11 @@ export default class Account extends React.Component<IProps> {
                 ? <Root>
                     <AccountDescription>
                         <div css={fonts.addressFont}>{wavesKeeperAccount.address}</div>
-                        <div
-                            css={[fonts.descriptionFont, css`display: flex;justify-content: flex-end; align-items: center`]}>
+                        <AccountDetailWrapper>
                             <Wifi/>
                             {getNetwork(network.code)}
                             {isInvalidServer && <ErrorText>&nbsp;invalid network</ErrorText>}
-                        </div>
+                        </AccountDetailWrapper>
                     </AccountDescription>
                     <Avatar address={wavesKeeperAccount.address}/>
                 </Root>

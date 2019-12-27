@@ -37,6 +37,19 @@ const Root = styled.div`
           z-index: 1;
   `;
 
+const DappInputWrapper = styled.div`
+display: flex;
+ align-items: center;
+width: 100%;
+white-space: nowrap;
+@media(max-width: 1200px){
+    align-items: flex-start;
+    flex-direction: column;
+}
+`
+
+
+
 
 @inject('historyStore')
 @observer
@@ -57,17 +70,13 @@ export default class Head extends React.Component<IProps, { value: string }> {
         return <Root css={ css`background: ${this.props.withSearch
             ? 'linear-gradient(180deg, #F8F9FB 65.31%, rgba(248, 249, 251, 0) 100%);'
             : 'transparent'}`}>
+
             <LogoWrapper><a href="/"><img src={logo} alt={'Logo'}/></a></LogoWrapper>
             {this.props.withSearch &&
-            <div css={css`display: flex; align-items: center; width: 100%;white-space: nowrap`}>
+            <DappInputWrapper>
                 <div css={[fonts.descriptionFont, css`margin-right: 8px`]}>Smart Contract:</div>
-                <Input
-                    css={css``}
-                    value={value}
-                    onKeyPress={this.handleKeyPress}
-                    onChange={this.handleChange}
-                />
-            </div>}
+                <Input value={value} onKeyPress={this.handleKeyPress} onChange={this.handleChange}/>
+            </DappInputWrapper>}
             <Account/>
         </Root>;
     }

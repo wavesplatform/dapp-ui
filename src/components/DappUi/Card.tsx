@@ -15,6 +15,7 @@ import Select from "@components/Select";
 const flexStyle = css`display: flex;width: 100%;`;
 
 const Root = styled.div`
+flex-shrink: 0;
 position: relative;
 display: flex;
 background: white;
