@@ -1,42 +1,93 @@
 /** @jsx jsx  **/
 import React from "react";
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import styled from "@emotion/styled";
+import RCSelect from 'rc-select';
+import 'rc-select/assets/index.css';
 
-const Root = styled.select`
-outline: none;
-border: none;
-background: #F4F6FA;
-border-radius: 4px;
-height: 50px;
+// const selectStyle = css`
+// height: 50px;
+// width: 100%;
+// background: #F4F6FA;
+// border-radius: 4px;
+//
+// outline: none;
+// border: none;
+// padding: 0 10px;
+// font-family: Roboto;
+// font-size: 16px;
+// `;
+
+const Root = styled.div`
+display: flex;
 width: 100%;
-padding: 0 10px;
 font-family: Roboto;
 font-size: 16px;
+.rc-select{
+  width: 100%;
+  
+  .rc-select-selection{
+      background: #F4F6FA;
+      border-radius: 4px;
+      border: none;
+      box-shadow: none !important;
+      height: 50px;
+      
+      &__rendered, &-selected-value, .rc-select-search__field{
+        height: 50px;
+        display: flex !important;
+        align-items: center;
+        color: black;
+      }
+      
+      .rc-select-arrow{
+        height: 50px;
+        margin-right: 8px;
+      } 
+  }
+}
 `;
 
-const styles = {
-    root: css`display: flex; width: 100%`,
-};
-
+//
 interface IProps {
     value?: string
-    onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void
+    onChange?: (e: string) => void
     css?: any
-    disabled?: boolean
 
 }
+
 interface IState {
 }
 
 export default class Select extends React.Component<IProps, IState> {
 
+    handleChange = (e: any) => console.log(e)
+
     render() {
-        const { css, children, ...others} = this.props;
-        return <div css={[styles.root, css]}>
-            <Root css={[css]} {...others}>
-                {children}
+        const {css: style, children, value, onChange} = this.props;
+
+
+        return (
+            <Root css={style}>
+                <RCSelect value={value} onChange={onChange}>{children}</RCSelect>
             </Root>
-        </div>;
+        );
     }
 }
+
+
+// export default class Select extends React.Component<IProps, IState> {
+//
+//     render() {
+//         const { css, children, ...others} = this.props;
+//         return
+//
+//         {/*<div css={[styles.root, css]}>*/}
+//         {/*    <Root css={[css]} {...others}>*/}
+//                 // {children}
+//             // </Root>
+//         // </div>;
+//     }
+// }
+
+

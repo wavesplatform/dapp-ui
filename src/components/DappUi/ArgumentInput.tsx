@@ -3,6 +3,7 @@ import { ICallableArgumentType } from "@stores/DappStore";
 import Input from "@components/Input";
 import Select from "@components/Select";
 import { css } from "@emotion/core";
+import { Option } from 'rc-select';
 
 interface IArgumentInputProps {
     name: string
@@ -22,7 +23,8 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
 
     state: IArgumentInputState = {byteVectorType: 'base58'};
 
-    handleChangeByteVectorType = (byteVectorType: 'base58' | 'base64') => {
+    handleChangeByteVectorType = (byteVectorType: string) => {
+        if (byteVectorType !== 'base58' && byteVectorType !== 'base64') return;
         this.setState({byteVectorType});
         this.props.onChangeByteVectorType(this.props.name, byteVectorType)
     };
@@ -35,21 +37,20 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
         const {byteVectorType} = this.state;
         switch (type) {
             case "Boolean":
-                return <Select css={style} onChange={(e) => this.handleChange(e.target.value)} value={value}>
-                    <option/>
-                    <option value="false">false</option>
-                    <option value="true">true</option>
+                return <Select css={style} onChange={this.handleChange} value={value}>
+                    <Option value="false">false</Option>
+                    <Option value="true">true</Option>
                 </Select>;
 
             case "ByteVector":
                 return <>
                     <Select
                         value={byteVectorType}
-                        onChange={(e) => this.handleChangeByteVectorType(e.target.value as 'base58' | 'base64')}
+                        onChange={this.handleChangeByteVectorType}
                         css={[style, css`margin-right: 8px`]}
                     >
-                        <option value="base58">base58</option>
-                        <option value="base64">base64</option>
+                        <Option value="base58">base58</Option>
+                        <Option value="base64">base64</Option>
                     </Select>
                     <Input
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
@@ -71,10 +72,10 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
                 return <Input
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
                     value={value} css={style}
-                    />;
+                />;
             default:
-            return <Input css={style} disabled/>;
-            }
-            }
-            }
+                return <Input css={style} disabled/>;
+        }
+    }
+}
 

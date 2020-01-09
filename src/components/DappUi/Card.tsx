@@ -11,7 +11,7 @@ import Input from "@components/Input";
 import { inject, observer } from "mobx-react";
 import AccountStore from "@stores/AccountStore";
 import Select from "@components/Select";
-
+import { Option } from 'rc-select';
 const flexStyle = css`display: flex;width: 100%;`;
 
 const Root = styled.div`
@@ -55,6 +55,8 @@ display: flex;
 margin-right: 20px;
 align-items: center;
 justify-content: flex-end;
+min-width: 100px;
+max-width: 150px;
 `;
 
 const ArgumentTitleVarName = styled.div`
@@ -173,7 +175,7 @@ export default class Card extends React.Component<IProps, IState> {
         this.setState({payments})
     };
 
-    handleChangePaymentAsset = (i: number) => ({target: {value: v}}: React.ChangeEvent<HTMLSelectElement>) => {
+    handleChangePaymentAsset = (i: number) => (v: string) => {
         const payments = this.state.payments;
         payments[i].assetId = v;
         this.setState({payments})
@@ -223,7 +225,7 @@ export default class Card extends React.Component<IProps, IState> {
                         return <AttachPaymentItem key={i}>
                             <Select onChange={this.handleChangePaymentAsset(i)} value={assetId}>
                                 {Object.values(accountStore!.assets).map(({assetId, name}) =>
-                                    <option key={assetId} value={assetId}>{name}({assetId})</option>)}
+                                    <Option key={assetId} value={assetId}>{name}({assetId})</Option>)}
                             </Select>
                             <Input
                                 type="number"

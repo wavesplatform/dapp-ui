@@ -77,7 +77,9 @@ export default class Account extends React.Component<IProps> {
                     <Avatar address={wavesKeeperAccount.address}/>
                 </Root>
                 : <SignBtn>
-                    <div css={css`cursor: pointer`}>Sign in with wavesKeeper</div>
+                    <div css={css`cursor: pointer; white-space: nowrap;padding-left: 10px;`}>
+                        Sign in with wavesKeeper
+                    </div>
                 </SignBtn>
         }</Wrapper>
 

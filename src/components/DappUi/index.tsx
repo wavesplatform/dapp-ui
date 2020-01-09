@@ -13,8 +13,9 @@ import { getExplorerLink } from "@utils/index";
 import EmptyDapp from './EmptyDapp'
 import { Explorer } from "@components/DappUi/Explorer";
 import Loading from "@components/DappUi/Loading";
-import MenuIcon from "@components/DappUi/MenuIcon";
+import MenuIcon, {MenuWrapper} from "@components/DappUi/MenuIcon";
 import Modal from "@components/DappUi/Modal";
+import { Collapse } from 'react-collapse';
 
 interface IInjectedProps {
     accountStore?: AccountStore
@@ -29,13 +30,14 @@ interface IProps extends IInjectedProps {
 }
 
 interface IState {
+    open: boolean
 }
 
 const Root = styled.div`
 background: linear-gradient(152.04deg, #FFFFFF 9.12%, #F0F7FC 104.06%);
 position: fixed;top: 0;left: 0;right: 0;
 height: 100%;
-`
+`;
 
 const Sep = styled.div`height: 100px; flex-shrink: 0;`;
 
@@ -54,14 +56,14 @@ display: none;
 display: block;
 }
  
-`
+`;
 const Desktop = styled.div`
 display: block;
 @media(max-width: 768px){
 display: none;
 }
  
-`
+`;
 
 @inject('accountStore', 'dappStore', 'notificationStore', 'metaStore', 'historyStore')
 @observer
@@ -87,6 +89,15 @@ class DappUi extends React.Component<IProps, IState> {
         })
     };
 
+    state = {open: false};
+
+    handleOpenModal = () => this.setState({open: true});
+
+    handleCloseModal = () =>{
+        console.log('ok')
+        this.setState({open: false});
+    }
+
     render() {
         const {isFailed, meta, invalidMeta, byte} = this.props.metaStore!;
         const pathname = this.props.historyStore!.currentPath;
@@ -97,7 +108,7 @@ class DappUi extends React.Component<IProps, IState> {
         }
 
         if (isFailed || invalidMeta) {
-            const link = <a target="_blank" href={getExplorerLink(byte, pathname, 'address')}>
+            const link = <a target="_blank" rel="noopener noreferrer" href={getExplorerLink(byte, pathname, 'address')}>
                 Browse in WavesExplorer
             </a>;
             body = <EmptyDapp description={
@@ -114,17 +125,22 @@ class DappUi extends React.Component<IProps, IState> {
         return <Root>
 
             <Head withSearch/>
+            <MenuWrapper>
+                <MenuIcon onClick={this.handleOpenModal}/>
+            </MenuWrapper>
             <Mobile>
-                <Modal btn={<MenuIcon/>}>
-                    <Explorer meta={meta} hash={hash}/>
-                </Modal>
+                <Collapse isOpened={this.state.open}>
+                    <Modal handleClose={this.handleCloseModal}>
+                        <Explorer onSelect={this.handleCloseModal} meta={meta} hash={hash}/>
+                    </Modal>
+                </Collapse>
+
             </Mobile>
             <Desktop>
                 <Explorer meta={meta} hash={hash}/>
             </Desktop>
             <ScrollBar containerRef={this.setRef} onScrollY={this.scrollHandler} css={contentWrapperStyle}>
                 <Sep/>
-                <Loading>Loading</Loading>
                 {body}
                 <Footer/>
             </ScrollBar>

@@ -1,28 +1,13 @@
 import React from "react";
 import styled from "@emotion/styled";
 
-const MenuWrapper = styled.div`
-position: fixed;
-top: 0;
-left: 0;
-height: 100px;
-width: 32px;
-display: none;
-align-items: center;
-margin-left: 20px;
-z-index: 2;
-outline: none;
-
-@media(max-width: 768px){
-  display: flex;
-}
-`;
 
 const Root = styled.div`
-position: fixed; top: 0; left: 0; right:0; bottom:0;
-background-color: rgba(205, 211, 226, 0.8); 
-display: flex;
-z-index: 2;
+//position: absolute; top: 0; left: 0; right:0; bottom:0;
+//background-color: rgba(205, 211, 226, 0.8); 
+//display: flex;
+//z-index: 2;
+//height: 100vh;
 `
 
 const Content = styled.div`
@@ -50,29 +35,17 @@ const ExitBtn: React.FunctionComponent<{ onClick: () => void }> = ({onClick}) =>
 </ExitBtnRoot>
 
 interface IProps {
-    btn: JSX.Element
+    handleClose: () => void
 }
 
-export default class Modal extends React.Component<IProps, { open: boolean }> {
-
-    state = {open: false};
-
-    handleOpen = () => this.setState({open: true});
-
-    handleClose = () => this.setState({open: false});
+export default class Modal extends React.Component<IProps> {
 
     render() {
-        return <>
-            <MenuWrapper>
-                <div onClick={this.handleOpen}>{this.props.btn}</div>
-            </MenuWrapper>
-            {this.state.open && <Root>
-                <Content>
-                    <ExitBtn onClick={this.handleClose}/>
-                    {this.props.children}
-                </Content>
-            </Root>}
-        </>
+        return <Root>
+            <Content>
+                <ExitBtn onClick={this.props.handleClose}/>
+                {this.props.children}
+            </Content>
+        </Root>
     }
-
 }

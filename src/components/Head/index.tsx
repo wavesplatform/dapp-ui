@@ -42,9 +42,11 @@ display: flex;
  align-items: center;
 width: 100%;
 white-space: nowrap;
+
 @media(max-width: 1200px){
     align-items: flex-start;
     flex-direction: column;
+    margin-right: 20px;
 }
 `
 

@@ -51,3 +51,19 @@ code {
 .ps__rail-y:hover .ps__thumb-y {
     width: 6px !important;
 }
+
+.ReactCollapse--collapse{
+    /*position: relative;*/
+    transition: height 500ms !important;
+    position: fixed; top: 0; left: 0; right:0; bottom:0;
+    background-color: rgba(205, 211, 226, 0.8);
+    display: flex;
+    z-index: 2;
+    /*height: 100vh;*/
+
+}
+
+.ReactCollapse--content{
+    width: 100%;
+
+}

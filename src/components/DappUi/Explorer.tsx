@@ -29,7 +29,6 @@ padding-left: 20px;
 `
 
 
-
 const anchorWrapperStyle = css`
 position: fixed;
 top:100px;
@@ -46,9 +45,11 @@ height: 100%;
 
 `;
 
-export const Explorer: React.FunctionComponent<{ meta?: IMeta, hash: string }> = ({meta, hash}) =>
-    <ScrollBar css={anchorWrapperStyle}>
-    {meta && meta.callableFuncTypes ? Object.keys(meta.callableFuncTypes).map(key =>
-        <Anchor key={key} href={`#${key}`} css={hash === key && css`background: #E9EFFF`}> {key}</Anchor>
-) : <div/>}
-</ScrollBar>
+export const Explorer: React.FunctionComponent<{ meta?: IMeta, hash: string, onSelect?: () => void }> =
+    ({meta, hash, onSelect}) =>
+        <ScrollBar css={anchorWrapperStyle} options={{suppressScrollX: true}}>
+            {meta && meta.callableFuncTypes ? Object.keys(meta.callableFuncTypes).map(key =>
+                <Anchor onClick={onSelect} key={key} href={`#${key}`}
+                        css={hash === key && css`background: #E9EFFF`}> {key}</Anchor>
+            ) : <div/>}
+        </ScrollBar>;

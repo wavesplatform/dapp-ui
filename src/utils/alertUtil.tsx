@@ -10,6 +10,9 @@ display: flex;
 flex-direction: column;
 width: 400px;
 height:fit-content;
+@media(max-width: 768px){
+  width: 300px;
+}
 `;
 
 const Body = styled.div`
@@ -36,7 +39,7 @@ width: 80%;
 const Link = styled.a`
 text-decoration: none;
 color: #5A8AFF
-`
+`;
 
 const getAlert = (content: string | JSX.Element, {type, title, link, linkTitle}: TNotifyOptions) => {
     if (!type) return null;
