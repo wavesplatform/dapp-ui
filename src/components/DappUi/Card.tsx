@@ -27,7 +27,12 @@ flex-direction: column;
 justify-content: flex-end;
 `;
 
-const FlexBlock = styled.div`${flexStyle}`;
+const FlexBlock = styled.div`
+${flexStyle};
+@media(max-width: 900px){
+  flex-direction: column;
+}
+`;
 
 const Header = styled.div`
 ${flexStyle};
@@ -68,13 +73,17 @@ const ArgumentTitleVarType = styled.div`${fonts.callableFuncArgFont}`;
 
 const AttachPaymentBtn = styled.div`
 ${flexStyle};
-align-items: flex-end;
 justify-content: flex-end;
+flex: 1;
 `;
 
 const AttachPaymentItems = styled.div`
 ${flexStyle};
 flex-direction: column;
+flex: 1;
+@media(max-width: 1280px){
+  flex: 2;
+}
 `
 
 const AttachPaymentItem = styled.div`

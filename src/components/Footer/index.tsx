@@ -16,7 +16,7 @@ width: 100%;
 align-items: flex-end;
 flex-shrink: 0;
 flex: 1;
-padding-bottom: 14px;
+padding: 14px 0;
 `
 
 const Footer = () => <Root>
