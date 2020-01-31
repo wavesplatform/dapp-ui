@@ -1,17 +1,18 @@
-import React from "react";
-import styled from "@emotion/styled";
-import { fonts } from "@src/styles";
-import Button from "@components/DappUi/Button";
-import Attach from "@src/assets/icons/Attach";
-import { css } from "@emotion/core";
-import DappStore, { ICallableArgumentType, ICallableFuncArgument } from "@stores/DappStore";
-import ArgumentInput from "@components/DappUi/ArgumentInput";
-import Close from "@src/assets/icons/Close";
-import Input from "@components/Input";
-import { inject, observer } from "mobx-react";
-import AccountStore from "@stores/AccountStore";
-import Select from "@components/Select";
+import React from 'react';
+import styled from '@emotion/styled';
+import { fonts } from '@src/styles';
+import Button from '@components/DappUi/Button';
+import Attach from '@src/assets/icons/Attach';
+import { css } from '@emotion/core';
+import DappStore, { ICallableArgumentType, ICallableFuncArgument } from '@stores/DappStore';
+import ArgumentInput from '@components/DappUi/ArgumentInput';
+import Close from '@src/assets/icons/Close';
+import Input from '@components/Input';
+import { inject, observer } from 'mobx-react';
+import AccountStore from '@stores/AccountStore';
+import Select from '@components/Select';
 import { Option } from 'rc-select';
+
 const flexStyle = css`display: flex;width: 100%;`;
 
 const Root = styled.div`
@@ -84,7 +85,7 @@ flex: 1;
 @media(max-width: 1280px){
   flex: 2;
 }
-`
+`;
 
 const AttachPaymentItem = styled.div`
 ${flexStyle};
@@ -149,7 +150,7 @@ export default class Card extends React.Component<IProps, IState> {
         const invalidPayment = payments.some(({assetId, tokens}) => !assetId || !tokens);
         const invalidArgs = Object.keys(funcArgs).length !== Object.keys(args).length || Object.values(args)
             .some(({value}) => value === undefined || value === '');
-        return invalidPayment || invalidArgs
+        return invalidPayment || invalidArgs;
     }
 
     handleAddAttach = () => this.setState({
@@ -175,19 +176,19 @@ export default class Card extends React.Component<IProps, IState> {
         if (isNaN(+v) || +v < 0) return;
         const payments = this.state.payments;
         payments[i].tokens = v;
-        this.setState({payments})
+        this.setState({payments});
     };
 
     handleBlurPaymentCount = (i: number) => ({target: {value: v}}: React.ChangeEvent<HTMLInputElement>) => {
         const payments = this.state.payments;
         payments[i].tokens = (+v).toFixed(this.props.accountStore!.assets[payments[i].assetId].decimals || 1e-8);
-        this.setState({payments})
+        this.setState({payments});
     };
 
-    handleChangePaymentAsset = (i: number) => (v: string) => {
+    handleChangePaymentAsset = (i: number) => (assetId: string) => {
         const payments = this.state.payments;
-        payments[i].assetId = v;
-        this.setState({payments})
+        payments[i] = {assetId, tokens: (0).toFixed(this.props.accountStore!.assets[assetId].decimals || 8)};
+        this.setState({payments});
     };
 
 
@@ -201,7 +202,7 @@ export default class Card extends React.Component<IProps, IState> {
     render() {
         const {funcName: title, accountStore} = this.props;
         const {args} = this.state;
-        return <Root >
+        return <Root>
             <Anchor id={title}/>
             <Header>
                 <Title>{title}</Title>
@@ -245,12 +246,12 @@ export default class Card extends React.Component<IProps, IState> {
                                 onBlur={this.handleBlurPaymentCount(i)}
                             />
                             <Close onClick={this.handleRemoveAttach(i)}/>
-                        </AttachPaymentItem>
+                        </AttachPaymentItem>;
                     })}
                 </AttachPaymentItems>
                 <AttachPaymentBtn><Attach onClick={this.handleAddAttach}/></AttachPaymentBtn>
             </FlexBlock>
-        </Root>
+        </Root>;
     }
 }
 

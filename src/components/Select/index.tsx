@@ -5,19 +5,6 @@ import styled from "@emotion/styled";
 import RCSelect from 'rc-select';
 import 'rc-select/assets/index.css';
 
-// const selectStyle = css`
-// height: 50px;
-// width: 100%;
-// background: #F4F6FA;
-// border-radius: 4px;
-//
-// outline: none;
-// border: none;
-// padding: 0 10px;
-// font-family: Roboto;
-// font-size: 16px;
-// `;
-
 const Root = styled.div`
 display: flex;
 width: 100%;
@@ -48,7 +35,6 @@ font-size: 16px;
 }
 `;
 
-//
 interface IProps {
     value?: string
     onChange?: (e: string) => void
@@ -61,12 +47,8 @@ interface IState {
 
 export default class Select extends React.Component<IProps, IState> {
 
-    handleChange = (e: any) => console.log(e)
-
     render() {
         const {css: style, children, value, onChange} = this.props;
-
-
         return (
             <Root css={style}>
                 <RCSelect value={value} onChange={onChange}>{children}</RCSelect>
@@ -74,20 +56,3 @@ export default class Select extends React.Component<IProps, IState> {
         );
     }
 }
-
-
-// export default class Select extends React.Component<IProps, IState> {
-//
-//     render() {
-//         const { css, children, ...others} = this.props;
-//         return
-//
-//         {/*<div css={[styles.root, css]}>*/}
-//         {/*    <Root css={[css]} {...others}>*/}
-//                 // {children}
-//             // </Root>
-//         // </div>;
-//     }
-// }
-
-

@@ -101,7 +101,7 @@ class DappStore extends SubStore {
             const transaction = JSON.parse(tx);
             const {network} = accountStore;
             const link = network ? getExplorerLink(network!.code, transaction.id, 'tx') : undefined;
-            console.log(transaction);
+            console.dir(transaction);
             this.rootStore.notificationStore
                 .notify(
                     `Transaction sent: ${transaction.id}\n`,

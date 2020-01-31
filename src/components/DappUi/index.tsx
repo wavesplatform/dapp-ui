@@ -94,7 +94,6 @@ class DappUi extends React.Component<IProps, IState> {
     handleOpenModal = () => this.setState({open: true});
 
     handleCloseModal = () =>{
-        console.log('ok')
         this.setState({open: false});
     }
 
