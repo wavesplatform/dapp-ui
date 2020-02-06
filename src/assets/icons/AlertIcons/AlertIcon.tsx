@@ -7,23 +7,23 @@ import warn from './warning.svg'
 export const ErrorIcn =  styled.div`
 width: 58px;
 height: 58px;
-background: url(${err});
+background: url(${err}) center no-repeat;
 `;
 
 export const SuccessIcn = styled.div`
 width: 38px;
 height: 38px;;
-background: url(${suc});
+background: url(${suc})  center no-repeat;
 `;
 
 export const WarningIcn =  styled.div`
 width: 41px;
 height: 36px;
-background: url(${warn});
+background: url(${warn})  center no-repeat;
 `;
 
 export const InfoIcn =  styled.div`
 width: 38px;
 height: 38px;
-background: url(${info});
+background: url(${info})  center no-repeat;
 `;

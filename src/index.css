@@ -39,7 +39,9 @@ code {
     background: transparent;
 }
 
-
+.rc-notification-notice-close{
+ opacity: 1 !important;
+}
 
 .ps__rail-y{
     z-index: 2;
