@@ -77,7 +77,7 @@ export default class Head extends React.Component<IProps, { value: string }> {
             {this.props.withSearch &&
             <DappInputWrapper>
                 <div css={[fonts.descriptionFont, css`margin-right: 8px`]}>Smart Contract:</div>
-                <Input value={value} onKeyPress={this.handleKeyPress} onChange={this.handleChange}/>
+                <Input value={value} onKeyPress={this.handleKeyPress} onChange={this.handleChange}  spellCheck={false}/>
             </DappInputWrapper>}
             <Account/>
         </Root>;

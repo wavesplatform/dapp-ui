@@ -19,7 +19,9 @@ export default class SignBtn extends React.Component <IProps> {
             accountStore!.setupSynchronizationWithWavesKeeper();
         }
 
-        accountStore.login().catch(e => this.props.notificationStore!.notify(e.message, {type: 'error'}));
+        accountStore.login().catch(e => this.props.notificationStore!.notify(
+            e.message.includes('undefined is not an object') ? 'waves keeper is not installed' : e.message
+            , {type: 'error'}));
     };
 
     render(): React.ReactNode {

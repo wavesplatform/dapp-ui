@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { fonts } from '@src/styles';
 import Button from '@components/DappUi/Button';
 import Attach from '@src/assets/icons/Attach';
-import { css } from '@emotion/core';
+import { css, jsx } from '@emotion/core';
 import DappStore, { ICallableArgumentType, ICallableFuncArgument } from '@stores/DappStore';
 import ArgumentInput from '@components/DappUi/ArgumentInput';
 import Close from '@src/assets/icons/Close';
@@ -138,7 +138,7 @@ export default class Card extends React.Component<IProps, IState> {
         super(props);
         this.state = {
             args: Object.entries(this.props.funcArgs).reduce((acc, [k, v]) =>
-                ({...acc, [k]: {type: v, byteVectorType: v === 'ByteVector' ? 'base58' : undefined}}), {}),
+                ({...acc, [k]: {type: v, byteVectorType: v === 'ByteVector' ? 'base58' : undefined, value: defaultValue(v)}}), {}),
             payments: []
         };
     }
@@ -149,7 +149,7 @@ export default class Card extends React.Component<IProps, IState> {
         const {funcArgs} = this.props;
         const invalidPayment = payments.some(({assetId, tokens}) => !assetId || !tokens);
         const invalidArgs = Object.keys(funcArgs).length !== Object.keys(args).length || Object.values(args)
-            .some(({value}) => value === undefined || value === '');
+            .some(({value}) => value === undefined );
         return invalidPayment || invalidArgs;
     }
 
@@ -219,7 +219,7 @@ export default class Card extends React.Component<IProps, IState> {
                         </ArgumentTitle>
                         <ArgumentInput
                             css={css`flex:5`}
-                            value={args[argName] ? args[argName].value : undefined}
+                            value={args[argName] ? args[argName].value : defaultValue(type)}
                             name={argName}
                             type={type}
                             onChange={this.handleChangeValue}
@@ -244,6 +244,7 @@ export default class Card extends React.Component<IProps, IState> {
                                 onChange={this.handleChangePaymentCount(i)}
                                 value={String(tokens)}
                                 onBlur={this.handleBlurPaymentCount(i)}
+                                spellCheck={false}
                             />
                             <Close onClick={this.handleRemoveAttach(i)}/>
                         </AttachPaymentItem>;
@@ -255,3 +256,5 @@ export default class Card extends React.Component<IProps, IState> {
     }
 }
 
+
+const defaultValue = (type: ICallableArgumentType) => type === 'String' || type === 'ByteVector' ? '' : undefined

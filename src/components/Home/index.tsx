@@ -86,7 +86,7 @@ class Home extends React.Component<IProps, IState> {
                 <Title>Search for Smart Contract</Title>
                 <InputWrapper>
                     <Input onKeyPress={this.handleKeyPress} css={withSearchIconStyle} value={value}
-                           onChange={this.handleChange}/>
+                           onChange={this.handleChange} spellCheck={false}/>
                     <SearchIcn onClick={() => this.props.historyStore!.handleSearch(value)}/>
                 </InputWrapper>
             </FormBg>

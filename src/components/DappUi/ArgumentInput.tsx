@@ -2,7 +2,7 @@ import React from "react";
 import { ICallableArgumentType } from "@stores/DappStore";
 import Input from "@components/Input";
 import Select from "@components/Select";
-import { css } from "@emotion/core";
+import { css, jsx } from '@emotion/core';
 import { Option } from 'rc-select';
 
 interface IArgumentInputProps {
@@ -54,7 +54,7 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
                     </Select>
                     <Input
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
-                        value={value} css={style}
+                        value={value} css={style}  spellCheck={false}
                     />
                 </>;
 
@@ -63,6 +63,7 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
                     type="number"
                     value={value}
                     css={style}
+                    spellCheck={false}
                     onChange={({target: {value: v}}: React.ChangeEvent<HTMLInputElement>) =>
                         this.handleChange(!isNaN(+v) ? String(v) : undefined)
                     }
@@ -71,7 +72,7 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
             case "String":
                 return <Input
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
-                    value={value} css={style}
+                    value={value} css={style}  spellCheck={false}
                 />;
             default:
                 return <Input css={style} disabled/>;
