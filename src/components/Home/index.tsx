@@ -4,7 +4,7 @@ import { css, jsx } from '@emotion/core'
 import { fonts } from "@src/styles";
 import { inject, observer } from "mobx-react";
 import AccountStore from "@stores/AccountStore";
-import NotificationsStore from "@stores/NotificationStore";
+import NotificationStore from "@stores/NotificationStore";
 import { RouteComponentProps } from "react-router";
 import Input from "@components/Input";
 import { SearchIcn } from "@src/assets/icons/SearchIcn";
@@ -40,7 +40,7 @@ const withSearchIconStyle = css`border-radius: 4px 0  0 4px;`;
 
 interface IInjectedProps {
     accountStore?: AccountStore
-    notificationStore?: NotificationsStore
+    notificationStore?: NotificationStore
     historyStore?: HistoryStore
 }
 

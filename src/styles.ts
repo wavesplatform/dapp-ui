@@ -10,6 +10,8 @@ font-size: 12px;
 line-height: 14px;
 text-align: right;
 color: #6F7582;
+display: flex;
+align-items: center;
 `,
     descriptionFont: css`
 font-family: Roboto;

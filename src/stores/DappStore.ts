@@ -1,7 +1,6 @@
 import { SubStore } from './SubStore';
-import { IArgumentInput } from "@components/DappUi/Card";
-import { base58Decode, base64Encode } from '@waves/ts-lib-crypto'
-import { getExplorerLink } from "@utils/index";
+import { IArgumentInput } from '@components/DappUi/Card';
+import { base58Decode, base64Encode } from '@waves/ts-lib-crypto';
 
 export type ICallableArgumentType =
     'Int' | 'String' | 'ByteVector' | 'Boolean'
@@ -14,7 +13,6 @@ export interface ICallableFuncArgument {
 export interface ICallableFuncTypes {
     [func: string]: ICallableFuncArgument
 }
-
 
 
 interface IKeeperTransactionDataCallArg {
@@ -56,13 +54,13 @@ class DappStore extends SubStore {
         const {value, type, byteVectorType} = arg;
         if (value === undefined) {
             this.rootStore.notificationStore.notify('value is undefined', {type: 'error'});
-            return ''
+            return '';
         }
         if (type === 'Boolean' && ['true', 'false'].includes(value)) return value === 'true';
         if (type === 'Int' && !isNaN(+value)) return +value;
         if (byteVectorType === 'base58') return `base64:${b58strTob64Str(value)}`;
         if (byteVectorType === 'base64') return `base64:${value}`;
-        else return value
+        else return value;
     };
 
     private convertArgs = (args: IArgumentInput[]): IKeeperTransactionDataCallArg[] =>
@@ -73,7 +71,7 @@ class DappStore extends SubStore {
         const {accountStore} = this.rootStore;
         let args: IKeeperTransactionDataCallArg[] = [];
         try {
-            args = this.convertArgs(inArgs)
+            args = this.convertArgs(inArgs);
         } catch (e) {
             console.error(e);
             this.rootStore.notificationStore.notify(e, {type: 'error'});
@@ -84,7 +82,7 @@ class DappStore extends SubStore {
                 function: func,
                 args
             },
-            fee: {tokens: this.rootStore.accountStore.scripted ? '0.009' : '0.005', assetId: 'WAVES'},
+            fee: {tokens: this.rootStore.accountStore.fee, assetId: 'WAVES'},
             payment
         };
 
@@ -93,27 +91,16 @@ class DappStore extends SubStore {
             data: transactionData
         };
 
-        if (!accountStore.isApplicationAuthorizedInWavesKeeper) {
+        if (!accountStore.isAuthorized || !accountStore.loginType) {
             this.rootStore.notificationStore.notify('Application is not authorized in WavesKeeper', {type: 'warning'});
-            return
+            return;
         }
-        window['WavesKeeper'].signAndPublishTransaction(tx).then((tx: any) => {
-            const transaction = JSON.parse(tx);
-            const {network} = accountStore;
-            const link = network ? getExplorerLink(network!.code, transaction.id, 'tx') : undefined;
-            console.dir(transaction);
-            this.rootStore.notificationStore
-                .notify(
-                    `Transaction sent: ${transaction.id}\n`,
-                    {type: 'success', link, linkTitle: 'View transaction'})
 
-        }).catch((error: any) => {
-            console.error(error);
-            this.rootStore.notificationStore.notify(error.data, {type: 'error', title: error.message});
-        });
+        if (accountStore.loginType === 'keeper') this.rootStore.keeperStore.sendTx(tx)
+
+        if (accountStore.loginType === 'exchange') this.rootStore.signerStore.sendTx(tx)
+
     };
-
-
 }
 
 
@@ -123,21 +110,21 @@ function b58strTob64Str(str = ''): string {
     try {
         return base64Encode(base58Decode(str));
     } catch (e) {
-        throw error
+        throw error;
     }
 }
 
 function convertArgType(type: ICallableArgumentType): string {
     switch (type) {
-        case "Boolean":
+        case 'Boolean':
             return 'boolean';
-        case "ByteVector":
+        case 'ByteVector':
             return 'binary';
-        case "Int":
+        case 'Int':
             return 'integer';
-        case "String":
+        case 'String':
             return 'string';
     }
-    return type
+    return type;
 };
 export default DappStore;

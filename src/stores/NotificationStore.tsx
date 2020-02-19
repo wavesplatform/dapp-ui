@@ -2,6 +2,7 @@ import notification from 'rc-notification';
 import { SubStore } from '@stores/SubStore';
 import { RootStore } from '@stores/RootStore';
 import getAlert, {closeAlertIcon} from '@utils/alertUtil'
+import { observable } from 'mobx';
 
 export type TNotifyOptions = Partial<{
     duration: number,
@@ -45,6 +46,8 @@ const styles = {
 
 class NotificationStore extends SubStore {
     _instance?: any;
+
+    @observable isOpenLoginDialog = false;
 
     constructor(rootStore: RootStore) {
         super(rootStore);

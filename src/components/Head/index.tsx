@@ -24,7 +24,8 @@ flex-shrink: 0;
 @media(max-width: 768px){
   padding-left: 0;
   justify-content: center;
-  width: 100%; 
+  //width: 50%;
+  flex: 3; 
 }
 `
 
@@ -48,8 +49,10 @@ white-space: nowrap;
     flex-direction: column;
     margin-right: 20px;
 }
+@media(max-width: 768px){
+display: none;
+}
 `
-
 
 
 
