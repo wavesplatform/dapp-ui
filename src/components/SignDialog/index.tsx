@@ -1,3 +1,4 @@
+/** @jsx jsx*/
 import React from 'react';
 import { inject, observer } from 'mobx-react';
 import AccountStore from '@stores/AccountStore';
@@ -6,6 +7,8 @@ import NotificationStore from '@stores/NotificationStore';
 import Button from '@components/DappUi/Button';
 import { SignerStore } from '@stores/index';
 import styled from '@emotion/styled';
+import { css, jsx } from '@emotion/core';
+import { fonts } from '@src/styles';
 
 interface IProps {
     accountStore?: AccountStore
@@ -60,15 +63,19 @@ const Icon = styled.svg`
 
 const Body = styled.div`
     display: flex;
-    align-items:center;
-    flex-direction:column;
     justify-content:space-around;
     height: 100%;
-    margin: -4px 0;
+    margin: 0 -4px ;
     & > *  {
-    margin: 4px 0;
+    margin: 0 4px ;
+    flex: 1;
     }
 `;
+
+const Description = styled.div`
+${fonts.footerFont};
+text-align: left;
+`
 
 
 @inject('accountStore', 'notificationStore', 'signerStore', 'keeperStore')
@@ -118,8 +125,14 @@ export default class SignDialog extends React.Component <IProps> {
                 <CloseIcon onClick={this.handleCloseDialog}/>
                 <Title>Connect a wallet to get started</Title>
                 <Body>
-                    <Button onClick={this.handleSignWithKeeper}>Sign in with Keeper</Button>
-                    <Button onClick={this.handleSignWithExchange}>Sign in with Exchange</Button>
+                    <div>
+                        <Button css={css`width: 100%`} onClick={this.handleSignWithKeeper}>Sign in with Keeper</Button>
+                        <Description><br/>The network will be chosen in WavesKeeper by user</Description>
+                    </div>
+                    <div>
+                        <Button css={css`width: 100%`} onClick={this.handleSignWithExchange}>Sign in with Exchange</Button>
+                        <Description><br/>The network will be MainNet by default</Description>
+                    </div>
                 </Body>
             </Dialog>
         </Overlay>;
