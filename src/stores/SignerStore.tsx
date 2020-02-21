@@ -24,12 +24,11 @@ class SignerStore extends SubStore {
     login = async () => {
         const account = await this.signer.login();
         if ('address' in account) {
-            this.rootStore.accountStore.address = account.address;
             const byte = await this.signer.getNetworkByte();
             this.rootStore.accountStore.network = this.getNetworkByCharCode(byte);
-            await this.rootStore.accountStore.updateAccountAssets(account.address);
             this.isApplicationAuthorizedInWavesExchange = true;
             this.rootStore.accountStore.loginType = 'exchange';
+            this.rootStore.accountStore.address = account.address;
         }
     };
 

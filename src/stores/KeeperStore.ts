@@ -65,9 +65,8 @@ class KeeperStore extends SubStore {
         const resp = window['WavesKeeper'].publicState();
         const publicState = await resp;
         if (publicState.account && publicState.account.address) {
+            this.updateNetwork(publicState)
             this.rootStore.accountStore.address = publicState.account.address;
-            // this.rootStore.dappStore.updateDetails(publicState.account.address);
-            // this.rootStore.accountStore.isAuthorized = true;
             this.rootStore.accountStore.loginType = 'keeper';
 
         }
@@ -91,7 +90,8 @@ class KeeperStore extends SubStore {
     @action
     async updateWavesKeeper(publicState: any) {
         this.updateNetwork(publicState);
-        await this.rootStore.accountStore.updateAccountAssets(publicState);
+        this.rootStore.accountStore.address = publicState.account.address;
+
         if (this.wavesKeeperAccount) {
             publicState.account
                 ? this.updateWavesKeeperAccount(publicState)

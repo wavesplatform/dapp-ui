@@ -125,7 +125,7 @@ const getNetwork = (url: string) => {
     }
 };
 
-const Logout = ({onClick}: { onClick?: () => void }) => <svg css={css`margin-left: 14px`} onClick={onClick} width="14"
+const Logout = ({onClick}: { onClick?: () => void }) => <svg css={css`margin-left: 14px;cursor: pointer;`} onClick={onClick} width="14"
                                                              height="14" viewBox="0 0 14 14" fill="none"
                                                              xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0)">
@@ -143,7 +143,7 @@ const Logout = ({onClick}: { onClick?: () => void }) => <svg css={css`margin-lef
     </defs>
 </svg>;
 
-const Copy = ({onClick}: { onClick?: () => void }) => <svg css={css`margin-left: 8px`} onClick={onClick} width="14"
+const Copy = ({onClick}: { onClick?: () => void }) => <svg css={css`margin-left: 8px;cursor: pointer;`} onClick={onClick} width="14"
                                                            height="14" viewBox="0 0 14 14" fill="none"
                                                            xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0)">

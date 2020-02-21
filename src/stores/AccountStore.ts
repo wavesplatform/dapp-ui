@@ -1,8 +1,9 @@
-import { action, computed, observable } from 'mobx';
+import { action, autorun, computed, observable } from 'mobx';
 import { SubStore } from './SubStore';
 import { base58Decode } from '@waves/ts-lib-crypto';
 import { IAsset, INetwork } from '@stores/KeeperStore';
 import { checkSlash } from '@utils/index';
+import { RootStore } from '@stores/RootStore';
 
 class AccountStore extends SubStore {
     @observable assets: { [name: string]: IAsset } = {'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8}};
@@ -10,6 +11,17 @@ class AccountStore extends SubStore {
     @observable network: INetwork | null = null;
     @observable address: string | null = null;
     @observable loginType: 'keeper' | 'exchange' | null = null;
+
+    constructor(rootStore: RootStore){
+        super(rootStore)
+
+        autorun(async () => {
+            console.log(this.address)
+            if(this.address){
+                await this.updateAccountAssets(this.address);
+            }
+        })
+    }
 
     @computed get isAuthorized() {
         return this.rootStore.keeperStore.isApplicationAuthorizedInWavesKeeper ||
@@ -26,7 +38,8 @@ class AccountStore extends SubStore {
         const server = this.network.server;
         const path = `${checkSlash(server)}assets/balance/${address}`;
         const resp = await fetch(path);
-        const assets: { balances: { assetId: string, issueTransaction: { name: string, decimals: number } }[] } = await (resp).json();
+        const data = (await (resp).json())
+        const assets: { balances: { assetId: string, issueTransaction: { name: string, decimals: number } }[] } = data;
         if ('balances' in assets) {
 
             this.rootStore.accountStore.assets = {

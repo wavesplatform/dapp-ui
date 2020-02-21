@@ -232,7 +232,7 @@ export default class Card extends React.Component<IProps, IState> {
             <FlexBlock>
                 <AttachPaymentItems>
                     {this.state.payments.map(({assetId, tokens}, i) => {
-                        const decimals = accountStore!.assets[assetId].decimals || 8;
+                        const decimals = accountStore!.assets[assetId] && accountStore!.assets[assetId].decimals || 8;
                         return <AttachPaymentItem key={i}>
                             <Select onChange={this.handleChangePaymentAsset(i)} value={assetId}>
                                 {Object.values(accountStore!.assets).map(({assetId, name}) =>
