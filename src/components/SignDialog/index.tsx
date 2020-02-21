@@ -74,8 +74,8 @@ const Body = styled.div`
 
 const Description = styled.div`
 ${fonts.footerFont};
-text-align: left;
-`
+//text-align: left;
+`;
 
 
 @inject('accountStore', 'notificationStore', 'signerStore', 'keeperStore')
@@ -100,7 +100,8 @@ export default class SignDialog extends React.Component <IProps> {
         }
         keeperStore.login()
             .catch(e => this.props.notificationStore!.notify(
-                <a href="https://wavesplatform.com/technology/keeper" target="_blank">install WavesKeeper</a>,
+                <a href="https://wavesplatform.com/technology/keeper"  target="_blank" rel="noopener noreferrer">
+                    install WavesKeeper</a>,
                 {type: 'error', title: 'keeper is not installed'})
             );
     };
@@ -119,6 +120,7 @@ export default class SignDialog extends React.Component <IProps> {
 
     render(): React.ReactNode {
         const open = this.props.notificationStore!.isOpenLoginDialog;
+        const isKeeper = this.props.keeperStore!.isBrowserSupportsWavesKeeper;
         if (!open) return null;
         return <Overlay>
             <Dialog data-owner={'sign'}>
@@ -126,11 +128,19 @@ export default class SignDialog extends React.Component <IProps> {
                 <Title>Connect a wallet to get started</Title>
                 <Body>
                     <div>
-                        <Button css={css`width: 100%`} onClick={this.handleSignWithKeeper}>Sign in with Keeper</Button>
-                        <Description><br/>The network will be chosen in WavesKeeper by user</Description>
+                        <Button css={css`width: 100%`} onClick={this.handleSignWithKeeper} disabled={!isKeeper}>
+                            Sign in with Keeper
+                        </Button>
+                        <Description css={!isKeeper && css`color: #EF7362`}>
+                            <br/>{
+                            isKeeper
+                                ? 'The network will be chosen in WavesKeeper by user'
+                                : 'Waves Keeper doesn’t support this browser'
+                        }</Description>
                     </div>
                     <div>
-                        <Button css={css`width: 100%`} onClick={this.handleSignWithExchange}>Sign in with Exchange</Button>
+                        <Button css={css`width: 100%`} onClick={this.handleSignWithExchange}>
+                            Sign in with Exchange</Button>
                         <Description><br/>The network will be MainNet by default</Description>
                     </div>
                 </Body>

@@ -16,7 +16,7 @@ class SignerStore extends SubStore {
         super(rootStore);
         const pathname = this.rootStore.historyStore!.currentPath;
         const networkByAddress = this.rootStore.accountStore!.getNetworkByAddress(pathname);
-        const NODE_URL = networkByAddress ?  networkByAddress.server : 'https://nodes.wavesnodes.com';
+        const NODE_URL = networkByAddress ? networkByAddress.server : 'https://nodes.wavesnodes.com';
         this.signer = new Signer({NODE_URL});
         this.signer.setProvider(new Provider());
     }
@@ -25,8 +25,9 @@ class SignerStore extends SubStore {
         const account = await this.signer.login();
         if ('address' in account) {
             this.rootStore.accountStore.address = account.address;
-            const byte = await this.signer.getNetworkByte()
+            const byte = await this.signer.getNetworkByte();
             this.rootStore.accountStore.network = this.getNetworkByCharCode(byte);
+            await this.rootStore.accountStore.updateAccountAssets(account.address);
             this.isApplicationAuthorizedInWavesExchange = true;
             this.rootStore.accountStore.loginType = 'exchange';
         }
@@ -35,7 +36,7 @@ class SignerStore extends SubStore {
     @action
     async sendTx({data: tx}: any, opts: { notStopWait?: boolean } = {}) {
         if ('payment' in tx) {
-            tx.payment = tx.payment.map(({ tokens: amount, assetId }: any) => ({ amount: +amount * 1e8, assetId }));
+            tx.payment = tx.payment.map(({tokens: amount, assetId}: any) => ({amount: +amount * 1e8, assetId}));
         }
         if ('fee' in tx) {
             delete tx.feeAssetId;
@@ -44,18 +45,17 @@ class SignerStore extends SubStore {
 
         try {
             const transaction = await this.signer.invoke(tx).broadcast();
-            const id = (transaction as any).id || ''
+            const id = (transaction as any).id || '';
             const {network} = this.rootStore.accountStore;
             const link = network ? getExplorerLink(network!.code, id, 'tx') : undefined;
             console.dir(transaction);
             this.rootStore.notificationStore
-                .notify(
-                    `Transaction sent: ${id}\n`,
-                    {type: 'success', link, linkTitle: 'View transaction'})
+                .notify(`Transaction sent: ${id}\n`,
+                    {type: 'success', link, linkTitle: 'View transaction'});
 
-        } catch ({ message }) {
-            console.error(message);
-            this.rootStore.notificationStore.notify(message, { type: 'error' });
+        } catch (err) {
+            console.error(err);
+            this.rootStore.notificationStore.notify((typeof err === 'string' ? err : err.message), {type: 'error'})
         }
     }
 

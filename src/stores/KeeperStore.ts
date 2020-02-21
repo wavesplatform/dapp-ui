@@ -1,6 +1,5 @@
 import { SubStore } from '@stores/SubStore';
-import { action, autorun, computed, observable, set } from 'mobx';
-import { checkSlash } from '@utils';
+import { action, autorun, observable, set } from 'mobx';
 import { nodeInteraction } from '@waves/waves-transactions';
 import { RootStore } from '@stores/RootStore';
 import { getCurrentBrowser, getExplorerLink } from '@utils/index';
@@ -42,7 +41,7 @@ class KeeperStore extends SubStore {
 
     constructor(rootStore: RootStore) {
         super(rootStore);
-        if (isBrowserSupportsWavesKeeper()) {
+        if (this.isBrowserSupportsWavesKeeper) {
             this.setupWavesKeeper();
         } else {
             this.rootStore.notificationStore!.notify('you use unsupported browser', {
@@ -77,24 +76,6 @@ class KeeperStore extends SubStore {
 
 
     @action
-    async updateAccountAssets(publicState: any) {
-        if (!publicState || !publicState.network || !publicState.account) return;
-        const server = publicState.network.server;
-        const path = `${checkSlash(server)}assets/balance/${publicState.account.address}`;
-        const resp = await fetch(path);
-        const assets: { balances: { assetId: string, issueTransaction: { name: string, decimals: number } }[] } = await (resp).json();
-        if ('balances' in assets) {
-
-            this.rootStore.accountStore.assets = {
-                'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8},
-                ...assets.balances.reduce((acc, {assetId, issueTransaction: {name, decimals}}) =>
-                    ({...acc, [assetId]: {assetId, name, decimals}}), {})
-            };
-        }
-    }
-
-
-    @action
     updateWavesKeeperAccount = async (publicState: any) => {
         this.rootStore.accountStore.scripted = (await nodeInteraction.scriptInfo(publicState.account.address, publicState.network.server)).script != null;
         this.wavesKeeperAccount && set(this.wavesKeeperAccount, {
@@ -110,7 +91,7 @@ class KeeperStore extends SubStore {
     @action
     async updateWavesKeeper(publicState: any) {
         this.updateNetwork(publicState);
-        this.updateAccountAssets(publicState);
+        await this.rootStore.accountStore.updateAccountAssets(publicState);
         if (this.wavesKeeperAccount) {
             publicState.account
                 ? this.updateWavesKeeperAccount(publicState)
@@ -202,14 +183,14 @@ class KeeperStore extends SubStore {
         console.error(error);
         this.rootStore.notificationStore.notify(error.data, {type: 'error', title: error.message});
     })
+    get isBrowserSupportsWavesKeeper(): boolean {
+        const browser = getCurrentBrowser();
+        return ['chrome', 'firefox', 'opera', 'edge'].includes(browser);
+    }
 
 
 }
 
-function isBrowserSupportsWavesKeeper(): boolean {
-    const browser = getCurrentBrowser();
-    return ['chrome', 'firefox', 'opera', 'edge'].includes(browser);
-}
 
 
 export default KeeperStore;

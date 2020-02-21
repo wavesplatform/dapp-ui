@@ -1,7 +1,8 @@
-import { computed, observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { SubStore } from './SubStore';
 import { base58Decode } from '@waves/ts-lib-crypto';
 import { IAsset, INetwork } from '@stores/KeeperStore';
+import { checkSlash } from '@utils/index';
 
 class AccountStore extends SubStore {
     @observable assets: { [name: string]: IAsset } = {'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8}};
@@ -17,6 +18,23 @@ class AccountStore extends SubStore {
 
     @computed get fee() {
         return this.scripted ? '0.009' : '0.005';
+    }
+
+    @action
+    async updateAccountAssets(address: string) {
+        if (!this.network ) return;
+        const server = this.network.server;
+        const path = `${checkSlash(server)}assets/balance/${address}`;
+        const resp = await fetch(path);
+        const assets: { balances: { assetId: string, issueTransaction: { name: string, decimals: number } }[] } = await (resp).json();
+        if ('balances' in assets) {
+
+            this.rootStore.accountStore.assets = {
+                'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8},
+                ...assets.balances.reduce((acc, {assetId, issueTransaction: {name, decimals}}) =>
+                    ({...acc, [assetId]: {assetId, name, decimals}}), {})
+            };
+        }
     }
 
     getNetworkByAddress = (address: string): INetwork | null => {

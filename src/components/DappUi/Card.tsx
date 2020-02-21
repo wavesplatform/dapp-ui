@@ -1,3 +1,4 @@
+/** @jsx jsx **/
 import React from 'react';
 import styled from '@emotion/styled';
 import { fonts } from '@src/styles';

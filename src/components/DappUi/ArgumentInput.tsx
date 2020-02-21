@@ -2,7 +2,7 @@ import React from "react";
 import { ICallableArgumentType } from "@stores/DappStore";
 import Input from "@components/Input";
 import Select from "@components/Select";
-import { css, jsx } from '@emotion/core';
+import { css} from '@emotion/core';
 import { Option } from 'rc-select';
 
 interface IArgumentInputProps {
