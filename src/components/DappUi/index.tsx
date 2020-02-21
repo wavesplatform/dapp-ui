@@ -13,8 +13,7 @@ import { getExplorerLink } from "@utils/index";
 import EmptyDapp from './EmptyDapp'
 import { Explorer } from "@components/DappUi/Explorer";
 import Loading from "@components/DappUi/Loading";
-import MenuIcon, {MenuWrapper} from "@components/DappUi/MenuIcon";
-import Modal from "@components/DappUi/Modal";
+import Modal from "@components/Modal";
 import { Collapse } from 'react-collapse';
 
 interface IInjectedProps {
@@ -89,13 +88,8 @@ class DappUi extends React.Component<IProps, IState> {
         })
     };
 
-    state = {open: false};
 
-    handleOpenModal = () => this.setState({open: true});
-
-    handleCloseModal = () =>{
-        this.setState({open: false});
-    }
+    handleCloseModal = () => this.props.notificationStore!.isOpenMobileExplorer = false
 
     render() {
         const {isFailed, meta, invalidMeta, byte} = this.props.metaStore!;
@@ -124,16 +118,14 @@ class DappUi extends React.Component<IProps, IState> {
         return <Root>
 
             <Head withSearch/>
-            <MenuWrapper>
-                <MenuIcon onClick={this.handleOpenModal}/>
-            </MenuWrapper>
+            {/*<MenuWrapper>*/}
+            {/*</MenuWrapper>*/}
             <Mobile>
-                <Collapse isOpened={this.state.open}>
+                <Collapse isOpened={this.props.notificationStore!.isOpenMobileExplorer}>
                     <Modal handleClose={this.handleCloseModal}>
                         <Explorer onSelect={this.handleCloseModal} meta={meta} hash={hash}/>
                     </Modal>
                 </Collapse>
-
             </Mobile>
             <Desktop>
                 <Explorer meta={meta} hash={hash}/>

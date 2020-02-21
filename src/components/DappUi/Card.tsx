@@ -13,6 +13,7 @@ import { inject, observer } from 'mobx-react';
 import AccountStore from '@stores/AccountStore';
 import Select from '@components/Select';
 import { Option } from 'rc-select';
+import { centerEllipsis } from '@components/Home/Account';
 
 const flexStyle = css`display: flex;width: 100%;`;
 
@@ -206,7 +207,7 @@ export default class Card extends React.Component<IProps, IState> {
         return <Root>
             <Anchor id={title}/>
             <Header>
-                <Title>{title}</Title>
+                <Title>{centerEllipsis(title)}</Title>
                 <Button onClick={this.handleCall} disabled={this.isInvalid}>{title}</Button>
             </Header>
             <ArgumentsLayout>
@@ -214,7 +215,7 @@ export default class Card extends React.Component<IProps, IState> {
                 Object.entries(args).map(([argName, {type}], i: number) =>
                     <ArgumentItem key={i}>
                         <ArgumentTitle>
-                            <ArgumentTitleVarName>{argName}:</ArgumentTitleVarName>
+                            <ArgumentTitleVarName>{centerEllipsis(argName, 7)}:</ArgumentTitleVarName>
                             &nbsp;
                             <ArgumentTitleVarType>{type}</ArgumentTitleVarType>
                         </ArgumentTitle>
@@ -232,7 +233,7 @@ export default class Card extends React.Component<IProps, IState> {
             <FlexBlock>
                 <AttachPaymentItems>
                     {this.state.payments.map(({assetId, tokens}, i) => {
-                        const decimals = accountStore!.assets[assetId] && accountStore!.assets[assetId].decimals || 8;
+                        const decimals = (accountStore!.assets[assetId] && accountStore!.assets[assetId].decimals) || 8;
                         return <AttachPaymentItem key={i}>
                             <Select onChange={this.handleChangePaymentAsset(i)} value={assetId}>
                                 {Object.values(accountStore!.assets).map(({assetId, name}) =>

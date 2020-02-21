@@ -14,13 +14,7 @@ class AccountStore extends SubStore {
 
     constructor(rootStore: RootStore){
         super(rootStore)
-
-        autorun(async () => {
-            console.log(this.address)
-            if(this.address){
-                await this.updateAccountAssets(this.address);
-            }
-        })
+        autorun(async () => this.address && await this.updateAccountAssets(this.address))
     }
 
     @computed get isAuthorized() {

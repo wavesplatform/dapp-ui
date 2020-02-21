@@ -6,13 +6,14 @@ const Root = styled.div`
 //position: absolute; top: 0; left: 0; right:0; bottom:0;
 //background-color: rgba(205, 211, 226, 0.8); 
 //display: flex;
-//z-index: 2;
+z-index: 3;
 //height: 100vh;
 `
 
 const Content = styled.div`
 background: white;
 height: max-content;
+position:relative;
 width: 100%;
 padding-bottom: 40px;
 `
@@ -22,8 +23,9 @@ height: 100px;
 width: 32px;
 display: flex;
 align-items: center;
-margin-left: 20px;
+padding-left: 10%;
 outline: none;
+z-index: 3;
 `
 
 const ExitBtn: React.FunctionComponent<{ onClick: () => void }> = ({onClick}) => <ExitBtnRoot>

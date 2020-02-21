@@ -48,6 +48,8 @@ class NotificationStore extends SubStore {
     _instance?: any;
 
     @observable isOpenLoginDialog = false;
+    @observable isOpenMobileExplorer = false;
+    @observable isOpenMobileAccount = false;
 
     constructor(rootStore: RootStore) {
         super(rootStore);

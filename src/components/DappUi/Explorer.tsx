@@ -5,6 +5,7 @@ import ScrollBar from "react-perfect-scrollbar";
 import { css, jsx } from "@emotion/core";
 import styled from "@emotion/styled";
 import { fonts } from "@src/styles";
+import { centerEllipsis } from '@components/Home/Account';
 
 
 const Anchor = styled.a`
@@ -50,6 +51,7 @@ export const Explorer: React.FunctionComponent<{ meta?: IMeta, hash: string, onS
         <ScrollBar css={anchorWrapperStyle} options={{suppressScrollX: true}}>
             {meta && meta.callableFuncTypes ? Object.keys(meta.callableFuncTypes).map(key =>
                 <Anchor onClick={onSelect} key={key} href={`#${key}`}
-                        css={hash === key && css`background: #E9EFFF`}> {key}</Anchor>
+                        css={hash === key && css`background: #E9EFFF`}> {centerEllipsis(key)}</Anchor>
             ) : <div/>}
+            <div css={css`height: 200px; width: 100%`}/>
         </ScrollBar>;

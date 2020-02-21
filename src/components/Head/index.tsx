@@ -9,9 +9,12 @@ import Input from "@components/Input";
 import { inject, observer } from "mobx-react";
 import HistoryStore from "@stores/HistoryStore";
 import { autorun } from "mobx";
+import MenuIcon from '@components/DappUi/MenuIcon';
+import { NotificationStore } from '@stores/index';
 
 interface IProps {
     historyStore?: HistoryStore
+    notificationStore?: NotificationStore
     withSearch?: boolean
 }
 
@@ -19,7 +22,6 @@ const LogoWrapper = styled.div`
 display: flex;
 width: 20%;
 justify-content: center; 
-padding-left: 10%;
 flex-shrink: 0;
 @media(max-width: 768px){
   padding-left: 0;
@@ -36,6 +38,7 @@ const Root = styled.div`
           height: 100px;
           position: fixed;top: 0;left: 0;right: 0;
           z-index: 1;
+          padding-left: 10%;
   `;
 
 const DappInputWrapper = styled.div`
@@ -56,7 +59,7 @@ display: none;
 
 
 
-@inject('historyStore')
+@inject('historyStore', 'notificationStore')
 @observer
 export default class Head extends React.Component<IProps, { value: string }> {
 
@@ -66,6 +69,7 @@ export default class Head extends React.Component<IProps, { value: string }> {
         autorun(() => this.setState({value: this.props.historyStore!.currentPath}))
     }
 
+    handleOpenExplorerModal = () => this.props.notificationStore!.isOpenMobileExplorer = true
 
     handleKeyPress = (e: React.KeyboardEvent) => e.key === 'Enter' && this.props.historyStore!.handleSearch(this.state.value || '');
     handleChange = ({target: {value}}: React.ChangeEvent<HTMLInputElement>) => this.setState({value});
@@ -75,6 +79,8 @@ export default class Head extends React.Component<IProps, { value: string }> {
         return <Root css={ css`background: ${this.props.withSearch
             ? 'linear-gradient(180deg, #F8F9FB 65.31%, rgba(248, 249, 251, 0) 100%);'
             : 'transparent'}`}>
+
+            <MenuIcon onClick={this.handleOpenExplorerModal}/>
 
             <LogoWrapper><a href="/"><img src={logo} alt={'Logo'}/></a></LogoWrapper>
             {this.props.withSearch &&
