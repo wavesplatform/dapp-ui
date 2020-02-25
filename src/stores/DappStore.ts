@@ -104,7 +104,7 @@ class DappStore extends SubStore {
 }
 
 
-function b58strTob64Str(str = ''): string {
+export function b58strTob64Str(str = ''): string {
     const error = 'incorrect base58';
     try {
         return base64Encode(base58Decode(str));

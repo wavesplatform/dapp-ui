@@ -140,7 +140,10 @@ export default class Card extends React.Component<IProps, IState> {
         super(props);
         this.state = {
             args: Object.entries(this.props.funcArgs).reduce((acc, [k, v]) =>
-                ({...acc, [k]: {type: v, byteVectorType: v === 'ByteVector' ? 'base58' : undefined, value: defaultValue(v)}}), {}),
+                ({
+                    ...acc,
+                    [k]: {type: v, byteVectorType: v === 'ByteVector' ? 'base58' : undefined, value: defaultValue(v)}
+                }), {}),
             payments: []
         };
     }
@@ -151,7 +154,7 @@ export default class Card extends React.Component<IProps, IState> {
         const {funcArgs} = this.props;
         const invalidPayment = payments.some(({assetId, tokens}) => !assetId || !tokens);
         const invalidArgs = Object.keys(funcArgs).length !== Object.keys(args).length || Object.values(args)
-            .some(({value}) => value === undefined );
+            .some(({value}) => value === undefined);
         return invalidPayment || invalidArgs;
     }
 
@@ -168,9 +171,10 @@ export default class Card extends React.Component<IProps, IState> {
         this.setState({payments});
     };
 
-    handleChangeValue = (name: string, type: ICallableArgumentType, value?: string) =>
+    handleChangeValue = (name: string, type: ICallableArgumentType, value?: string) => {
+        if (type === 'Int' && value && (isNaN(+value) || value.includes('e'))) return;
         this.setState({args: {...this.state.args, [name]: {...this.state.args[name], type, value}}});
-
+    };
     handleChangeByteVectorType = (name: string, byteVectorType: 'base58' | 'base64') =>
         this.setState({args: {...this.state.args, [name]: {...this.state.args[name], byteVectorType}}});
 
@@ -259,4 +263,4 @@ export default class Card extends React.Component<IProps, IState> {
 }
 
 
-const defaultValue = (type: ICallableArgumentType) => type === 'String' || type === 'ByteVector' ? '' : undefined
+const defaultValue = (type: ICallableArgumentType) => type === 'String' || type === 'ByteVector' ? '' : undefined;
