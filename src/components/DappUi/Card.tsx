@@ -5,7 +5,7 @@ import { fonts } from '@src/styles';
 import Button from '@components/DappUi/Button';
 import Attach from '@src/assets/icons/Attach';
 import { css, jsx } from '@emotion/core';
-import DappStore, { ICallableArgumentType, ICallableFuncArgument } from '@stores/DappStore';
+import DappStore, { b58strTob64Str, ICallableArgumentType, ICallableFuncArgument } from '@stores/DappStore';
 import ArgumentInput from '@components/DappUi/ArgumentInput';
 import Close from '@src/assets/icons/Close';
 import Input from '@components/Input';
@@ -155,7 +155,18 @@ export default class Card extends React.Component<IProps, IState> {
         const invalidPayment = payments.some(({assetId, tokens}) => !assetId || !tokens);
         const invalidArgs = Object.keys(funcArgs).length !== Object.keys(args).length || Object.values(args)
             .some(({value}) => value === undefined);
-        return invalidPayment || invalidArgs;
+        const invalidB58 = Object.values(args).some(({value, byteVectorType}) => {
+            let error = false;
+            if (byteVectorType && byteVectorType === 'base58') {
+                try {
+                    b58strTob64Str(value);
+                } catch (e) {
+                    error = true;
+                }
+            }
+            return error;
+        });
+        return invalidPayment || invalidArgs || invalidB58;
     }
 
     handleAddAttach = () => this.setState({
@@ -172,7 +183,7 @@ export default class Card extends React.Component<IProps, IState> {
     };
 
     handleChangeValue = (name: string, type: ICallableArgumentType, value?: string) => {
-        if (type === 'Int' && value && (isNaN(+value) || value.includes('e'))) return;
+        if (type === 'Int' && value && (isNaN(+value) || value.includes('e'))) value = value.replace('e', '');
         this.setState({args: {...this.state.args, [name]: {...this.state.args[name], type, value}}});
     };
     handleChangeByteVectorType = (name: string, byteVectorType: 'base58' | 'base64') =>
