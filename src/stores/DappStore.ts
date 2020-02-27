@@ -92,7 +92,7 @@ class DappStore extends SubStore {
         };
 
         if (!accountStore.isAuthorized || !accountStore.loginType) {
-            this.rootStore.notificationStore.notify('Application is not authorized in WavesKeeper', {type: 'warning'});
+            this.rootStore.notificationStore.notify('Application is not authorized', {type: 'warning'});
             return;
         }
 

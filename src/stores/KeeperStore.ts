@@ -43,14 +43,14 @@ class KeeperStore extends SubStore {
         super(rootStore);
         if (this.isBrowserSupportsWavesKeeper) {
             this.setupWavesKeeper();
-        } else {
-            this.rootStore.notificationStore!.notify('you use unsupported browser', {
-                type: 'warning',
-                link: "https://wavesplatform.com/technology/keeper",
-                linkTitle: 'more'
-            });
         }
-
+        // else {
+        //     this.rootStore.notificationStore!.notify('you use unsupported browser', {
+        //         type: 'warning',
+        //         link: "https://wavesplatform.com/technology/keeper",
+        //         linkTitle: 'more'
+        //     });
+        // }
     }
 
     @observable wavesKeeperAccount?: IWavesKeeperAccount;

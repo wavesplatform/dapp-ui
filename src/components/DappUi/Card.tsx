@@ -14,6 +14,7 @@ import AccountStore from '@stores/AccountStore';
 import Select from '@components/Select';
 import { Option } from 'rc-select';
 import { centerEllipsis } from '@components/Home/Account';
+import { autorun } from 'mobx';
 
 const flexStyle = css`display: flex;width: 100%;`;
 
@@ -130,6 +131,7 @@ interface IProps extends IInjectedProps {
 interface IState {
     args: { [name: string]: IArgumentInput }
     payments: { assetId: string, tokens: string }[]
+    address: string | null
 }
 
 @inject('dappStore', 'accountStore')
@@ -144,8 +146,19 @@ export default class Card extends React.Component<IProps, IState> {
                     ...acc,
                     [k]: {type: v, byteVectorType: v === 'ByteVector' ? 'base58' : undefined, value: defaultValue(v)}
                 }), {}),
-            payments: []
+            payments: [],
+            address: props.accountStore!.address
         };
+
+        autorun(() => {
+            let {payments} = this.state;
+            const address = this.props.accountStore!.address;
+            if (this.state.address !== null && this.state.address !== address) {
+                payments = [];
+            }
+            this.setState({payments, address});
+
+        });
     }
 
 
