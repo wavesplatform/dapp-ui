@@ -67,7 +67,7 @@ class NotificationStore extends SubStore {
                 ...opts,
                 content: getAlert(content, {...opts, type}),
                 style: {...styles[type], ...opts.style},
-                duration: opts.duration || 10,
+                duration: opts.duration || 1000000,
                 key: opts.key,
                 closable: true,
                 closeIcon: closeAlertIcon
