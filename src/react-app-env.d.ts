@@ -64,6 +64,7 @@ declare module '*.module.sass' {
 }
 
 declare module 'rc-notification';
+declare module 'rc-input-number';
 declare module 'rc-select';
 declare module 'react-scroll-into-view';
 declare interface Window {

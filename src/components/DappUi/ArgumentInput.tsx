@@ -6,6 +6,7 @@ import { css } from '@emotion/core';
 import { Option } from 'rc-select';
 import NotificationStore from '@stores/NotificationStore';
 import { inject, observer } from 'mobx-react';
+import InputNumber from '@components/Input/InputNumber';
 
 interface IArgumentInputProps {
     name: string
@@ -76,14 +77,10 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
                 </>;
 
             case 'Int':
-                return <Input
-                    type="number"
+                return <InputNumber
                     value={value}
-                    css={style}
                     spellCheck={false}
-                    onChange={({target: {value: v}}: React.ChangeEvent<HTMLInputElement>) =>
-                        this.handleChange(!isNaN(+v) ? String(v) : undefined)
-                    }
+                    onChange={(e: string) => this.handleChange(!isNaN(+e) ? e : '0')}
                 />;
 
             case 'String':

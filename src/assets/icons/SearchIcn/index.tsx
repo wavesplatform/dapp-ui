@@ -6,7 +6,7 @@ import vectorHov from './VectorHov.svg'
 import styled from "@emotion/styled";
 
 const rootStyle = css`
-height: 50px;
+height: 40px;
 display: flex; 
 justify-content: center;
 align-items: center;

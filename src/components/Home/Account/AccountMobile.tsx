@@ -10,24 +10,6 @@ import Modal from '@components/Modal';
 import { Collapse } from 'react-collapse';
 import { AccountDetails, SignIn } from '@components/Home/Account/index';
 
-const Root = styled.div`
-display: flex;
-margin-left: 30px;
-height: 34px;
-justify-content: flex-end;
-align-items: center;
-`;
-
-// const AccountDescription = styled.div`
-// display: flex;
-// flex-direction: column;
-// justify-content: space-between;
-// height: 100%;
-// @media(max-width: 1000px){
-//   display: none;
-// }
-// `;
-
 const Wrapper = styled.div`
 width: 70%;
 padding-right: 10%;
@@ -45,16 +27,6 @@ interface IProps {
     notificationStore?: NotificationStore
 }
 
-const ErrorText = styled.div`
-color: #EF7362
-`;
-
-const AccountDetailWrapper = styled.div`
-${fonts.descriptionFont};
-display: flex;
-justify-content: flex-end; 
-align-items: center;
-`;
 
 const Body = styled.div`
 display: flex;

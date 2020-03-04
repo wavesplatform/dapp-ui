@@ -3,14 +3,13 @@ import { inject, observer } from 'mobx-react';
 import React from 'react';
 import copyToClipboard from 'copy-to-clipboard';
 import { fonts } from '@src/styles';
-import Wifi from '@src/assets/icons/Wifi';
-import { css, jsx } from '@emotion/core';
+import { jsx } from '@emotion/core';
 import Avatar from '@components/Avatar';
 import styled from '@emotion/styled';
 import { AccountStore } from '@stores/index';
 import HistoryStore from '@stores/HistoryStore';
 import NotificationStore from '@stores/NotificationStore';
-import { AccountDetails, centerEllipsis, Copy, getNetwork, SignIn } from '@components/Home/Account/index';
+import { AccountDetails, centerEllipsis, Copy,  SignIn } from '@components/Home/Account/index';
 
 const Root = styled.div`
 display: flex;

@@ -12,9 +12,9 @@ class AccountStore extends SubStore {
     @observable address: string | null = null;
     @observable loginType: 'keeper' | 'exchange' | null = null;
 
-    constructor(rootStore: RootStore){
-        super(rootStore)
-        autorun(async () => this.address && await this.updateAccountAssets(this.address))
+    constructor(rootStore: RootStore) {
+        super(rootStore);
+        autorun(async () => this.address && await this.updateAccountAssets(this.address));
     }
 
     @computed get isAuthorized() {
@@ -28,20 +28,29 @@ class AccountStore extends SubStore {
 
     @action
     async updateAccountAssets(address: string) {
-        if (!this.network ) return;
+        if (!this.network) return;
         const server = this.network.server;
         const path = `${checkSlash(server)}assets/balance/${address}`;
         const resp = await fetch(path);
-        const data = (await (resp).json())
+        const data = (await (resp).json());
+
+        const nftResp = await fetch(`${checkSlash(server)}assets/nft/${address}/limit/1000`);
+        const nft: { 'id': 'string', 'name': 'string', 'decimals': 0 }[] = (await (nftResp).json());
+
         const assets: { balances: { assetId: string, issueTransaction: { name: string, decimals: number } }[] } = data;
+        assets.balances = [
+            ...assets.balances,
+            ...nft.map(({id, name, decimals}) => ({assetId: id, issueTransaction: {name, decimals}}))
+        ];
         if ('balances' in assets) {
 
             this.rootStore.accountStore.assets = {
                 'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8},
                 ...assets.balances.reduce((acc, {assetId, issueTransaction: {name, decimals}}) =>
-                    ({...acc, [assetId]: {assetId, name, decimals}}), {})
+                    ({...acc, [assetId]: {assetId, name, decimals}}), {}),
             };
         }
+
     }
 
     getNetworkByAddress = (address: string): INetwork | null => {

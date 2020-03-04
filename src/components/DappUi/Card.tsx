@@ -8,13 +8,13 @@ import { css, jsx } from '@emotion/core';
 import DappStore, { b58strTob64Str, ICallableArgumentType, ICallableFuncArgument } from '@stores/DappStore';
 import ArgumentInput from '@components/DappUi/ArgumentInput';
 import Close from '@src/assets/icons/Close';
-import Input from '@components/Input';
 import { inject, observer } from 'mobx-react';
 import AccountStore from '@stores/AccountStore';
 import Select from '@components/Select';
 import { Option } from 'rc-select';
 import { centerEllipsis } from '@components/Home/Account';
 import { autorun } from 'mobx';
+import InputNumber from '@components/Input/InputNumber';
 
 const flexStyle = css`display: flex;width: 100%;`;
 
@@ -33,7 +33,7 @@ justify-content: flex-end;
 
 const FlexBlock = styled.div`
 ${flexStyle};
-@media(max-width: 900px){
+@media(max-width: 1280px){
   flex-direction: column;
 }
 `;
@@ -49,8 +49,9 @@ margin: 0 0 20px 0;
 const ArgumentsLayout = styled.div`
 ${flexStyle};
 //margin: 0 0 20px 0;
+border-bottom: 1px solid #EBEDF2;
+margin-bottom: 16px;
 flex-direction: column;
-
 `;
 
 const ArgumentItem = styled.div`
@@ -84,20 +85,20 @@ flex: 1;
 const AttachPaymentItems = styled.div`
 ${flexStyle};
 flex-direction: column;
-flex: 1;
-@media(max-width: 1280px){
-  flex: 2;
-}
+flex: 3;
+//@media(max-width: 1280px){
+//  flex: 2;
+//}
 `;
 
 const AttachPaymentItem = styled.div`
 ${flexStyle};
 align-items: center;
-
- & > :first-of-type{
-  margin-right: 20px;
+  margin: 0 -10px;
+ & > *{
+  margin: 0 10px;
 }
- > * {
+ & > * {
   margin-bottom: 14px;
  }
 `;
@@ -138,18 +139,17 @@ interface IState {
 @observer
 export default class Card extends React.Component<IProps, IState> {
 
-    constructor(props: IProps) {
-        super(props);
-        this.state = {
-            args: Object.entries(this.props.funcArgs).reduce((acc, [k, v]) =>
-                ({
-                    ...acc,
-                    [k]: {type: v, byteVectorType: v === 'ByteVector' ? 'base58' : undefined, value: defaultValue(v)}
-                }), {}),
-            payments: [],
-            address: props.accountStore!.address
-        };
+    state: IState = {
+        args: Object.entries(this.props.funcArgs).reduce((acc, [k, v]) =>
+            ({
+                ...acc,
+                [k]: {type: v, byteVectorType: v === 'ByteVector' ? 'base58' : undefined, value: defaultValue(v)}
+            }), {}),
+        payments: [],
+        address: this.props.accountStore!.address
+    };
 
+    componentDidMount() {
         autorun(() => {
             let {payments} = this.state;
             const address = this.props.accountStore!.address;
@@ -157,7 +157,6 @@ export default class Card extends React.Component<IProps, IState> {
                 payments = [];
             }
             this.setState({payments, address});
-
         });
     }
 
@@ -182,7 +181,7 @@ export default class Card extends React.Component<IProps, IState> {
         return invalidPayment || invalidArgs || invalidB58;
     }
 
-    handleAddAttach = () => this.setState({
+    handleAddAttach = () => this.state.payments.length < 2 && this.setState({
         payments: [...this.state.payments, {
             assetId: 'WAVES',
             tokens: (0).toFixed(8)
@@ -196,16 +195,16 @@ export default class Card extends React.Component<IProps, IState> {
     };
 
     handleChangeValue = (name: string, type: ICallableArgumentType, value?: string) => {
-        if (type === 'Int' && value && (isNaN(+value) || value.includes('e'))) value = value.replace('e', '');
+        // if (type === 'Int' && value && (isNaN(+value) || value.includes('e'))) value = value.replace('e', '');
         this.setState({args: {...this.state.args, [name]: {...this.state.args[name], type, value}}});
     };
     handleChangeByteVectorType = (name: string, byteVectorType: 'base58' | 'base64') =>
         this.setState({args: {...this.state.args, [name]: {...this.state.args[name], byteVectorType}}});
 
-    handleChangePaymentCount = (i: number) => ({target: {value: v}}: React.ChangeEvent<HTMLInputElement>) => {
+    handleChangePaymentCount = (i: number) => (v: string | number) => {
         if (isNaN(+v) || +v < 0) return;
         const payments = this.state.payments;
-        payments[i].tokens = v;
+        payments[i].tokens = String(v);
         this.setState({payments});
     };
 
@@ -231,16 +230,16 @@ export default class Card extends React.Component<IProps, IState> {
 
     render() {
         const {funcName: title, accountStore} = this.props;
-        const {args} = this.state;
+        const {args, payments} = this.state;
         return <Root>
             <Anchor id={title}/>
             <Header>
                 <Title>{centerEllipsis(title)}</Title>
                 <Button onClick={this.handleCall} disabled={this.isInvalid}>{title}</Button>
             </Header>
+            {Object.keys(args).length > 0 &&
             <ArgumentsLayout>
-                {Object.keys(args).length > 0 &&
-                Object.entries(args).map(([argName, {type}], i: number) =>
+                {Object.entries(args).map(([argName, {type}], i: number) =>
                     <ArgumentItem key={i}>
                         <ArgumentTitle>
                             <ArgumentTitleVarName>{centerEllipsis(argName, 7)}:</ArgumentTitleVarName>
@@ -258,17 +257,22 @@ export default class Card extends React.Component<IProps, IState> {
                     </ArgumentItem>
                 )}
             </ArgumentsLayout>
+            }
             <FlexBlock>
                 <AttachPaymentItems>
                     {this.state.payments.map(({assetId, tokens}, i) => {
                         const decimals = (accountStore!.assets[assetId] && accountStore!.assets[assetId].decimals) || 8;
                         return <AttachPaymentItem key={i}>
+                            <ArgumentTitle>
+                                <ArgumentTitleVarName>Payments:</ArgumentTitleVarName>
+                                &nbsp;
+                                <ArgumentTitleVarType>{i + 1}/2</ArgumentTitleVarType>
+                            </ArgumentTitle>
                             <Select onChange={this.handleChangePaymentAsset(i)} value={assetId}>
                                 {Object.values(accountStore!.assets).map(({assetId, name}) =>
                                     <Option key={assetId} value={assetId}>{name}({assetId})</Option>)}
                             </Select>
-                            <Input
-                                type="number"
+                            <InputNumber
                                 min={0}
                                 step={10 ** -decimals}
                                 onChange={this.handleChangePaymentCount(i)}
@@ -280,7 +284,8 @@ export default class Card extends React.Component<IProps, IState> {
                         </AttachPaymentItem>;
                     })}
                 </AttachPaymentItems>
-                <AttachPaymentBtn><Attach onClick={this.handleAddAttach}/></AttachPaymentBtn>
+                {payments.length < 2 && <AttachPaymentBtn><Attach
+                    onClick={this.handleAddAttach}/></AttachPaymentBtn>}
             </FlexBlock>
         </Root>;
     }

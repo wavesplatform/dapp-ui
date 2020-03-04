@@ -1,35 +1,40 @@
 /** @jsx jsx  **/
 import React from "react";
-import { jsx } from "@emotion/core";
+import { css, jsx } from '@emotion/core';
 import styled from "@emotion/styled";
 import RCSelect from 'rc-select';
 import 'rc-select/assets/index.css';
+import Arrow from '@src/assets/icons/Arrow';
 
 const Root = styled.div`
 display: flex;
 width: 100%;
 font-family: Roboto;
-font-size: 16px;
+font-size: 14px;
+line-height: 16px;
+color: #6F7582;
 .rc-select{
   width: 100%;
-  
+ 
   .rc-select-selection{
       background: #F4F6FA;
       border-radius: 4px;
       border: none;
       box-shadow: none !important;
-      height: 50px;
+      height: 40px;
       
       &__rendered, &-selected-value, .rc-select-search__field{
-        height: 50px;
+        height: 40px;
         display: flex !important;
         align-items: center;
-        color: black;
+        color: #6F7582;
       }
       
       .rc-select-arrow{
-        height: 50px;
+        height: 40px;
         margin-right: 8px;
+        display: flex;
+        align-items: center;
       } 
   }
 }
@@ -45,13 +50,14 @@ interface IProps {
 interface IState {
 }
 
+
 export default class Select extends React.Component<IProps, IState> {
 
     render() {
         const {css: style, children, value, onChange} = this.props;
         return (
             <Root css={style}>
-                <RCSelect value={value} onChange={onChange}>{children}</RCSelect>
+                <RCSelect value={value} onChange={onChange} inputIcon={<Arrow style={css`padding-bottom: 5px`}/>}>{children}</RCSelect>
             </Root>
         );
     }
