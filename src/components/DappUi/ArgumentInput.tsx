@@ -1,12 +1,14 @@
 import React from 'react';
-import { b58strTob64Str, ICallableArgumentType } from '@stores/DappStore';
+import {b58strTob64Str, ICallableArgumentType} from '@stores/DappStore';
 import Input from '@components/Input';
 import Select from '@components/Select';
-import { css } from '@emotion/core';
-import { Option } from 'rc-select';
+import {css} from '@emotion/core';
+import {Option} from 'rc-select';
 import NotificationStore from '@stores/NotificationStore';
-import { inject, observer } from 'mobx-react';
+import {inject, observer} from 'mobx-react';
 import InputNumber from '@components/Input/InputNumber';
+import Radio from "@components/Input/Radio";
+import styled from "@emotion/styled";
 
 interface IArgumentInputProps {
     name: string
@@ -24,6 +26,15 @@ interface IArgumentInputState {
     byteVectorType: 'base58' | 'base64'
 }
 
+const RadioSet = styled.div`
+width: 100%;
+display: flex;
+margin: 0 -15px;
+& > * {
+  margin: 0 15px;
+}
+`
+
 @inject('notificationStore')
 @observer
 export default class ArgumentInput extends React.Component<IArgumentInputProps, IArgumentInputState> {
@@ -36,9 +47,10 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
         this.props.onChangeByteVectorType(this.props.name, byteVectorType);
     };
 
-    handleChange = (value?: string) =>
+    handleChange = (value?: string) => {
+        console.log(value)
         this.props.onChange(this.props.name, this.props.type, value);
-
+    }
     validateByteVector = (e: any) => {
         if (this.state.byteVectorType === 'base58') {
             try {
@@ -54,10 +66,10 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
         const {byteVectorType} = this.state;
         switch (type) {
             case 'Boolean':
-                return <Select css={style} onChange={this.handleChange} value={value}>
-                    <Option value="false">false</Option>
-                    <Option value="true">true</Option>
-                </Select>;
+                return <RadioSet css={style}>
+                    <Radio value="true" state={value} onChange={this.handleChange} label="True"/>
+                    <Radio value="false" state={value} onChange={this.handleChange} label="False"/>
+                </RadioSet>;
 
             case 'ByteVector':
                 return <>
