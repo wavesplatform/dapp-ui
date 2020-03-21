@@ -30,8 +30,8 @@ height: 100%;
 `;
 
 const Wrapper = styled.div`
-width: 70%;
-padding-right: 10%;
+width: 100%;
+//padding-right: 10%;
 display: flex;
 justify-content: flex-end;
 
@@ -51,7 +51,7 @@ interface IProps {
 @inject('accountStore', 'historyStore', 'notificationStore')
 @observer
 export default class AccountDesktop extends React.Component<IProps> {
-    handleExit = () => window.location.reload();
+    // handleExit = () => window.location.reload();
 
     handleCopy = () => {
         if (this.props.accountStore!.address && copyToClipboard(this.props.accountStore!.address)) {

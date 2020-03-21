@@ -76,7 +76,7 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
                     <Select
                         value={byteVectorType}
                         onChange={this.handleChangeByteVectorType}
-                        css={[style, css`margin-right: 8px`]}
+                        css={[style, css`margin-right: 8px; max-width: 90px`]}
                     >
                         <Option value="base58">base58</Option>
                         <Option value="base64">base64</Option>

@@ -75,15 +75,10 @@ const Icon: React.FunctionComponent<{ type: 'error' | 'info' | 'warning' | 'succ
     return <Root>{icon}</Root>;
 };
 
-export const closeAlertIcon = <svg width="35" height="35" viewBox="0 0 35 35" fill="none"
-                                   xmlns="http://www.w3.org/2000/svg">
-    <path fillRule="evenodd" clipRule="evenodd"
-          d="M16.5778 17.2642L8.87388 24.9682L9.58099 25.6753L17.2849 17.9714L25.137 25.8235L25.8441 25.1164L17.992 17.2642L25.8444 9.41182L25.1373 8.70472L17.2849 16.5571L9.58068 8.85291L8.87357 9.56002L16.5778 17.2642Z"
-          fill="#CDD3E2"/>
-    <path fillRule="evenodd" clipRule="evenodd"
-          d="M8.16677 24.9682L15.8707 17.2643L8.16647 9.5601L9.58068 8.14588L17.2849 15.8501L25.1373 7.99769L26.5515 9.4119L18.6991 17.2643L26.5512 25.1164L25.137 26.5307L17.2849 18.6785L9.58099 26.3825L8.16677 24.9682ZM17.2849 17.9714L25.137 25.8236L25.8441 25.1164L17.992 17.2643L25.8444 9.4119L25.1373 8.70479L17.2849 16.5572L9.58068 8.85299L8.87357 9.5601L16.5778 17.2643L8.87388 24.9682L9.58099 25.6754L17.2849 17.9714Z"
-          fill="#CDD3E2"/>
-</svg>;
+export const closeAlertIcon =<svg width="23" height="22" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fillRule="evenodd" clipRule="evenodd" d="M10.8773 10.6071L5.85347 15.6309L6.56058 16.338L11.5844 11.3142L16.4594 16.1891L17.1665 15.482L12.2915 10.6071L17.1672 5.73139L16.4601 5.02428L11.5844 9.89995L6.55988 4.87542L5.85278 5.58253L10.8773 10.6071Z" fill="#A3ACC4"/>
+    </svg>
+;
 
 
 export default getAlert;

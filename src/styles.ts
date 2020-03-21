@@ -34,7 +34,7 @@ color: #3A3E46;
 font-family: Roboto;
 font-style: normal;
 font-weight: 500;
-font-size: 16px;
+font-size: 12px;
 line-height: 21px;
 color: #6F7582;
 `,

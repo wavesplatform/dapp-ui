@@ -236,7 +236,7 @@ export default class Card extends React.Component<IProps, IState> {
             <Anchor id={title}/>
             <Header>
                 <Title>{centerEllipsis(title)}</Title>
-                <Button onClick={this.handleCall} disabled={this.isInvalid}>{title}</Button>
+                <Button onClick={this.handleCall} disabled={this.isInvalid}>Invoke</Button>
             </Header>
             {Object.keys(args).length > 0 &&
             <ArgumentsLayout>

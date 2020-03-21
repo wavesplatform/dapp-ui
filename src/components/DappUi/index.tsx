@@ -44,6 +44,7 @@ const contentWrapperStyle = css`
 padding: 0 10% 0 30%; 
 display: flex;
 flex-direction: column;
+max-width: 980px;
 @media(max-width: 768px){
   padding: 0 2vw;
 }
@@ -118,8 +119,6 @@ class DappUi extends React.Component<IProps, IState> {
         return <Root>
 
             <Head withSearch/>
-            {/*<MenuWrapper>*/}
-            {/*</MenuWrapper>*/}
             <Mobile>
                 <Collapse isOpened={this.props.notificationStore!.isOpenMobileExplorer}>
                     <Modal handleClose={this.handleCloseModal}>
