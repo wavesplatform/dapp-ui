@@ -15,6 +15,7 @@ import { Option } from 'rc-select';
 import { centerEllipsis } from '@components/Home/Account';
 import { autorun } from 'mobx';
 import InputNumber from '@components/Input/InputNumber';
+import Tooltip from 'rc-tooltip';
 
 const flexStyle = css`display: flex;width: 100%;`;
 
@@ -270,7 +271,11 @@ export default class Card extends React.Component<IProps, IState> {
                             </ArgumentTitle>
                             <Select onChange={this.handleChangePaymentAsset(i)} value={assetId}>
                                 {Object.values(accountStore!.assets).map(({assetId, name}) =>
-                                    <Option key={assetId} value={assetId}>{name}({assetId})</Option>)}
+                                    <Option key={assetId} value={assetId}>
+                                        <Tooltip placement="right" trigger={['hover']} overlay={<span>{assetId}</span>}>
+                                            <div>{name}({centerEllipsis(assetId, 6)})</div>
+                                        </Tooltip>
+                                    </Option>)}
                             </Select>
                             <InputNumber
                                 min={0}

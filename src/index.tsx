@@ -8,6 +8,7 @@ import './index.css'
 import 'rc-notification/assets/index.css'
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import 'rc-input-number/assets/index.css';
+import 'rc-tooltip/assets/bootstrap.css';
 
 const mobXStore = new RootStore();
 

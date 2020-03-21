@@ -1,6 +1,6 @@
 /** @jsx jsx  **/
 import React from "react";
-import { css, jsx } from '@emotion/core';
+import {css, jsx} from '@emotion/core';
 import styled from "@emotion/styled";
 import RCSelect from 'rc-select';
 import 'rc-select/assets/index.css';
@@ -38,6 +38,7 @@ color: #6F7582;
       } 
   }
 }
+
 `;
 
 interface IProps {
@@ -57,7 +58,8 @@ export default class Select extends React.Component<IProps, IState> {
         const {css: style, children, value, onChange} = this.props;
         return (
             <Root css={style}>
-                <RCSelect value={value} onChange={onChange} inputIcon={<Arrow style={css`padding-bottom: 5px`}/>}>{children}</RCSelect>
+                <RCSelect value={value} onChange={onChange}
+                          inputIcon={<Arrow style={css`padding-bottom: 5px`}/>}>{children}</RCSelect>
             </Root>
         );
     }

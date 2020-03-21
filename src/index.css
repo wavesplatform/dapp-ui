@@ -70,3 +70,8 @@ code {
     width: 100%;
 
 }
+
+
+.rc-select-dropdown-menu{
+    max-height: 250px;
+}
