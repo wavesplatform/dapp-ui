@@ -8,23 +8,27 @@ import { getExplorerLink } from '@utils/index';
 
 class SignerStore extends SubStore {
 
-    signer: Signer;
+    signer?: Signer;
 
     @observable isApplicationAuthorizedInWavesExchange = false;
 
     constructor(rootStore: RootStore) {
         super(rootStore);
+        this.initSigner()
+    }
+
+    initSigner = async () => {
         const pathname = this.rootStore.historyStore!.currentPath;
         const networkByAddress = this.rootStore.accountStore!.getNetworkByAddress(pathname);
         const NODE_URL = networkByAddress ? networkByAddress.server : 'https://nodes.wavesnodes.com';
         this.signer = new Signer({NODE_URL});
-        this.signer.setProvider(new Provider());
+        await this.signer.setProvider(new Provider());
     }
 
     login = async () => {
-        const account = await this.signer.login();
+        const account = await this.signer!.login();
         if ('address' in account) {
-            const byte = await this.signer.getNetworkByte();
+            const byte = await this.signer!.getNetworkByte();
             this.rootStore.accountStore.network = this.getNetworkByCharCode(byte);
             this.isApplicationAuthorizedInWavesExchange = true;
             this.rootStore.accountStore.loginType = 'exchange';
@@ -43,7 +47,7 @@ class SignerStore extends SubStore {
         }
 
         try {
-            const transaction = await this.signer.invoke(tx).broadcast();
+            const transaction = await this.signer!.invoke(tx).broadcast() as any;
             const id = (transaction as any).id || '';
             const {network} = this.rootStore.accountStore;
             const link = network ? getExplorerLink(network!.code, id, 'tx') : undefined;
