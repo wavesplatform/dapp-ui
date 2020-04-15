@@ -41,7 +41,7 @@ class HistoryStore extends SubStore {
         }
         const history = this.history;
         history.push(value);
-        this.rootStore.signerStore.initSigner()
+        this.rootStore.accountStore.address === null && this.rootStore.signerStore.initSigner()
     };
 
 }
