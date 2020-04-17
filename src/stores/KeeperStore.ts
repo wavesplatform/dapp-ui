@@ -1,8 +1,8 @@
-import { SubStore } from '@stores/SubStore';
-import { action, autorun, observable, set } from 'mobx';
-import { nodeInteraction } from '@waves/waves-transactions';
-import { RootStore } from '@stores/RootStore';
-import { getCurrentBrowser, getExplorerLink } from '@utils/index';
+import {SubStore} from '@stores/SubStore';
+import {action, autorun, observable, set} from 'mobx';
+import {nodeInteraction, waitForTx} from '@waves/waves-transactions';
+import {RootStore} from '@stores/RootStore';
+import {getCurrentBrowser, getExplorerLink} from '@utils/index';
 
 interface IWavesKeeperAccount {
     address: string
@@ -90,7 +90,9 @@ class KeeperStore extends SubStore {
     @action
     async updateWavesKeeper(publicState: any) {
         this.updateNetwork(publicState);
-        this.rootStore.accountStore.address = publicState.account.address;
+
+        if (publicState.account)
+            this.rootStore.accountStore.address = publicState.account.address;
 
         if (this.wavesKeeperAccount) {
             publicState.account
@@ -99,6 +101,10 @@ class KeeperStore extends SubStore {
         } else {
             this.wavesKeeperAccount = publicState.account;
         }
+    }
+
+    @action logout() {
+
     }
 
     @action
@@ -169,20 +175,25 @@ class KeeperStore extends SubStore {
     }
 
 
-    sendTx = (tx: any) => window['WavesKeeper'].signAndPublishTransaction(tx).then((tx: any) => {
+    sendTx = (tx: any) => window['WavesKeeper'].signAndPublishTransaction(tx).then(async (tx: any) => {
         const transaction = JSON.parse(tx);
         const {network} = this.rootStore.accountStore;
+        const {notificationStore} = this.rootStore
         const link = network ? getExplorerLink(network!.code, transaction.id, 'tx') : undefined;
         console.dir(transaction);
-        this.rootStore.notificationStore
-            .notify(
-                `Transaction sent: ${transaction.id}\n`,
-                {type: 'success', link, linkTitle: 'View transaction'})
+        const linkOpts = {link, linkTitle: 'View transaction'};
+        notificationStore.notify(`Transaction sent: ${transaction.id}\n`, {type: 'info'})
+
+        const res = await waitForTx(transaction.id, {apiBase: network!.server}) as any
+        res.applicationStatus && res.applicationStatus === 'scriptExecutionFailed'
+            ? notificationStore.notify(`Script execution failed`, {type: 'error'})
+            : notificationStore.notify(`Success`, {type: 'success', ...linkOpts})
 
     }).catch((error: any) => {
         console.error(error);
         this.rootStore.notificationStore.notify(error.data, {type: 'error', title: error.message});
     })
+
     get isBrowserSupportsWavesKeeper(): boolean {
         const browser = getCurrentBrowser();
         return ['chrome', 'firefox', 'opera', 'edge'].includes(browser);
@@ -190,7 +201,6 @@ class KeeperStore extends SubStore {
 
 
 }
-
 
 
 export default KeeperStore;

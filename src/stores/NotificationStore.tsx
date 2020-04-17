@@ -57,6 +57,7 @@ class NotificationStore extends SubStore {
     }
 
     notify(content: string | JSX.Element, opts: TNotifyOptions = {}) {
+        console.log(content)
         if (opts.key) {
             this._instance.removeNotice(opts.key);
         }

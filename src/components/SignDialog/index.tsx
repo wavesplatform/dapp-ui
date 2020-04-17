@@ -139,9 +139,10 @@ export default class SignDialog extends React.Component <IProps> {
                         }</Description>
                     </div>
                     <div>
-                        <Button css={css`width: 100%`} onClick={this.handleSignWithExchange}>
+                        <Button css={css`width: 100%`} onClick={this.handleSignWithExchange} disabled>
                             Sign in with Exchange</Button>
-                        <Description><br/>The network will be MainNet by default</Description>
+                        {/*<Description><br/>The network will be MainNet by default</Description>*/}
+                        <Description><br/>Will be available soon</Description>
                     </div>
                 </Body>
             </Dialog>
