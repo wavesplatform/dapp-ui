@@ -63,7 +63,7 @@ class AccountStore extends SubStore {
                 case 'W':
                     return {server: 'https://nodes.wavesnodes.com', code: 'W'};
                 case 'D':
-                    return {server: 'http://localhost:3000', code: 'D'};
+                    return {server: 'https://devnet1-htz-nbg1-1.wavesnodes.com', code: 'D'};
                 case 'R':
                     return {server: 'http://localhost:6869', code: 'R'};
             }
