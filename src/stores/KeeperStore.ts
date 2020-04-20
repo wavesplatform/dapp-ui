@@ -185,10 +185,12 @@ class KeeperStore extends SubStore {
 
         const res = await waitForTx(transaction.id, {apiBase: network!.server}) as any
 
+        const isFailed = res.applicationStatus && res.applicationStatus === 'scriptExecutionFailed'
+
         notificationStore.notify(
-            res.applicationStatus && res.applicationStatus === 'scriptExecutionFailed'
+            isFailed
                 ? `Script execution failed`
-                : `Success`, {type: 'success', link, linkTitle: 'View transaction'}
+                : `Success`, {type: isFailed ? 'error' : 'success', link, linkTitle: 'View transaction'}
         )
     }).catch((error: any) => {
         console.error(error);
