@@ -181,14 +181,15 @@ class KeeperStore extends SubStore {
         const {notificationStore} = this.rootStore
         const link = network ? getExplorerLink(network!.code, transaction.id, 'tx') : undefined;
         console.dir(transaction);
-        const linkOpts = {link, linkTitle: 'View transaction'};
         notificationStore.notify(`Transaction sent: ${transaction.id}\n`, {type: 'info'})
 
         const res = await waitForTx(transaction.id, {apiBase: network!.server}) as any
-        res.applicationStatus && res.applicationStatus === 'scriptExecutionFailed'
-            ? notificationStore.notify(`Script execution failed`, {type: 'error'})
-            : notificationStore.notify(`Success`, {type: 'success', ...linkOpts})
 
+        notificationStore.notify(
+            res.applicationStatus && res.applicationStatus === 'scriptExecutionFailed'
+                ? `Script execution failed`
+                : `Success`, {type: 'success', link, linkTitle: 'View transaction'}
+        )
     }).catch((error: any) => {
         console.error(error);
         this.rootStore.notificationStore.notify(error.data, {type: 'error', title: error.message});
