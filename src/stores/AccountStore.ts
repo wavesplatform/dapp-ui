@@ -1,9 +1,9 @@
-import { action, autorun, computed, observable } from 'mobx';
-import { SubStore } from './SubStore';
-import { base58Decode } from '@waves/ts-lib-crypto';
-import { IAsset, INetwork } from '@stores/KeeperStore';
-import { checkSlash } from '@utils/index';
-import { RootStore } from '@stores/RootStore';
+import {action, autorun, computed, observable} from 'mobx';
+import {SubStore} from './SubStore';
+import {base58Decode} from '@waves/ts-lib-crypto';
+import {IAsset, INetwork} from '@stores/KeeperStore';
+import {checkSlash} from '@utils/index';
+import {RootStore} from '@stores/RootStore';
 
 class AccountStore extends SubStore {
     @observable assets: { [name: string]: IAsset } = {'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8}};
@@ -57,15 +57,15 @@ class AccountStore extends SubStore {
         try {
             switch (String.fromCharCode(base58Decode(address)[1])) {
                 case 'T':
-                    return {server: 'https://nodes-testnet.wavesnodes.com', code: 'T'};
+                    return networks.testnet;
                 case 'S':
-                    return {server: 'https://nodes-stagenet.wavesnodes.com', code: 'S'};
+                    return networks.stagenet;
                 case 'W':
-                    return {server: 'https://nodes.wavesnodes.com', code: 'W'};
+                    return networks.mainnet;
                 case 'D':
-                    return {server: 'https://devnet1-htz-nbg1-1.wavesnodes.com', code: 'D'};
+                    return networks.devnet;
                 case 'R':
-                    return {server: 'http://localhost:6869', code: 'R'};
+                    return networks.private;
             }
 
         } catch (e) {
@@ -74,6 +74,26 @@ class AccountStore extends SubStore {
         return null;
     };
 
+}
+
+export const networks = {
+    'testnet': {
+        server: 'https://nodes-testnet.wavesnodes.com',
+        code: 'T',
+        clientOrigin: 'https://testnet.waves.exchange/signer/'
+    },
+    'stagenet': {
+        server: 'https://nodes-stagenet.wavesnodes.com',
+        code: 'S',
+        clientOrigin: 'https://stagenet.waves.exchange/signer/'
+    },
+    'mainnet': {
+        server: 'https://nodes.wavesnodes.com',
+        code: 'W',
+        clientOrigin: 'https://waves.exchange/signer/'
+    },
+    'devnet': {server: 'https://devnet1-htz-nbg1-1.wavesnodes.com', code: 'D'},
+    'private': {server: 'http://localhost:6869', code: 'R'}
 }
 
 export default AccountStore;

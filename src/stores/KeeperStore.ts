@@ -21,6 +21,7 @@ interface IWavesKeeperAccount {
 export interface INetwork {
     code: string,
     server: string,
+    clientOrigin?: string
     matcher?: string
 }
 

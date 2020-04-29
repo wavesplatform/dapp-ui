@@ -1,14 +1,15 @@
-import { RootStore } from '@stores';
-import { SubStore } from './SubStore';
+import {RootStore} from '@stores';
+import {SubStore} from './SubStore';
 import Signer from '@waves/signer';
 import Provider from '@waves.exchange/provider-web';
-import { action, observable } from 'mobx';
-import { INetwork } from '@stores/KeeperStore';
-import { getExplorerLink } from '@utils/index';
+import {action, observable} from 'mobx';
+import {INetwork} from '@stores/KeeperStore';
+import {getExplorerLink} from '@utils/index';
+import {networks} from "@stores/AccountStore";
 
 class SignerStore extends SubStore {
 
-    signer?: Signer;
+    signer?: any;
 
     @observable isApplicationAuthorizedInWavesExchange = false;
 
@@ -20,9 +21,18 @@ class SignerStore extends SubStore {
     initSigner = async () => {
         const pathname = this.rootStore.historyStore!.currentPath;
         const networkByAddress = this.rootStore.accountStore!.getNetworkByAddress(pathname);
-        const NODE_URL = networkByAddress ? networkByAddress.server : 'https://nodes.wavesnodes.com';
-        this.signer = new Signer({NODE_URL});
-        await this.signer.setProvider(new Provider());
+        const network = (networkByAddress != null) ? networkByAddress : networks.mainnet;
+        console.log(network.code)
+        if (network.clientOrigin) {
+            this.signer = new Signer({NODE_URL: network.server});
+            await this.signer.setProvider(new Provider(network.clientOrigin));
+        } else {
+            this.signer = undefined;
+            this.rootStore.notificationStore.notify(
+                `Unfortunately, Exchange does not support a Stagenet network at this time. Sign in with Keeper.`,
+                {type: 'error'}
+            )
+        }
     }
 
     login = async () => {
@@ -66,11 +76,11 @@ class SignerStore extends SubStore {
         try {
             switch (byte) {
                 case 84:
-                    return {server: 'https://nodes-testnet.wavesnodes.com', code: 'T'};
+                    return networks.testnet;
                 case 83:
-                    return {server: 'https://nodes-stagenet.wavesnodes.com', code: 'S'};
+                    return networks.stagenet;
                 case 87:
-                    return {server: 'https://nodes.wavesnodes.com', code: 'W'};
+                    return networks.mainnet;
             }
 
         } catch (e) {
