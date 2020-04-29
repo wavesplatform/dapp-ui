@@ -22,7 +22,6 @@ class SignerStore extends SubStore {
         const pathname = this.rootStore.historyStore!.currentPath;
         const networkByAddress = this.rootStore.accountStore!.getNetworkByAddress(pathname);
         const network = (networkByAddress != null) ? networkByAddress : networks.mainnet;
-        console.log(network.code)
         if (network.clientOrigin) {
             this.signer = new Signer({NODE_URL: network.server});
             await this.signer.setProvider(new Provider(network.clientOrigin));
