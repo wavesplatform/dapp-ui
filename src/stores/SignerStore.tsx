@@ -6,6 +6,7 @@ import {action, observable} from 'mobx';
 import {INetwork} from '@stores/KeeperStore';
 import {getExplorerLink} from '@utils/index';
 import {networks} from "@stores/AccountStore";
+import {waitForTx} from "@waves/waves-transactions";
 
 class SignerStore extends SubStore {
 
@@ -28,7 +29,7 @@ class SignerStore extends SubStore {
         } else {
             this.signer = undefined;
             this.rootStore.notificationStore.notify(
-                `Unfortunately, Exchange does not support a Stagenet network at this time. Sign in with Keeper.`,
+                `Unfortunately, Exchange does not support a ${network.server} network at this time. Sign in with Keeper.`,
                 {type: 'error'}
             )
         }
@@ -58,13 +59,25 @@ class SignerStore extends SubStore {
         try {
             const transaction = await this.signer!.invoke(tx).broadcast() as any;
             const id = (transaction as any).id || '';
-            const {network} = this.rootStore.accountStore;
+            const {accountStore: {network}, notificationStore} = this.rootStore;
             const link = network ? getExplorerLink(network!.code, id, 'tx') : undefined;
-            console.dir(transaction);
-            this.rootStore.notificationStore
-                .notify(`Transaction sent: ${id}\n`,
-                    {type: 'success', link, linkTitle: 'View transaction'});
+            // console.dir(transaction);
+            // this.rootStore.notificationStore
+            //     .notify(`Transaction sent: ${id}\n`,
+            //         {type: 'success', link, linkTitle: 'View transaction'});
 
+            console.dir(transaction);
+            notificationStore.notify(`Transaction sent: ${transaction.id}\n`, {type: 'info'})
+
+            const res = await waitForTx(transaction.id, {apiBase: network!.server}) as any
+
+            const isFailed = res.applicationStatus && res.applicationStatus === 'scriptExecutionFailed'
+
+            notificationStore.notify(
+                isFailed
+                    ? `Script execution failed`
+                    : `Success`, {type: isFailed ? 'error' : 'success', link, linkTitle: 'View transaction'}
+            )
         } catch (err) {
             console.error(err);
             this.rootStore.notificationStore.notify((typeof err === 'string' ? err : err.message), {type: 'error'})
