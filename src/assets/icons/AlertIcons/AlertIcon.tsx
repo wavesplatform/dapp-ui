@@ -5,25 +5,25 @@ import info from './info.svg'
 import warn from './warning.svg'
 
 export const ErrorIcn =  styled.div`
-width: 58px;
-height: 58px;
-background: url(${err});
+height: 21px;
+background: url(${err}) center no-repeat;
+background-size: contain;
 `;
 
 export const SuccessIcn = styled.div`
-width: 38px;
-height: 38px;;
-background: url(${suc});
+height: 21px;
+background: url(${suc})  center no-repeat;
+background-size: contain;
 `;
 
 export const WarningIcn =  styled.div`
-width: 41px;
-height: 36px;
-background: url(${warn});
+height: 21px;
+background: url(${warn})  center no-repeat;
+background-size: contain;
 `;
 
 export const InfoIcn =  styled.div`
-width: 38px;
-height: 38px;
-background: url(${info});
+height: 21px;
+background: url(${info})  center no-repeat;
+background-size: contain;
 `;

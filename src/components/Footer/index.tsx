@@ -2,13 +2,25 @@ import styled from "@emotion/styled";
 import { fonts } from "@src/styles";
 import React from "react";
 
-const Root = styled.a`
+const Link = styled.a`
 ${fonts.footerFont};
-margin:  60px  0 14px 0;
 text-decoration: none;
+flex: 1;
 `;
 
-const Footer = () =>
-    <Root rel="noopener, noreferrer" href={'https://wavesplatform.com'} target="_blank">wavesplatform.com</Root>;
+const Root = styled.div`
+display: flex;
+justify-content: center;
+height: 60px;
+width: 100%;
+align-items: flex-end;
+flex-shrink: 0;
+flex: 1;
+padding: 14px 0;
+`
+
+const Footer = () => <Root>
+    <Link rel="noopener, noreferrer" href={'https://wavesplatform.com'} target="_blank">wavesplatform.com</Link>
+</Root>;
 
 export default Footer

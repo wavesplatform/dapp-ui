@@ -1,20 +1,27 @@
-import React from "react";
-import styled from "@emotion/styled";
-import { fonts } from "@src/styles";
-import Button from "@components/DappUi/Button";
-import Attach from "@src/assets/icons/Attach";
-import { css } from "@emotion/core";
-import DappStore, { ICallableArgumentType, ICallableFuncArgument } from "@stores/DappStore";
-import ArgumentInput from "@components/DappUi/ArgumentInput";
-import Close from "@src/assets/icons/Close";
-import Input from "@components/Input";
-import { inject, observer } from "mobx-react";
-import AccountStore from "@stores/AccountStore";
-import Select from "@components/Select";
+/** @jsx jsx **/
+import React from 'react';
+import styled from '@emotion/styled';
+import { fonts } from '@src/styles';
+import Button from '@components/DappUi/Button';
+import Attach from '@src/assets/icons/Attach';
+import { css, jsx } from '@emotion/core';
+import DappStore, { b58strTob64Str, ICallableArgumentType, ICallableFuncArgument } from '@stores/DappStore';
+import ArgumentInput from '@components/DappUi/ArgumentInput';
+import Close from '@src/assets/icons/Close';
+import { inject, observer } from 'mobx-react';
+import AccountStore from '@stores/AccountStore';
+import Select from '@components/Select';
+import { Option } from 'rc-select';
+import { centerEllipsis } from '@components/Home/Account';
+import { autorun } from 'mobx';
+import InputNumber from '@components/Input/InputNumber';
+import Tooltip from 'rc-tooltip';
 
 const flexStyle = css`display: flex;width: 100%;`;
 
 const Root = styled.div`
+flex-shrink: 0;
+position: relative;
 display: flex;
 background: white;
 box-shadow: 0 5px 16px rgba(134, 142, 164, 0.05);
@@ -25,7 +32,12 @@ flex-direction: column;
 justify-content: flex-end;
 `;
 
-const FlexBlock = styled.div`${flexStyle}`;
+const FlexBlock = styled.div`
+${flexStyle};
+@media(max-width: 1280px){
+  flex-direction: column;
+}
+`;
 
 const Header = styled.div`
 ${flexStyle};
@@ -38,8 +50,9 @@ margin: 0 0 20px 0;
 const ArgumentsLayout = styled.div`
 ${flexStyle};
 //margin: 0 0 20px 0;
+border-bottom: 1px solid #EBEDF2;
+margin-bottom: 16px;
 flex-direction: column;
-
 `;
 
 const ArgumentItem = styled.div`
@@ -53,6 +66,8 @@ display: flex;
 margin-right: 20px;
 align-items: center;
 justify-content: flex-end;
+min-width: 100px;
+max-width: 150px;
 `;
 
 const ArgumentTitleVarName = styled.div`
@@ -64,23 +79,27 @@ const ArgumentTitleVarType = styled.div`${fonts.callableFuncArgFont}`;
 
 const AttachPaymentBtn = styled.div`
 ${flexStyle};
-align-items: flex-end;
 justify-content: flex-end;
+flex: 1;
 `;
 
 const AttachPaymentItems = styled.div`
 ${flexStyle};
 flex-direction: column;
-`
+flex: 3;
+//@media(max-width: 1280px){
+//  flex: 2;
+//}
+`;
 
 const AttachPaymentItem = styled.div`
 ${flexStyle};
 align-items: center;
-
- & > :first-of-type{
-  margin-right: 20px;
+  margin: 0 -10px;
+ & > *{
+  margin: 0 10px;
 }
- > * {
+ & > * {
   margin-bottom: 14px;
  }
 `;
@@ -93,6 +112,11 @@ export interface IArgumentInput {
     byteVectorType?: 'base58' | 'base64'
 }
 
+
+const Anchor = styled.div`
+position:absolute;
+top:-100px;
+`;
 
 interface IInjectedProps {
     dappStore?: DappStore
@@ -109,19 +133,32 @@ interface IProps extends IInjectedProps {
 interface IState {
     args: { [name: string]: IArgumentInput }
     payments: { assetId: string, tokens: string }[]
+    address: string | null
 }
 
 @inject('dappStore', 'accountStore')
 @observer
 export default class Card extends React.Component<IProps, IState> {
 
-    constructor(props: IProps) {
-        super(props);
-        this.state = {
-            args: Object.entries(this.props.funcArgs).reduce((acc, [k, v]) =>
-                ({...acc, [k]: {type: v, byteVectorType: v === 'ByteVector' ? 'base58' : undefined}}), {}),
-            payments: []
-        };
+    state: IState = {
+        args: Object.entries(this.props.funcArgs).reduce((acc, [k, v]) =>
+            ({
+                ...acc,
+                [k]: {type: v, byteVectorType: v === 'ByteVector' ? 'base58' : undefined, value: defaultValue(v)}
+            }), {}),
+        payments: [],
+        address: this.props.accountStore!.address
+    };
+
+    componentDidMount() {
+        autorun(() => {
+            let {payments} = this.state;
+            const address = this.props.accountStore!.address;
+            if (this.state.address !== null && this.state.address !== address) {
+                payments = [];
+            }
+            this.setState({payments, address});
+        });
     }
 
 
@@ -130,11 +167,22 @@ export default class Card extends React.Component<IProps, IState> {
         const {funcArgs} = this.props;
         const invalidPayment = payments.some(({assetId, tokens}) => !assetId || !tokens);
         const invalidArgs = Object.keys(funcArgs).length !== Object.keys(args).length || Object.values(args)
-            .some(({value}) => value === undefined || value === '');
-        return invalidPayment || invalidArgs
+            .some(({value}) => value === undefined);
+        const invalidB58 = Object.values(args).some(({value, byteVectorType}) => {
+            let error = false;
+            if (byteVectorType && byteVectorType === 'base58') {
+                try {
+                    b58strTob64Str(value);
+                } catch (e) {
+                    error = true;
+                }
+            }
+            return error;
+        });
+        return invalidPayment || invalidArgs || invalidB58;
     }
 
-    handleAddAttach = () => this.setState({
+    handleAddAttach = () => this.state.payments.length < 2 && this.setState({
         payments: [...this.state.payments, {
             assetId: 'WAVES',
             tokens: (0).toFixed(8)
@@ -147,29 +195,30 @@ export default class Card extends React.Component<IProps, IState> {
         this.setState({payments});
     };
 
-    handleChangeValue = (name: string, type: ICallableArgumentType, value?: string) =>
+    handleChangeValue = (name: string, type: ICallableArgumentType, value?: string) => {
+        // if (type === 'Int' && value && (isNaN(+value) || value.includes('e'))) value = value.replace('e', '');
         this.setState({args: {...this.state.args, [name]: {...this.state.args[name], type, value}}});
-
+    };
     handleChangeByteVectorType = (name: string, byteVectorType: 'base58' | 'base64') =>
         this.setState({args: {...this.state.args, [name]: {...this.state.args[name], byteVectorType}}});
 
-    handleChangePaymentCount = (i: number) => ({target: {value: v}}: React.ChangeEvent<HTMLInputElement>) => {
+    handleChangePaymentCount = (i: number) => (v: string | number) => {
         if (isNaN(+v) || +v < 0) return;
         const payments = this.state.payments;
-        payments[i].tokens = v;
-        this.setState({payments})
+        payments[i].tokens = String(v);
+        this.setState({payments});
     };
 
     handleBlurPaymentCount = (i: number) => ({target: {value: v}}: React.ChangeEvent<HTMLInputElement>) => {
         const payments = this.state.payments;
         payments[i].tokens = (+v).toFixed(this.props.accountStore!.assets[payments[i].assetId].decimals || 1e-8);
-        this.setState({payments})
+        this.setState({payments});
     };
 
-    handleChangePaymentAsset = (i: number) => ({target: {value: v}}: React.ChangeEvent<HTMLSelectElement>) => {
+    handleChangePaymentAsset = (i: number) => (assetId: string) => {
         const payments = this.state.payments;
-        payments[i].assetId = v;
-        this.setState({payments})
+        payments[i] = {assetId, tokens: (0).toFixed(this.props.accountStore!.assets[assetId].decimals || 8)};
+        this.setState({payments});
     };
 
 
@@ -182,24 +231,25 @@ export default class Card extends React.Component<IProps, IState> {
 
     render() {
         const {funcName: title, accountStore} = this.props;
-        const {args} = this.state;
-        return <Root id={title}>
+        const {args, payments} = this.state;
+        return <Root>
+            <Anchor id={title}/>
             <Header>
-                <Title>{title}</Title>
-                <Button onClick={this.handleCall} disabled={this.isInvalid}>{title}</Button>
+                <Title>{centerEllipsis(title)}</Title>
+                <Button onClick={this.handleCall} disabled={this.isInvalid}>Invoke</Button>
             </Header>
+            {Object.keys(args).length > 0 &&
             <ArgumentsLayout>
-                {Object.keys(args).length > 0 &&
-                Object.entries(args).map(([argName, {type}], i: number) =>
+                {Object.entries(args).map(([argName, {type}], i: number) =>
                     <ArgumentItem key={i}>
                         <ArgumentTitle>
-                            <ArgumentTitleVarName>{argName}:</ArgumentTitleVarName>
+                            <ArgumentTitleVarName>{centerEllipsis(argName, 7)}:</ArgumentTitleVarName>
                             &nbsp;
                             <ArgumentTitleVarType>{type}</ArgumentTitleVarType>
                         </ArgumentTitle>
                         <ArgumentInput
                             css={css`flex:5`}
-                            value={args[argName] ? args[argName].value : undefined}
+                            value={args[argName] ? args[argName].value : defaultValue(type)}
                             name={argName}
                             type={type}
                             onChange={this.handleChangeValue}
@@ -208,30 +258,43 @@ export default class Card extends React.Component<IProps, IState> {
                     </ArgumentItem>
                 )}
             </ArgumentsLayout>
+            }
             <FlexBlock>
                 <AttachPaymentItems>
                     {this.state.payments.map(({assetId, tokens}, i) => {
-                        const decimals = accountStore!.assets[assetId].decimals || 8;
+                        const decimals = (accountStore!.assets[assetId] && accountStore!.assets[assetId].decimals) || 8;
                         return <AttachPaymentItem key={i}>
+                            <ArgumentTitle>
+                                <ArgumentTitleVarName>Payments:</ArgumentTitleVarName>
+                                &nbsp;
+                                <ArgumentTitleVarType>{i + 1}/2</ArgumentTitleVarType>
+                            </ArgumentTitle>
                             <Select onChange={this.handleChangePaymentAsset(i)} value={assetId}>
                                 {Object.values(accountStore!.assets).map(({assetId, name}) =>
-                                    <option key={assetId} value={assetId}>{name}({assetId})</option>)}
+                                    <Option key={assetId} value={assetId}>
+                                        <Tooltip placement="right" trigger={['hover']} overlay={<span>{assetId}</span>}>
+                                            <div>{name}({centerEllipsis(assetId, 6)})</div>
+                                        </Tooltip>
+                                    </Option>)}
                             </Select>
-                            <Input
-                                type="number"
+                            <InputNumber
                                 min={0}
                                 step={10 ** -decimals}
                                 onChange={this.handleChangePaymentCount(i)}
                                 value={String(tokens)}
                                 onBlur={this.handleBlurPaymentCount(i)}
+                                spellCheck={false}
                             />
                             <Close onClick={this.handleRemoveAttach(i)}/>
-                        </AttachPaymentItem>
+                        </AttachPaymentItem>;
                     })}
                 </AttachPaymentItems>
-                <AttachPaymentBtn><Attach onClick={this.handleAddAttach}/></AttachPaymentBtn>
+                {payments.length < 2 && <AttachPaymentBtn><Attach
+                    onClick={this.handleAddAttach}/></AttachPaymentBtn>}
             </FlexBlock>
-        </Root>
+        </Root>;
     }
 }
 
+
+const defaultValue = (type: ICallableArgumentType) => type === 'String' || type === 'ByteVector' ? '' : undefined;

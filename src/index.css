@@ -13,6 +13,8 @@ body {
     sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+
 }
 
 
@@ -35,4 +37,41 @@ code {
 
 .hideScrollbar::-webkit-scrollbar-thumb {
     background: transparent;
+}
+
+.rc-notification-notice-close{
+ opacity: 1 !important;
+}
+
+.ps__rail-y{
+    z-index: 2;
+}
+
+.ps__rail-y:hover{
+    background: transparent !important;
+}
+
+.ps__rail-y:hover .ps__thumb-y {
+    width: 6px !important;
+}
+
+.ReactCollapse--collapse{
+    /*position: relative;*/
+    transition: height 500ms !important;
+    position: fixed; top: 0; left: 0; right:0; bottom:0;
+    background-color: rgba(205, 211, 226, 0.8);
+    display: flex;
+    z-index: 2;
+    /*height: 100vh;*/
+
+}
+
+.ReactCollapse--content{
+    width: 100%;
+
+}
+
+
+.rc-select-dropdown-menu{
+    max-height: 250px;
 }

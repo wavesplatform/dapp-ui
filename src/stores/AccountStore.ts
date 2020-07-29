@@ -1,200 +1,99 @@
-import { action, autorun, computed, observable, set } from 'mobx';
-import { SubStore } from './SubStore';
-import { checkSlash, getCurrentBrowser } from '@utils';
-import { base58Decode } from '@waves/ts-lib-crypto'
-import { nodeInteraction } from "@waves/waves-transactions";
-
-interface IWavesKeeperAccount {
-    address: string
-    name: string
-    network: string
-    networkCode: string
-    publicKey: string
-    type: string
-    balance: {
-        available: string
-        leasedOut: string
-        network: string
-    }
-}
-
-export interface INetwork {
-    code: string,
-    server: string,
-    matcher?: string
-}
-
-interface IKeeperError {
-    code: string
-    data: any
-    message: string
-}
-
-export interface IAsset {
-    assetId: string
-    name: string
-    decimals: number
-}
+import {action, autorun, computed, observable} from 'mobx';
+import {SubStore} from './SubStore';
+import {base58Decode} from '@waves/ts-lib-crypto';
+import {IAsset, INetwork} from '@stores/KeeperStore';
+import {checkSlash} from '@utils/index';
+import {RootStore} from '@stores/RootStore';
 
 class AccountStore extends SubStore {
-    @observable applicationNetwork: string = 'custom';
-    @observable wavesKeeperAccount?: IWavesKeeperAccount;
-
-    @observable isWavesKeeperInitialized: boolean = false;
-    @observable isWavesKeeperInstalled: boolean = false;
-
-    @observable isApplicationAuthorizedInWavesKeeper: boolean = false;
-
-    @observable network: INetwork | null = null;
     @observable assets: { [name: string]: IAsset } = {'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8}};
-
     @observable scripted = false;
+    @observable network: INetwork | null = null;
+    @observable address: string | null = null;
+    @observable loginType: 'keeper' | 'exchange' | null = null;
 
-    @computed
-    get isBrowserSupportsWavesKeeper(): boolean {
-        const browser = getCurrentBrowser();
-        return ['chrome', 'firefox', 'opera', 'edge'].includes(browser);
+    constructor(rootStore: RootStore) {
+        super(rootStore);
+        autorun(async () => this.address && await this.updateAccountAssets(this.address));
     }
 
+    @computed get isAuthorized() {
+        return this.rootStore.keeperStore.isApplicationAuthorizedInWavesKeeper ||
+            this.rootStore.signerStore.isApplicationAuthorizedInWavesExchange;
+    }
+
+    @computed get fee() {
+        return this.scripted ? '0.009' : '0.005';
+    }
 
     @action
-    async updateAccountAssets(publicState: any) {
-        if (!publicState || !publicState.network || !publicState.account) return;
-        const server = publicState.network.server;
-        const path = `${checkSlash(server)}assets/balance/${publicState.account.address}`;
+    async updateAccountAssets(address: string) {
+        if (!this.network) return;
+        const server = this.network.server;
+        const path = `${checkSlash(server)}assets/balance/${address}`;
         const resp = await fetch(path);
-        const assets: { balances: { assetId: string, issueTransaction: { name: string, decimals: number } }[] } = await (resp).json();
+        const data = (await (resp).json());
+
+        const nftResp = await fetch(`${checkSlash(server)}assets/nft/${address}/limit/1000`);
+        const nft: { 'id': 'string', 'name': 'string', 'decimals': 0 }[] = (await (nftResp).json());
+
+        const assets: { balances: { assetId: string, issueTransaction: { name: string, decimals: number } }[] } = data;
+        assets.balances = [
+            ...assets.balances,
+            ...nft.map(({id, name, decimals}) => ({assetId: id, issueTransaction: {name, decimals}}))
+        ];
         if ('balances' in assets) {
 
-            this.assets = {
+            this.rootStore.accountStore.assets = {
                 'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8},
                 ...assets.balances.reduce((acc, {assetId, issueTransaction: {name, decimals}}) =>
-                    ({...acc, [assetId]: {assetId, name, decimals}}), {})
+                    ({...acc, [assetId]: {assetId, name, decimals}}), {}),
             };
         }
-    }
 
-    @action
-    updateWavesKeeperAccount = async (publicState: any) => {
-        this.scripted = (await nodeInteraction.scriptInfo(publicState.account.address, publicState.network.server)).script != null;
-        this.wavesKeeperAccount && set(this.wavesKeeperAccount, {
-            ...publicState.account
-        });
-    };
-
-    @action
-    resetWavesKeeperAccount = () => {
-        this.wavesKeeperAccount = undefined;
-    };
-
-    @action
-    async updateWavesKeeper(publicState: any) {
-        this.updateNetwork(publicState);
-        this.updateAccountAssets(publicState);
-        if (this.wavesKeeperAccount) {
-            publicState.account
-                ? this.updateWavesKeeperAccount(publicState)
-                : this.resetWavesKeeperAccount();
-        } else {
-            this.wavesKeeperAccount = publicState.account;
-        }
-    }
-
-    @action
-    updateNetwork = (publicState: any) => {
-        if (publicState.network && publicState.network !== this.network) {
-            this.network = publicState.network;
-        }
-    };
-
-    setupWavesKeeper = () => {
-        let attemptsCount = 0;
-
-        autorun(
-            (reaction) => {
-                if (attemptsCount === 2) {
-                    reaction.dispose();
-                    console.error('keeper is not installed');
-                    this.rootStore.notificationStore.notify('keeper is not installed', {
-                        type: 'warning',
-                        link: "https://wavesplatform.com/technology/keeper",
-                        linkTitle: 'install waves keeper'
-                    });
-                } else if (window['WavesKeeper']) {
-                    reaction.dispose();
-                    this.isWavesKeeperInstalled = true;
-                } else {
-                    attemptsCount += 1;
-                }
-            },
-            {scheduler: run => setInterval(run, 1000)}
-        );
-    };
-
-    @action
-    setupSynchronizationWithWavesKeeper = () => {
-        window['WavesKeeper'].initialPromise
-            .then((keeperApi: any) => {
-                this.isWavesKeeperInitialized = true;
-                return keeperApi;
-            })
-            .then((keeperApi: { publicState: () => void; }) => keeperApi.publicState())
-            .then((publicState: any) => {
-                this.isApplicationAuthorizedInWavesKeeper = true;
-                this.updateWavesKeeper(publicState).catch(e => {
-                    this.rootStore.notificationStore.notify(e, {type: 'error'});
-                    console.error(e);
-                });
-                this.subscribeToWavesKeeperUpdate();
-            })
-            .catch((error: IKeeperError) => {
-                if (error.code === '14') {
-                    this.isApplicationAuthorizedInWavesKeeper = true;
-                    this.subscribeToWavesKeeperUpdate();
-                } else {
-                    this.isApplicationAuthorizedInWavesKeeper = false;
-                }
-            });
-    };
-
-    login = async () => {
-        const resp = window['WavesKeeper'].publicState();
-        const publicState = await resp;
-        if (publicState.account && publicState.account.address) {
-        }
-        return resp;
-    };
-
-    subscribeToWavesKeeperUpdate() {
-        window['WavesKeeper'].on('update', async (publicState: any) => {
-            this.updateWavesKeeper(publicState).catch(e => {
-                this.rootStore.notificationStore.notify(e, {type: 'error'});
-                console.error(e);
-            });
-        });
     }
 
     getNetworkByAddress = (address: string): INetwork | null => {
         try {
             switch (String.fromCharCode(base58Decode(address)[1])) {
                 case 'T':
-                    return {server: 'https://nodes-testnet.wavesnodes.com', code: 'T'};
+                    return networks.testnet;
                 case 'S':
-                    return {server: 'https://nodes-stagenet.wavesnodes.com', code: 'S'};
+                    return networks.stagenet;
                 case 'W':
-                    return {server: 'https://nodes.wavesnodes.com', code: 'W'};
+                    return networks.mainnet;
                 case 'D':
-                    return {server: 'http://localhost:3000', code: 'D'};
+                    return networks.devnet;
                 case 'R':
-                    return {server: 'http://localhost:6869', code: 'R'};
+                    return networks.private;
             }
 
         } catch (e) {
-            this.rootStore.notificationStore.notify(e.message, {type: 'error'})
+            this.rootStore.notificationStore.notify(e.message, {type: 'error'});
         }
-        return null
-    }
+        return null;
+    };
 
+}
+
+export const networks = {
+    'testnet': {
+        server: 'https://nodes-testnet.wavesnodes.com',
+        code: 'T',
+        clientOrigin: 'https://testnet.waves.exchange/signer/'
+    },
+    'stagenet': {
+        server: 'https://nodes-stagenet.wavesnodes.com',
+        code: 'S',
+        clientOrigin: 'https://stagenet.waves.exchange/signer/'
+    },
+    'mainnet': {
+        server: 'https://nodes.wavesnodes.com',
+        code: 'W',
+        clientOrigin: 'https://waves.exchange/signer/'
+    },
+    'devnet': {server: 'https://devnet1-htz-nbg1-1.wavesnodes.com', code: 'D'},
+    'private': {server: 'http://localhost:6869', code: 'R'}
 }
 
 export default AccountStore;
