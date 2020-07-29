@@ -4,6 +4,7 @@ import { css, jsx } from '@emotion/core'
 import { inject, observer } from "mobx-react";
 import styled from "@emotion/styled";
 import { AccountStore, DappStore, HistoryStore, MetaStore } from "@stores/index";
+import { isArrayArguments, isRecordArguments, ICallableFuncTypesArray, TCallableFuncArgumentsArray, TCallableFuncArguments } from "@stores/MetaStore";
 import DappBody from "@components/DappUi/DappBody";
 import NotificationStore from "@stores/NotificationStore";
 import Head from "@components/Head";

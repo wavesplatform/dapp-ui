@@ -1,6 +1,6 @@
 /** @jsx jsx **/
 import React from "react";
-import { IMeta } from "@stores/MetaStore";
+import { IScriptInfoMeta, TCallableFuncArguments } from "@stores/MetaStore";
 import ScrollBar from "react-perfect-scrollbar";
 import { css, jsx } from "@emotion/core";
 import styled from "@emotion/styled";
@@ -46,7 +46,7 @@ height: 100%;
 
 `;
 
-export const Explorer: React.FunctionComponent<{ meta?: IMeta, hash: string, onSelect?: () => void }> =
+export const Explorer: React.FunctionComponent<{ meta?: IScriptInfoMeta<TCallableFuncArguments>, hash: string, onSelect?: () => void }> =
     ({meta, hash, onSelect}) =>
         <ScrollBar css={anchorWrapperStyle} options={{suppressScrollX: true}}>
             {meta && meta.callableFuncTypes ? Object.keys(meta.callableFuncTypes).map(key =>

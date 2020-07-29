@@ -54,8 +54,10 @@ class AccountStore extends SubStore {
     }
 
     getNetworkByAddress = (address: string): INetwork | null => {
+        const byte = String.fromCharCode(base58Decode(address)[1])
+
         try {
-            switch (String.fromCharCode(base58Decode(address)[1])) {
+            switch (byte) {
                 case 'T':
                     return networks.testnet;
                 case 'S':

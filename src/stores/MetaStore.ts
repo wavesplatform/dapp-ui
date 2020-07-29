@@ -2,18 +2,35 @@ import { SubStore } from '@stores/SubStore';
 import { RootStore } from "@stores/RootStore";
 import { action, autorun, observable } from "mobx";
 import { checkSlash } from '@utils'
-import { ICallableFuncTypes } from "@stores/DappStore";
 
+export type ICallableArgumentType = 'Int' | 'String' | 'ByteVector' | 'Boolean'
 
-export interface IMeta {
-    callableFuncTypes?: ICallableFuncTypes
-    version?: number
+export type TCallableFuncArgumentsArray = { name: string, type: ICallableArgumentType }[]
+export type TCallableFuncArgumentsRecord = Record<string, ICallableArgumentType>
+export type TCallableFuncArguments = TCallableFuncArgumentsArray | TCallableFuncArgumentsRecord 
+
+export type ICallableFuncTypesArray = Record<string, TCallableFuncArgumentsArray>
+
+export interface IScriptInfoMeta<TArguments extends TCallableFuncArguments> {
+    version: string
+    isArrayArguments?: boolean
+    callableFuncTypes: Record<string, TArguments>
 }
 
+export const isArrayArguments = (scriptInfoMeta: IScriptInfoMeta<TCallableFuncArguments>): scriptInfoMeta is IScriptInfoMeta<TCallableFuncArgumentsArray> => 
+    !!scriptInfoMeta.isArrayArguments
 
+export const isRecordArguments = (scriptInfoMeta: IScriptInfoMeta<TCallableFuncArguments>): scriptInfoMeta is IScriptInfoMeta<TCallableFuncArgumentsRecord> => 
+    !scriptInfoMeta.isArrayArguments
+
+export interface IScriptInfoMetaRes {
+    address: string
+    meta: IScriptInfoMeta<TCallableFuncArguments>
+}
+    
 class MetaStore extends SubStore {
 
-    @observable meta: IMeta | undefined = undefined;
+    @observable meta: IScriptInfoMeta<TCallableFuncArgumentsArray> | undefined = undefined;
     @observable isFailed: boolean | undefined = undefined;
     @observable invalidMeta: boolean | undefined = undefined;
     @observable server: string | undefined = undefined;
@@ -35,7 +52,6 @@ class MetaStore extends SubStore {
 
     }
 
-
     @action
     async updateMeta() {
         const pathname = this.rootStore.historyStore.currentPath;
@@ -50,7 +66,19 @@ class MetaStore extends SubStore {
                     this.isFailed = true;
                     this.invalidMeta = true;
                 } else {
-                    this.meta = res.meta;
+                    if (isArrayArguments(res.meta) ) {
+                        this.meta = res.meta;
+                    }
+
+                    if (isRecordArguments(res.meta)) {
+                        const callableFuncTypes = convertFuncArgumentsRecordToArray(res.meta.callableFuncTypes)
+
+                        this.meta = {
+                            ...res.meta,
+                            callableFuncTypes
+                        };
+                    }
+
                     this.isFailed = false;
                     this.invalidMeta = false;
                 }
@@ -65,12 +93,28 @@ class MetaStore extends SubStore {
 
 }
 
-async function getDappMeta(address: string, server: string) {
+async function getDappMeta(address: string, server: string): Promise<IScriptInfoMetaRes> {
     //todo handle error
     const path = `${checkSlash(server)}addresses/scriptInfo/${address}/meta`;
     const resp = await fetch(path);
     return await (resp).json();
 };
+
+
+function convertFuncArgumentsRecordToArray(callableFuncTypes: Record<string, TCallableFuncArguments>) {
+    return Object.entries(callableFuncTypes)
+        .reduce((acc, [funcName, args]) => {
+            return ({
+                ...acc,
+                [funcName]: Object.entries(args).reduce((acc, [name, type]) => {
+                    return ([
+                        ...acc,
+                        { name, type }
+                    ])
+                }, [] as TCallableFuncArgumentsArray)
+            })
+        }, {} as ICallableFuncTypesArray)
+}
 
 
 export default MetaStore;
