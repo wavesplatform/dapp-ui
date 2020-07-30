@@ -5,7 +5,8 @@ import { fonts } from '@src/styles';
 import Button from '@components/DappUi/Button';
 import Attach from '@src/assets/icons/Attach';
 import { css, jsx } from '@emotion/core';
-import DappStore, { b58strTob64Str, ICallableArgumentType, ICallableFuncArgument } from '@stores/DappStore';
+import DappStore, { b58strTob64Str } from "@stores/DappStore";
+import  { ICallableArgumentType, TCallableFuncArgumentsArray } from "@stores/MetaStore";
 import ArgumentInput from '@components/DappUi/ArgumentInput';
 import Close from '@src/assets/icons/Close';
 import { inject, observer } from 'mobx-react';
@@ -125,7 +126,7 @@ interface IInjectedProps {
 
 interface IProps extends IInjectedProps {
     funcName: string
-    funcArgs: ICallableFuncArgument
+    funcArgs: TCallableFuncArgumentsArray
     address: string
     key?: string
 }
@@ -141,10 +142,10 @@ interface IState {
 export default class Card extends React.Component<IProps, IState> {
 
     state: IState = {
-        args: Object.entries(this.props.funcArgs).reduce((acc, [k, v]) =>
+        args: this.props.funcArgs.reduce((acc, arg) =>
             ({
                 ...acc,
-                [k]: {type: v, byteVectorType: v === 'ByteVector' ? 'base58' : undefined, value: defaultValue(v)}
+                [arg.name]: {type: arg.type, byteVectorType: arg.type === 'ByteVector' ? 'base58' : undefined, value: defaultValue(arg.type)}
             }), {}),
         payments: [],
         address: this.props.accountStore!.address
@@ -166,7 +167,7 @@ export default class Card extends React.Component<IProps, IState> {
         const {args, payments} = this.state;
         const {funcArgs} = this.props;
         const invalidPayment = payments.some(({assetId, tokens}) => !assetId || !tokens);
-        const invalidArgs = Object.keys(funcArgs).length !== Object.keys(args).length || Object.values(args)
+        const invalidArgs = funcArgs.length !== Object.keys(args).length || Object.values(args)
             .some(({value}) => value === undefined);
         const invalidB58 = Object.values(args).some(({value, byteVectorType}) => {
             let error = false;

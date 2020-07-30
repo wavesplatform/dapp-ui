@@ -1,5 +1,7 @@
 import React from 'react';
-import {b58strTob64Str, ICallableArgumentType} from '@stores/DappStore';
+import {b58strTob64Str } from '@stores/DappStore';
+import { ICallableArgumentType } from '@stores/MetaStore';
+
 import Input from '@components/Input';
 import Select from '@components/Select';
 import {css} from '@emotion/core';

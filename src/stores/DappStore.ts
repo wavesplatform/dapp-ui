@@ -1,19 +1,7 @@
 import { SubStore } from './SubStore';
+import { ICallableArgumentType } from './MetaStore';
 import { IArgumentInput } from '@components/DappUi/Card';
 import { base58Decode, base64Encode } from '@waves/ts-lib-crypto';
-
-export type ICallableArgumentType =
-    'Int' | 'String' | 'ByteVector' | 'Boolean'
-
-
-export interface ICallableFuncArgument {
-    [arg: string]: ICallableArgumentType
-}
-
-export interface ICallableFuncTypes {
-    [func: string]: ICallableFuncArgument
-}
-
 
 interface IKeeperTransactionDataCallArg {
     type: string,
