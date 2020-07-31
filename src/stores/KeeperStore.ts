@@ -186,7 +186,7 @@ class KeeperStore extends SubStore {
 
         const res = await waitForTx(transaction.id, {apiBase: network!.server}) as any
 
-        const isFailed = res.applicationStatus && res.applicationStatus === 'scriptExecutionFailed'
+        const isFailed = res.applicationStatus && res.applicationStatus === 'script_execution_failed'
 
         notificationStore.notify(
             isFailed
