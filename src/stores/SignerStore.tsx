@@ -7,6 +7,7 @@ import {INetwork} from '@stores/KeeperStore';
 import {getExplorerLink} from '@utils/index';
 import {networks} from "@stores/AccountStore";
 import {waitForTx} from "@waves/waves-transactions";
+import Decimal from 'decimal.js';
 
 class SignerStore extends SubStore {
 
@@ -49,11 +50,11 @@ class SignerStore extends SubStore {
     @action
     async sendTx({data: tx}: any, opts: { notStopWait?: boolean } = {}) {
         if ('payment' in tx) {
-            tx.payment = tx.payment.map(({tokens: amount, assetId}: any) => ({amount: +amount * 1e8, assetId}));
+            tx.payment = tx.payment.map(({tokens: amount, assetId}: any) => ({amount: new Decimal(10).pow(8).mul(+amount).toNumber(), assetId}));
         }
         if ('fee' in tx) {
             delete tx.feeAssetId;
-            tx.fee = +this.rootStore.accountStore.fee * 1e8;
+            tx.fee = new Decimal(10).pow(8).mul(+this.rootStore.accountStore.fee).toNumber();
         }
 
         try {
@@ -61,11 +62,6 @@ class SignerStore extends SubStore {
             const id = (transaction as any).id || '';
             const {accountStore: {network}, notificationStore} = this.rootStore;
             const link = network ? getExplorerLink(network!.code, id, 'tx') : undefined;
-            // console.dir(transaction);
-            // this.rootStore.notificationStore
-            //     .notify(`Transaction sent: ${id}\n`,
-            //         {type: 'success', link, linkTitle: 'View transaction'});
-
             console.dir(transaction);
             notificationStore.notify(`Transaction sent: ${transaction.id}\n`, {type: 'info'})
 

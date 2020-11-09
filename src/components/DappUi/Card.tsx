@@ -17,6 +17,7 @@ import { centerEllipsis } from '@components/Home/Account';
 import { autorun } from 'mobx';
 import InputNumber from '@components/Input/InputNumber';
 import Tooltip from 'rc-tooltip';
+import Decimal from "decimal.js";
 
 const flexStyle = css`display: flex;width: 100%;`;
 
@@ -230,6 +231,7 @@ export default class Card extends React.Component<IProps, IState> {
     };
 
 
+
     render() {
         const {funcName: title, accountStore} = this.props;
         const {args, payments} = this.state;
@@ -280,7 +282,7 @@ export default class Card extends React.Component<IProps, IState> {
                             </Select>
                             <InputNumber
                                 min={0}
-                                step={10 ** -decimals}
+                                step={(new Decimal(10).pow(-decimals)).toNumber()}
                                 onChange={this.handleChangePaymentCount(i)}
                                 value={String(tokens)}
                                 onBlur={this.handleBlurPaymentCount(i)}
