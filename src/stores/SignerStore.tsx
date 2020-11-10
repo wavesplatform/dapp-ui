@@ -1,4 +1,4 @@
-import {RootStore} from '@stores';
+import {AccountStore, RootStore} from '@stores';
 import {SubStore} from './SubStore';
 import Signer from '@waves/signer';
 import Provider from '@waves.exchange/provider-web';
@@ -50,7 +50,12 @@ class SignerStore extends SubStore {
     @action
     async sendTx({data: tx}: any, opts: { notStopWait?: boolean } = {}) {
         if ('payment' in tx) {
-            tx.payment = tx.payment.map(({tokens: amount, assetId}: any) => ({amount: new Decimal(10).pow(8).mul(+amount).toNumber(), assetId}));
+
+            tx.payment = tx.payment.map(({tokens: amount, assetId}: any) => {
+                const decimals = this.rootStore.accountStore.assets[assetId].decimals
+                return ({amount: new Decimal(10).pow(decimals).mul(+amount).toNumber(), assetId})
+        }
+            )
         }
         if ('fee' in tx) {
             delete tx.feeAssetId;

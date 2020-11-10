@@ -1,20 +1,20 @@
 /** @jsx jsx **/
 import React from 'react';
 import styled from '@emotion/styled';
-import { fonts } from '@src/styles';
+import {fonts} from '@src/styles';
 import Button from '@components/DappUi/Button';
 import Attach from '@src/assets/icons/Attach';
-import { css, jsx } from '@emotion/core';
-import DappStore, { b58strTob64Str } from "@stores/DappStore";
-import  { ICallableArgumentType, TCallableFuncArgumentsArray } from "@stores/MetaStore";
+import {css, jsx} from '@emotion/core';
+import DappStore, {b58strTob64Str} from "@stores/DappStore";
+import {ICallableArgumentType, TCallableFuncArgumentsArray} from "@stores/MetaStore";
 import ArgumentInput from '@components/DappUi/ArgumentInput';
 import Close from '@src/assets/icons/Close';
-import { inject, observer } from 'mobx-react';
+import {inject, observer} from 'mobx-react';
 import AccountStore from '@stores/AccountStore';
 import Select from '@components/Select';
-import { Option } from 'rc-select';
-import { centerEllipsis } from '@components/Home/Account';
-import { autorun } from 'mobx';
+import {Option} from 'rc-select';
+import {centerEllipsis} from '@components/Home/Account';
+import {autorun} from 'mobx';
 import InputNumber from '@components/Input/InputNumber';
 import Tooltip from 'rc-tooltip';
 import Decimal from "decimal.js";
@@ -146,7 +146,11 @@ export default class Card extends React.Component<IProps, IState> {
         args: this.props.funcArgs.reduce((acc, arg) =>
             ({
                 ...acc,
-                [arg.name]: {type: arg.type, byteVectorType: arg.type === 'ByteVector' ? 'base58' : undefined, value: defaultValue(arg.type)}
+                [arg.name]: {
+                    type: arg.type,
+                    byteVectorType: arg.type === 'ByteVector' ? 'base58' : undefined,
+                    value: defaultValue(arg.type)
+                }
             }), {}),
         payments: [],
         address: this.props.accountStore!.address
@@ -231,7 +235,6 @@ export default class Card extends React.Component<IProps, IState> {
     };
 
 
-
     render() {
         const {funcName: title, accountStore} = this.props;
         const {args, payments} = this.state;
@@ -265,7 +268,10 @@ export default class Card extends React.Component<IProps, IState> {
             <FlexBlock>
                 <AttachPaymentItems>
                     {this.state.payments.map(({assetId, tokens}, i) => {
-                        const decimals = (accountStore!.assets[assetId] && accountStore!.assets[assetId].decimals) || 8;
+                        const decimals = (accountStore!.assets[assetId]
+                            && (accountStore!.assets[assetId].decimals || accountStore!.assets[assetId].decimals === 0))
+                            ? accountStore!.assets[assetId].decimals
+                            : 8;
                         return <AttachPaymentItem key={i}>
                             <ArgumentTitle>
                                 <ArgumentTitleVarName>Payments:</ArgumentTitleVarName>
