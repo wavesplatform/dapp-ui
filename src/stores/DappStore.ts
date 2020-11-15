@@ -111,6 +111,14 @@ function convertArgType(type: ICallableArgumentType): string {
             return 'integer';
         case 'String':
             return 'string';
+        case 'List[Int]':
+            return 'string';
+        case 'List[String]':
+            return 'string';
+        case 'List[ByteVector]':
+            return 'string';
+        case 'List[Boolean]':
+            return 'string';
     }
     return type;
 };

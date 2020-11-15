@@ -1,4 +1,4 @@
-import {AccountStore, RootStore} from '@stores';
+import {RootStore} from '@stores';
 import {SubStore} from './SubStore';
 import Signer from '@waves/signer';
 import Provider from '@waves.exchange/provider-web';

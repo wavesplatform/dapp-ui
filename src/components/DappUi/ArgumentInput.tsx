@@ -102,6 +102,31 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
                     value={value} css={style} spellCheck={false}
                 />;
+
+            case 'List[Int]':
+                return <Input
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
+                    value={value} css={style} spellCheck={false}
+                />;
+
+            case 'List[String]':
+                return <Input
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
+                    value={value} css={style} spellCheck={false}
+                />;
+
+            case 'List[ByteVector]':
+                return <Input
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
+                    value={value} css={style} spellCheck={false}
+                />;
+
+            case 'List[Boolean]':
+                return <Input
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
+                    value={value} css={style} spellCheck={false}
+                />;
+
             default:
                 return <Input css={style} disabled/>;
         }

@@ -3,7 +3,7 @@ import { RootStore } from "@stores/RootStore";
 import { action, autorun, observable } from "mobx";
 import { checkSlash } from '@utils'
 
-export type ICallableArgumentType = 'Int' | 'String' | 'ByteVector' | 'Boolean'
+export type ICallableArgumentType = 'Int' | 'String' | 'ByteVector' | 'Boolean' | 'List[Int]' | 'List[String]' | 'List[ByteVector]' | 'List[Boolean]'
 
 export type TCallableFuncArgumentsArray = { name: string, type: ICallableArgumentType }[]
 export type TCallableFuncArgumentsRecord = Record<string, ICallableArgumentType>

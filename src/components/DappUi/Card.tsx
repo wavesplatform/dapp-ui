@@ -174,6 +174,20 @@ export default class Card extends React.Component<IProps, IState> {
         const invalidPayment = payments.some(({assetId, tokens}) => !assetId || !tokens);
         const invalidArgs = funcArgs.length !== Object.keys(args).length || Object.values(args)
             .some(({value}) => value === undefined);
+        const invalidValues = Object.values(args).some(({type, value}) => {
+            if (type === 'List[Int]' && value !== undefined) {
+                value = value!.replace(' ', '');
+                return !(/\[((((\d+,)+)\d+)|\d+)]/g.test(value));
+            } else if (type === 'List[String]' && value !== undefined) {
+                return !(/\[((((['"]\w+['"],)+)['"]\w+['"])|(['"]\w+['"]))]/g.test(value));
+            } else if (type === 'List[ByteVector]' && value !== undefined) {
+                value = value!.replace(' ', '');
+                return !(/\[(((base(16|58|64)['"][\w+/=]+['"],)+base(16|58|64)['"][\w+/=]+['"])|(base(16|58|64)['"][\w+/=]+)['"])]/g.test(value));
+            } else if (type === 'List[Boolean]' && value !== undefined) {
+                value = value!.replace(' ', '');
+                return !(/\[((((true)|(false)),+)+((true)|(false))|((true)|(false)))]/g.test(value));
+            } else return false
+        })
         const invalidB58 = Object.values(args).some(({value, byteVectorType}) => {
             let error = false;
             if (byteVectorType && byteVectorType === 'base58') {
@@ -185,7 +199,7 @@ export default class Card extends React.Component<IProps, IState> {
             }
             return error;
         });
-        return invalidPayment || invalidArgs || invalidB58;
+        return invalidPayment || invalidArgs || invalidB58 || invalidValues;
     }
 
     handleAddAttach = () => this.state.payments.length < 2 && this.setState({
@@ -203,6 +217,7 @@ export default class Card extends React.Component<IProps, IState> {
 
     handleChangeValue = (name: string, type: ICallableArgumentType, value?: string) => {
         // if (type === 'Int' && value && (isNaN(+value) || value.includes('e'))) value = value.replace('e', '');
+
         this.setState({args: {...this.state.args, [name]: {...this.state.args[name], type, value}}});
     };
     handleChangeByteVectorType = (name: string, byteVectorType: 'base58' | 'base64') =>
