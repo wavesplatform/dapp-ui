@@ -1,11 +1,11 @@
-import { SubStore } from './SubStore';
-import { ICallableArgumentType } from './MetaStore';
-import { IArgumentInput } from '@components/DappUi/Card';
-import { base58Decode, base64Encode } from '@waves/ts-lib-crypto';
+import {SubStore} from './SubStore';
+import {ICallableArgumentType} from './MetaStore';
+import {IArgument, IArgumentInput} from '@components/DappUi/Card';
+import {base58Decode, base64Encode} from '@waves/ts-lib-crypto';
 
 interface IKeeperTransactionDataCallArg {
     type: string,
-    value: string | number | boolean
+    value: string | number | boolean | {type: string, value: string | number | boolean}[]
 }
 
 interface IKeeperTransactionDataCall {
@@ -38,24 +38,30 @@ export interface IKeeperTransaction {
 class DappStore extends SubStore {
 
 
-    private convertArgValue = (arg: IArgumentInput): (string | number | boolean) => {
+    private convertArgValue = (arg: IArgument | IArgumentInput): (string | number | boolean | { type: string, value: string | number | boolean }[]) => {
         const {value, type, byteVectorType} = arg;
         if (value === undefined) {
             this.rootStore.notificationStore.notify('value is undefined', {type: 'error'});
             return '';
         }
-        if (type === 'Boolean' && ['true', 'false'].includes(value)) return value === 'true';
+        if (type === 'Boolean') return (value as string).includes('true');
         if (type === 'Int' && !isNaN(+value)) return +value;
-        if (byteVectorType === 'base58') return `base64:${b58strTob64Str(value)}`;
+        if (byteVectorType === 'base58') return `base64:${b58strTob64Str(value as string)}`;
         if (byteVectorType === 'base64') return `base64:${value}`;
-        else return value;
+        if (type.startsWith('List')) return (value as IArgumentInput[]).map(item => {
+                const a = {type: item.type, value: (this.convertArgValue(item) as string | number | boolean)};
+                return a;
+            });
+        else return (value as string | number | boolean | { type: string, value: string | number | boolean }[]);
     };
 
-    private convertArgs = (args: IArgumentInput[]): IKeeperTransactionDataCallArg[] =>
-        args.filter(({value}) => value !== undefined)
-            .map(arg => ({type: convertArgType(arg.type), value: this.convertArgValue(arg)}));
+    private convertArgs = (args: IArgument[]): IKeeperTransactionDataCallArg[] =>
+        args.filter(({value}) => value !== undefined || !(value as unknown as IArgumentInput[]).some(item => item.value === undefined))
+            .map(arg => {
+                return ({type: convertArgType(arg.type), value: this.convertArgValue(arg)})
+            });
 
-    callCallableFunction = (address: string, func: string, inArgs: IArgumentInput[], payment: IKeeperTransactionPayment[]) => {
+    callCallableFunction = (address: string, func: string, inArgs: IArgument[], payment: IKeeperTransactionPayment[]) => {
         const {accountStore} = this.rootStore;
         let args: IKeeperTransactionDataCallArg[] = [];
         try {
@@ -101,7 +107,7 @@ export function b58strTob64Str(str = ''): string {
     }
 }
 
-function convertArgType(type: ICallableArgumentType): string {
+function convertArgType(type: ICallableArgumentType | string): string {
     switch (type) {
         case 'Boolean':
             return 'boolean';
@@ -110,14 +116,6 @@ function convertArgType(type: ICallableArgumentType): string {
         case 'Int':
             return 'integer';
         case 'String':
-            return 'string';
-        case 'List[Int]':
-            return 'string';
-        case 'List[String]':
-            return 'string';
-        case 'List[ByteVector]':
-            return 'string';
-        case 'List[Boolean]':
             return 'string';
     }
     return type;

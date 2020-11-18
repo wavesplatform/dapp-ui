@@ -18,6 +18,8 @@ import {autorun} from 'mobx';
 import InputNumber from '@components/Input/InputNumber';
 import Tooltip from 'rc-tooltip';
 import Decimal from "decimal.js";
+import {ReactComponent as AttachIcon} from "@src/assets/icons/Attach/attach-icon.svg";
+import {ListArgComponent} from "@components/DappUi/ListArgComponent";
 
 const flexStyle = css`display: flex;width: 100%;`;
 
@@ -108,12 +110,17 @@ align-items: center;
 
 const Title = styled.div`${fonts.cardTitleFont}`;
 
+export interface IArgument {
+    type: ICallableArgumentType,
+    value: string | undefined | IArgumentInput[]
+    byteVectorType?: 'base58' | 'base64'
+}
+
 export interface IArgumentInput {
     type: ICallableArgumentType,
     value: string | undefined
     byteVectorType?: 'base58' | 'base64'
 }
-
 
 const Anchor = styled.div`
 position:absolute;
@@ -133,7 +140,7 @@ interface IProps extends IInjectedProps {
 }
 
 interface IState {
-    args: { [name: string]: IArgumentInput }
+    args: { [name: string]: IArgument }
     payments: { assetId: string, tokens: string }[]
     address: string | null
 }
@@ -174,32 +181,33 @@ export default class Card extends React.Component<IProps, IState> {
         const invalidPayment = payments.some(({assetId, tokens}) => !assetId || !tokens);
         const invalidArgs = funcArgs.length !== Object.keys(args).length || Object.values(args)
             .some(({value}) => value === undefined);
-        const invalidValues = Object.values(args).some(({type, value}) => {
-            if (type === 'List[Int]' && value !== undefined) {
-                value = value!.replace(' ', '');
-                return !(/\[((((\d+,)+)\d+)|\d+)]/g.test(value));
-            } else if (type === 'List[String]' && value !== undefined) {
-                return !(/\[((((['"]\w+['"],)+)['"]\w+['"])|(['"]\w+['"]))]/g.test(value));
-            } else if (type === 'List[ByteVector]' && value !== undefined) {
-                value = value!.replace(' ', '');
-                return !(/\[(((base(16|58|64)['"][\w+/=]+['"],)+base(16|58|64)['"][\w+/=]+['"])|(base(16|58|64)['"][\w+/=]+)['"])]/g.test(value));
-            } else if (type === 'List[Boolean]' && value !== undefined) {
-                value = value!.replace(' ', '');
-                return !(/\[((((true)|(false)),+)+((true)|(false))|((true)|(false)))]/g.test(value));
-            } else return false
-        })
-        const invalidB58 = Object.values(args).some(({value, byteVectorType}) => {
-            let error = false;
-            if (byteVectorType && byteVectorType === 'base58') {
-                try {
-                    b58strTob64Str(value);
-                } catch (e) {
-                    error = true;
-                }
-            }
-            return error;
-        });
-        return invalidPayment || invalidArgs || invalidB58 || invalidValues;
+        // const invalidValues = Object.values(args).some(({type, value}) => {
+        //     if (type === 'List[Int]' && value !== undefined) {
+        //         value = value!.replace(' ', '');
+        //         return !(/\[((((\d+,)+)\d+)|\d+)]/g.test(value));
+        //     } else if (type === 'List[String]' && value !== undefined) {
+        //         return !(/\[((((['"]\w+['"],)+)['"]\w+['"])|(['"]\w+['"]))]/g.test(value));
+        //     } else if (type === 'List[ByteVector]' && value !== undefined) {
+        //         value = value!.replace(' ', '');
+        //         return !(/\[(((base(16|58|64)['"][\w+/=]+['"],)+base(16|58|64)['"][\w+/=]+['"])|(base(16|58|64)['"][\w+/=]+)['"])]/g.test(value));
+        //     } else if (type === 'List[Boolean]' && value !== undefined) {
+        //         value = value!.replace(' ', '');
+        //         return !(/\[((((true)|(false)),+)+((true)|(false))|((true)|(false)))]/g.test(value));
+        //     } else return false
+        // })
+        // const invalidB58 = Object.values(args).some(({value, byteVectorType}) => {
+        //     let error = false;
+        //     if (byteVectorType && byteVectorType === 'base58') {
+        //         try {
+        //             b58strTob64Str(value);
+        //         } catch (e) {
+        //             error = true;
+        //         }
+        //     }
+        //     return error;
+        // });
+        return invalidPayment || invalidArgs
+        // || invalidB58;
     }
 
     handleAddAttach = () => this.state.payments.length < 2 && this.setState({
@@ -208,6 +216,7 @@ export default class Card extends React.Component<IProps, IState> {
             tokens: (0).toFixed(8)
         }]
     });
+
 
     handleRemoveAttach = (i: number) => () => {
         const payments = this.state.payments;
@@ -261,22 +270,36 @@ export default class Card extends React.Component<IProps, IState> {
             </Header>
             {Object.keys(args).length > 0 &&
             <ArgumentsLayout>
-                {Object.entries(args).map(([argName, {type}], i: number) =>
-                    <ArgumentItem key={i}>
-                        <ArgumentTitle>
-                            <ArgumentTitleVarName>{centerEllipsis(argName, 7)}:</ArgumentTitleVarName>
-                            &nbsp;
-                            <ArgumentTitleVarType>{type}</ArgumentTitleVarType>
-                        </ArgumentTitle>
-                        <ArgumentInput
-                            css={css`flex:5`}
-                            value={args[argName] ? args[argName].value : defaultValue(type)}
-                            name={argName}
-                            type={type}
-                            onChange={this.handleChangeValue}
-                            onChangeByteVectorType={this.handleChangeByteVectorType}
-                        />
-                    </ArgumentItem>
+                {Object.entries(args).map(([argName, {type}], i: number) => {
+                        return type.includes('List')
+                            ? (args[argName].value as IArgumentInput[]).map(({type, value}) => {
+                                    return <ListArgComponent
+                                        type={type}
+                                        setValue={(value) => this.setState({
+                                            args: {
+                                                ...this.state.args,
+                                                [argName]: {type: type, value: value}
+                                            }
+                                        })}
+                                    />
+                                }
+                            )
+                            : <ArgumentItem key={i}>
+                                <ArgumentTitle>
+                                    <ArgumentTitleVarName>{centerEllipsis(argName, 7)}:</ArgumentTitleVarName>
+                                    &nbsp;
+                                    <ArgumentTitleVarType>{type}</ArgumentTitleVarType>
+                                </ArgumentTitle>
+                                {/*<ArgumentInput*/}
+                                {/*    css={css`flex:5`}*/}
+                                {/*    value={args[argName] ? args[argName].value : defaultValue(type)}*/}
+                                {/*    name={argName}*/}
+                                {/*    type={type}*/}
+                                {/*    onChange={this.handleChangeValue}*/}
+                                {/*    onChangeByteVectorType={this.handleChangeByteVectorType}*/}
+                                {/*/>*/}
+                            </ArgumentItem>
+                    }
                 )}
             </ArgumentsLayout>
             }
@@ -321,4 +344,27 @@ export default class Card extends React.Component<IProps, IState> {
 }
 
 
-const defaultValue = (type: ICallableArgumentType) => type === 'String' || type === 'ByteVector' ? '' : undefined;
+const defaultValue = (type: ICallableArgumentType) => {
+    if (type.startsWith('List')) {
+        return [];
+    }
+    return type === 'String' || type === 'ByteVector' ? '' : undefined
+};
+
+export const convertListTypes = (listType: string) => {
+    listType.replace(' ', '')
+    const inputTypes = []
+    if (listType.includes('Int')) {
+        inputTypes.push('Int')
+    }
+    if (listType.includes('String')) {
+        inputTypes.push('String')
+    }
+    if (listType.includes('Boolean')) {
+        inputTypes.push('Boolean')
+    }
+    if (listType.includes('ByteVector')) {
+        inputTypes.push('ByteVector')
+    }
+    return inputTypes
+}

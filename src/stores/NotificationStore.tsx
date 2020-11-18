@@ -72,8 +72,6 @@ class NotificationStore extends SubStore {
         }catch(e){
             console.error(content)
         }
-
-
     }
 }
 

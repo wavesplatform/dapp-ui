@@ -1,6 +1,6 @@
 import React from 'react';
-import {b58strTob64Str } from '@stores/DappStore';
-import { ICallableArgumentType } from '@stores/MetaStore';
+import {b58strTob64Str} from '@stores/DappStore';
+import {ICallableArgumentType} from '@stores/MetaStore';
 
 import Input from '@components/Input';
 import Select from '@components/Select';
@@ -11,11 +11,12 @@ import {inject, observer} from 'mobx-react';
 import InputNumber from '@components/Input/InputNumber';
 import Radio from "@components/Input/Radio";
 import styled from "@emotion/styled";
+import {convertListTypes} from "@components/DappUi/Card";
 
 interface IArgumentInputProps {
     name: string
-    type: ICallableArgumentType
-    onChange: (name: string, type: ICallableArgumentType, value?: string) => void
+    type: string
+    onChange: (name: string, type: ICallableArgumentType | string, value?: string) => void
     onChangeByteVectorType: (name: string, byteVectorType: 'base58' | 'base64') => void
     value?: string
     css?: any
@@ -25,6 +26,7 @@ interface IArgumentInputProps {
 }
 
 interface IArgumentInputState {
+    selectedInputType: ICallableArgumentType
     byteVectorType: 'base58' | 'base64'
 }
 
@@ -41,7 +43,7 @@ margin: 0 -15px;
 @observer
 export default class ArgumentInput extends React.Component<IArgumentInputProps, IArgumentInputState> {
 
-    state: IArgumentInputState = {byteVectorType: 'base58'};
+    state: IArgumentInputState = {byteVectorType: 'base58', selectedInputType: 'String'};
 
     handleChangeByteVectorType = (byteVectorType: string) => {
         if (byteVectorType !== 'base58' && byteVectorType !== 'base64') return;
@@ -63,9 +65,11 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
         }
     };
 
-    render() {
-        const {type, value, css: style} = this.props;
+    inputSwitcher = (): React.ReactElement => {
+        let {type, value, css: style} = this.props;
         const {byteVectorType} = this.state;
+        if (type.startsWith('List')) type = 'List';
+        const listsTypes = convertListTypes(type)
         switch (type) {
             case 'Boolean':
                 return <RadioSet css={style}>
@@ -103,33 +107,28 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
                     value={value} css={style} spellCheck={false}
                 />;
 
-            case 'List[Int]':
-                return <Input
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
-                    value={value} css={style} spellCheck={false}
-                />;
-
-            case 'List[String]':
-                return <Input
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
-                    value={value} css={style} spellCheck={false}
-                />;
-
-            case 'List[ByteVector]':
-                return <Input
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
-                    value={value} css={style} spellCheck={false}
-                />;
-
-            case 'List[Boolean]':
-                return <Input
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
-                    value={value} css={style} spellCheck={false}
-                />;
+            case 'List':
+                return <>
+                    <Select
+                        value={byteVectorType}
+                        onChange={this.handleChangeByteVectorType}
+                        css={[style, css`margin-right: 8px; max-width: 90px`]}
+                    >
+                        {listsTypes.map(type => <Option value={type}>{type}</Option>)}
+                    </Select>
+                    {this.inputSwitcher()}
+                </>
 
             default:
                 return <Input css={style} disabled/>;
         }
     }
-}
 
+    render() {
+        // let {type, value, css: style} = this.props;
+        // const {byteVectorType} = this.state;
+        // if (type.startsWith('List')) type = 'List';
+        // const listsTypes = convertListTypes(type)
+        return this.inputSwitcher()
+    }
+}
