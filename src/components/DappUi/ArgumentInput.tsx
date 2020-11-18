@@ -109,6 +109,7 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
 
             case 'List':
                 return <>
+                    {console.log('listsTypes', listsTypes)}
                     <Select
                         value={byteVectorType}
                         onChange={this.handleChangeByteVectorType}

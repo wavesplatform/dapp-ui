@@ -224,10 +224,15 @@ export default class Card extends React.Component<IProps, IState> {
         this.setState({payments});
     };
 
-    handleChangeValue = (name: string, type: ICallableArgumentType, value?: string) => {
+    handleChangeValue = (name: string, type: string, value?: string) => {
         // if (type === 'Int' && value && (isNaN(+value) || value.includes('e'))) value = value.replace('e', '');
 
-        this.setState({args: {...this.state.args, [name]: {...this.state.args[name], type, value}}});
+        this.setState({
+            args: {
+                ...this.state.args,
+                [name]: {...this.state.args[name], type: (type as ICallableArgumentType), value}
+            }
+        });
     };
     handleChangeByteVectorType = (name: string, byteVectorType: 'base58' | 'base64') =>
         this.setState({args: {...this.state.args, [name]: {...this.state.args[name], byteVectorType}}});
@@ -271,10 +276,17 @@ export default class Card extends React.Component<IProps, IState> {
             {Object.keys(args).length > 0 &&
             <ArgumentsLayout>
                 {Object.entries(args).map(([argName, {type}], i: number) => {
-                        return type.includes('List')
-                            ? (args[argName].value as IArgumentInput[]).map(({type, value}) => {
+                        console.log('argName', argName)
+                        console.log('type', type)
+                        console.log('value', args[argName].value)
+                        return type.startsWith('List')
+                            ? (args[argName].value as IArgumentInput[]).map(({type, value}, i) => {
+
+                                    console.log('should render ListArgComponent')
                                     return <ListArgComponent
+                                        key={i}
                                         type={type}
+                                        argName={argName}
                                         setValue={(value) => this.setState({
                                             args: {
                                                 ...this.state.args,
@@ -290,14 +302,14 @@ export default class Card extends React.Component<IProps, IState> {
                                     &nbsp;
                                     <ArgumentTitleVarType>{type}</ArgumentTitleVarType>
                                 </ArgumentTitle>
-                                {/*<ArgumentInput*/}
-                                {/*    css={css`flex:5`}*/}
-                                {/*    value={args[argName] ? args[argName].value : defaultValue(type)}*/}
-                                {/*    name={argName}*/}
-                                {/*    type={type}*/}
-                                {/*    onChange={this.handleChangeValue}*/}
-                                {/*    onChangeByteVectorType={this.handleChangeByteVectorType}*/}
-                                {/*/>*/}
+                                <ArgumentInput
+                                    css={css`flex:5`}
+                                    value={(args[argName] ? args[argName].value : defaultValue(type)) as string | undefined}
+                                    name={argName}
+                                    type={type}
+                                    onChange={this.handleChangeValue}
+                                    onChangeByteVectorType={this.handleChangeByteVectorType}
+                                />
                             </ArgumentItem>
                     }
                 )}
@@ -346,7 +358,7 @@ export default class Card extends React.Component<IProps, IState> {
 
 const defaultValue = (type: ICallableArgumentType) => {
     if (type.startsWith('List')) {
-        return [];
+        return [{type: 'String', value: ''}];
     }
     return type === 'String' || type === 'ByteVector' ? '' : undefined
 };
