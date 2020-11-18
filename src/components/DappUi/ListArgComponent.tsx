@@ -1,69 +1,70 @@
-import React, {useState} from 'react'
+import React from 'react'
 import {IArgumentInput} from "@components/DappUi/Card";
 import {centerEllipsis} from "@components/Home/Account";
 import {ArgumentInput} from "@components/DappUi/ArgumentInput";
-import {css, jsx} from "@emotion/core";
+import {css} from "@emotion/core";
 import {ReactComponent as AttachIcon} from "@src/assets/icons/Attach/attach-icon.svg";
 import styled from "@emotion/styled";
 import {fonts} from "@src/styles";
-import {debounce} from "debounce";
 import {ICallableArgumentType} from "@stores/MetaStore";
 import Close from "@src/assets/icons/Close";
 
 interface IProps {
     type: string,
     argName: string,
+    values: IArgumentInput[],
     setValue: (value: IArgumentInput[]) => void,
+    setByteVectorType: (name: string, byteVectorType: 'base58' | 'base64') => void
 }
 
 export const ListArgComponent: React.FC<IProps> = (props) => {
-    console.log('props.type', props.type)
-    const defaultValue = {type: props.type, value: ''}
-    const [values, setValue] = useState({0: defaultValue})
+    const initialValue = {type: props.type, value: ''} as IArgumentInput
+    const {values, setValue, type, argName} = props
 
-    const handleAddArgument = () => setValue({...values, [Object.keys(values).length + 1]: defaultValue})
-    const handleDeleteArgument = (name: string) => {
-        // @ts-ignore
-        delete values[name];
-        setValue(values)
+    const handleAddArgument = () => setValue([...values, initialValue])
+
+    const handleDeleteArgument = (index: number) => {
+        values.splice(index, 1)
+        setValue([...values])
     }
-    const handleChangeValue = (name: string, type: ICallableArgumentType | string, value?: string) => {
-        setValue({...values, [name]: {type: type, value: value}});
-        // props.setValue(Object.values(values))
+
+    const handleChangeValue = (name: string, type: ICallableArgumentType | string, value?: string, index?: number) => {
+        values[index] = {...values[index], value: value}
+        setValue([...values]);
     };
 
-
-    const handleChangeByteVectorType = (name: string, byteVectorType: 'base58' | 'base64') =>
-        setValue({...values, [name]: {byteVectorType}});
+    const handleChangeType = (name: string, type: ICallableArgumentType | string) => {
+        const index = +name
+        values[index] = {...values[index], type: (type as ICallableArgumentType)}
+        setValue([...values]);
+    };
 
     return <Root>
         <ArgumentTitle>
             <ArgumentTitleVarName>{centerEllipsis(props.argName, 7)}:</ArgumentTitleVarName>
             &nbsp;
         </ArgumentTitle>
-        {console.log('render')}
         <Wrapper>
-            {Object.entries(values).map(item => {
-                const name = item[0]
-                const type = item[1].type
-                const value = item[1].value
-                return <Item>
+            {values.map((item, index) => {
+                const type = item.type
+                const value = item.value
+                return <Item key={Math.random()}>
                     <ArgumentTitle>
                         <ArgumentTitleVarType>{type}</ArgumentTitleVarType>
                     </ArgumentTitle>
-                    {console.log('type', type)}
-                    {console.log('value', value)}
                     <ArgumentInput
                         css={css`flex:5`}
                         value={value}
-                        name={name}
+                        name={argName}
+                        index={index}
                         type={type}
                         onChange={handleChangeValue}
-                        onChangeByteVectorType={handleChangeByteVectorType}
+                        onChangeType={handleChangeType}
+                        onChangeByteVectorType={props.setByteVectorType}
                     />
-                    {Object.keys(values).length > 1
+                    {values.length > 1
                         ? <Close style={{marginLeft: "10px", cursor: "pointer"}}
-                                 onClick={() => handleDeleteArgument(name)}/>
+                                 onClick={() => handleDeleteArgument(index)}/>
                         : null}
                     <AttachIcon style={{marginLeft: "10px", cursor: "pointer"}}
                                 onClick={() => handleAddArgument()}/>
@@ -99,8 +100,8 @@ height: 40px;
 display: flex;
 margin-right: 20px;
 align-items: center;
-justify-content: flex-end;
-min-width: 100px;
+//justify-content: flex-end;
+//min-width: 100px;
 max-width: 150px;
 `;
 

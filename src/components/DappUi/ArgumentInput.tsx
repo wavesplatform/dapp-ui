@@ -17,7 +17,9 @@ interface IArgumentInputProps {
     name: string
     type: string
     onChange: (name: string, type: ICallableArgumentType | string, value?: string) => void
-    onChangeByteVectorType: (name: string, byteVectorType: 'base58' | 'base64') => void
+    onChangeType?: (name: string, type: ICallableArgumentType | string) => void
+    onChangeByteVectorType: (name: string, byteVectorType: 'base58' | 'base64', index?: number) => void
+    index?: number
     value?: string
     css?: any
     notificationStore?: NotificationStore
@@ -33,21 +35,19 @@ margin: 0 -15px;
 `
 
 export const ArgumentInput: React.FC<IArgumentInputProps> = inject('notificationStore')(observer((props) => {
-    let {type, value, css: style} = props;
-    if (type.startsWith('List')) type = 'List';
+    let {type, value, css: style, index} = props;
     const listsTypes = convertListTypes(type);
     const [byteVectorType, setByteVectorType] = useState('base58')
-    const [selectedInputType, setSelectedInputType] = useState(listsTypes.length > 1 ? 'String' : props.type)
+    // const [selectedInputType, setSelectedInputType] = useState(listsTypes.length > 1 ? 'String' : props.type)
 
     const handleChangeByteVectorType = (byteVectorType: string) => {
         if (byteVectorType !== 'base58' && byteVectorType !== 'base64') return;
         setByteVectorType(byteVectorType);
-        props.onChangeByteVectorType(props.name, byteVectorType);
+        props.onChangeByteVectorType(props.name, byteVectorType, index);
     };
 
     const handleChange = (value?: string) => {
-        console.log(value)
-        props.onChange(props.name, selectedInputType, value);
+        props.onChange(props.name, type, value);
     }
 
     const validateByteVector = (e: any) => {
@@ -60,9 +60,7 @@ export const ArgumentInput: React.FC<IArgumentInputProps> = inject('notification
         }
     };
 
-    const inputSwitcher = (type: string): React.ReactElement => {
-        if (type.startsWith('List')) type = 'List';
-        const listsTypes = convertListTypes(type);
+    const singleInputSwitcher = (type: string): React.ReactElement => {
 
         if (type === 'Boolean') return <RadioSet css={style}>
             <Radio value="true" state={value} onChange={handleChange} label="True"/>
@@ -96,28 +94,33 @@ export const ArgumentInput: React.FC<IArgumentInputProps> = inject('notification
             value={value} css={style} spellCheck={false}
         />;
 
-        else if (type.startsWith('List')) return <>
-            {console.log('listsTypes', listsTypes)}
-            <Select
-                value={selectedInputType}
-                onChange={setSelectedInputType}
-                css={[style, css`margin-right: 8px; max-width: 90px`]}
-            >
-                {listsTypes.map(type => <Option value={type}>{type}</Option>)}
-            </Select>
-            {/*{inputSwitcher(selectedInputType)}*/}
-        </>
-
         else return <Input css={style} disabled/>;
+    }
+
+
+    const inputSwitcher = (type: string): React.ReactElement => {
+        if (type.startsWith('List')) {
+            const listsTypes = convertListTypes(type);
+            return <>
+                {listsTypes.length > 1
+                    ? <Select
+                        value={undefined}
+                        onChange={(selectedType) => {
+                            props.onChangeType!(props.name, selectedType)
+                        }}
+                        css={[style, css`margin-right: 8px; max-width: 90px`]}
+                    >
+                        {listsTypes.map(t => <Option value={t}>{t}</Option>)}
+                    </Select>
+                    : null}
+                {singleInputSwitcher(type)}
+            </>
+        } else return singleInputSwitcher(type);
     }
 
     // let {type, value, css: style} = this.props;
     // const {byteVectorType} = this.state;
     // if (type.startsWith('List')) type = 'List';
     // const listsTypes = convertListTypes(type)
-    console.log(props.name)
-    console.log(type)
-    console.log(selectedInputType)
-    console.log(listsTypes)
     return inputSwitcher(type)
 }))
