@@ -33,7 +33,7 @@ margin: 0 -15px;
 `
 
 export const ArgumentInput: React.FC<IArgumentInputProps> = inject('notificationStore')(observer((props) => {
-    let {type} = props;
+    let {type, value, css: style} = props;
     if (type.startsWith('List')) type = 'List';
     const listsTypes = convertListTypes(type);
     const [byteVectorType, setByteVectorType] = useState('base58')
@@ -60,67 +60,64 @@ export const ArgumentInput: React.FC<IArgumentInputProps> = inject('notification
         }
     };
 
-    const inputSwitcher = (): React.ReactElement => {
-        let {type, value, css: style} = props;
+    const inputSwitcher = (type: string): React.ReactElement => {
+        if (type.startsWith('List')) type = 'List';
+        const listsTypes = convertListTypes(type);
 
-        switch (type) {
-            case 'Boolean':
-                return <RadioSet css={style}>
-                    <Radio value="true" state={value} onChange={handleChange} label="True"/>
-                    <Radio value="false" state={value} onChange={handleChange} label="False"/>
-                </RadioSet>;
+        if (type === 'Boolean') return <RadioSet css={style}>
+            <Radio value="true" state={value} onChange={handleChange} label="True"/>
+            <Radio value="false" state={value} onChange={handleChange} label="False"/>
+        </RadioSet>;
 
-            case 'ByteVector':
-                return <>
-                    <Select
-                        value={byteVectorType}
-                        onChange={handleChangeByteVectorType}
-                        css={[style, css`margin-right: 8px; max-width: 90px`]}
-                    >
-                        <Option value="base58">base58</Option>
-                        <Option value="base64">base64</Option>
-                    </Select>
-                    <Input
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e.target.value)}
-                        onBlur={validateByteVector}
-                        value={value} css={style} spellCheck={false}
-                    />
-                </>;
+        else if (type === 'ByteVector') return <>
+            <Select
+                value={byteVectorType}
+                onChange={handleChangeByteVectorType}
+                css={[style, css`margin-right: 8px; max-width: 90px`]}
+            >
+                <Option value="base58">base58</Option>
+                <Option value="base64">base64</Option>
+            </Select>
+            <Input
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e.target.value)}
+                onBlur={validateByteVector}
+                value={value} css={style} spellCheck={false}
+            />
+        </>;
 
-            case 'Int':
-                return <InputNumber
-                    value={value}
-                    spellCheck={false}
-                    onChange={(e: string) => handleChange(!isNaN(+e) ? e : '0')}
-                />;
+        else if (type === 'Int') return <InputNumber
+            value={value}
+            spellCheck={false}
+            onChange={(e: string) => handleChange(!isNaN(+e) ? e : '0')}
+        />;
 
-            case 'String':
-                return <Input
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e.target.value)}
-                    value={value} css={style} spellCheck={false}
-                />;
+        else if (type === 'String') return <Input
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e.target.value)}
+            value={value} css={style} spellCheck={false}
+        />;
 
-            case 'List':
-                return <>
-                    {console.log('listsTypes', listsTypes)}
-                    <Select
-                        value={byteVectorType}
-                        onChange={handleChangeByteVectorType}
-                        css={[style, css`margin-right: 8px; max-width: 90px`]}
-                    >
-                        {listsTypes.map(type => <Option value={type}>{type}</Option>)}
-                    </Select>
-                    {inputSwitcher()}
-                </>
+        else if (type.startsWith('List')) return <>
+            {console.log('listsTypes', listsTypes)}
+            <Select
+                value={selectedInputType}
+                onChange={setSelectedInputType}
+                css={[style, css`margin-right: 8px; max-width: 90px`]}
+            >
+                {listsTypes.map(type => <Option value={type}>{type}</Option>)}
+            </Select>
+            {/*{inputSwitcher(selectedInputType)}*/}
+        </>
 
-            default:
-                return <Input css={style} disabled/>;
-        }
+        else return <Input css={style} disabled/>;
     }
 
     // let {type, value, css: style} = this.props;
     // const {byteVectorType} = this.state;
     // if (type.startsWith('List')) type = 'List';
     // const listsTypes = convertListTypes(type)
-    return inputSwitcher()
+    console.log(props.name)
+    console.log(type)
+    console.log(selectedInputType)
+    console.log(listsTypes)
+    return inputSwitcher(type)
 }))

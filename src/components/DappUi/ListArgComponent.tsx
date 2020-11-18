@@ -17,7 +17,8 @@ interface IProps {
 }
 
 export const ListArgComponent: React.FC<IProps> = (props) => {
-    const defaultValue = {type: 'String', value: ''}
+    console.log('props.type', props.type)
+    const defaultValue = {type: props.type, value: ''}
     const [values, setValue] = useState({0: defaultValue})
 
     const handleAddArgument = () => setValue({...values, [Object.keys(values).length + 1]: defaultValue})
@@ -28,7 +29,7 @@ export const ListArgComponent: React.FC<IProps> = (props) => {
     }
     const handleChangeValue = (name: string, type: ICallableArgumentType | string, value?: string) => {
         setValue({...values, [name]: {type: type, value: value}});
-        props.setValue(Object.values(values))
+        // props.setValue(Object.values(values))
     };
 
 
