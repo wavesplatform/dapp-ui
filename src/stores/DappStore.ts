@@ -5,7 +5,7 @@ import {base58Decode, base64Encode} from '@waves/ts-lib-crypto';
 
 interface IKeeperTransactionDataCallArg {
     type: string,
-    value: string | number | boolean | {type: string, value: string | number | boolean}[]
+    value: string | number | boolean | { type: string, value: string | number | boolean }[]
 }
 
 interface IKeeperTransactionDataCall {
@@ -49,9 +49,9 @@ class DappStore extends SubStore {
         if (byteVectorType === 'base58') return `base64:${b58strTob64Str(value as string)}`;
         if (byteVectorType === 'base64') return `base64:${value}`;
         if (type.startsWith('List')) return (value as IArgumentInput[]).map(item => {
-                const a = {type: item.type, value: (this.convertArgValue(item) as string | number | boolean)};
-                return a;
-            });
+            const a = {type: item.type, value: (this.convertArgValue(item) as string | number | boolean)};
+            return a;
+        });
         else return (value as string | number | boolean | { type: string, value: string | number | boolean }[]);
     };
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {b58strTob64Str} from '@stores/DappStore';
 import {ICallableArgumentType} from '@stores/MetaStore';
 
@@ -20,14 +20,7 @@ interface IArgumentInputProps {
     onChangeByteVectorType: (name: string, byteVectorType: 'base58' | 'base64') => void
     value?: string
     css?: any
-
     notificationStore?: NotificationStore
-
-}
-
-interface IArgumentInputState {
-    selectedInputType: ICallableArgumentType
-    byteVectorType: 'base58' | 'base64'
 }
 
 const RadioSet = styled.div`
@@ -39,57 +32,57 @@ margin: 0 -15px;
 }
 `
 
-@inject('notificationStore')
-@observer
-export default class ArgumentInput extends React.Component<IArgumentInputProps, IArgumentInputState> {
+export const ArgumentInput: React.FC<IArgumentInputProps> = inject('notificationStore')(observer((props) => {
+    let {type} = props;
+    if (type.startsWith('List')) type = 'List';
+    const listsTypes = convertListTypes(type);
+    const [byteVectorType, setByteVectorType] = useState('base58')
+    const [selectedInputType, setSelectedInputType] = useState(listsTypes.length > 1 ? 'String' : props.type)
 
-    state: IArgumentInputState = {byteVectorType: 'base58', selectedInputType: 'String'};
-
-    handleChangeByteVectorType = (byteVectorType: string) => {
+    const handleChangeByteVectorType = (byteVectorType: string) => {
         if (byteVectorType !== 'base58' && byteVectorType !== 'base64') return;
-        this.setState({byteVectorType});
-        this.props.onChangeByteVectorType(this.props.name, byteVectorType);
+        setByteVectorType(byteVectorType);
+        props.onChangeByteVectorType(props.name, byteVectorType);
     };
 
-    handleChange = (value?: string) => {
+    const handleChange = (value?: string) => {
         console.log(value)
-        this.props.onChange(this.props.name, this.props.type, value);
+        props.onChange(props.name, selectedInputType, value);
     }
-    validateByteVector = (e: any) => {
-        if (this.state.byteVectorType === 'base58') {
+
+    const validateByteVector = (e: any) => {
+        if (byteVectorType === 'base58') {
             try {
                 b58strTob64Str(e.target.value);
             } catch (e) {
-                this.props.notificationStore!.notify(e, {type: 'error'});
+                props.notificationStore!.notify(e, {type: 'error'});
             }
         }
     };
 
-    inputSwitcher = (): React.ReactElement => {
-        let {type, value, css: style} = this.props;
-        const {byteVectorType} = this.state;
-        if (type.startsWith('List')) type = 'List';
-        const listsTypes = convertListTypes(type)
+    const inputSwitcher = (): React.ReactElement => {
+        let {type, value, css: style} = props;
+
         switch (type) {
             case 'Boolean':
                 return <RadioSet css={style}>
-                    <Radio value="true" state={value} onChange={this.handleChange} label="True"/>
-                    <Radio value="false" state={value} onChange={this.handleChange} label="False"/>
+                    <Radio value="true" state={value} onChange={handleChange} label="True"/>
+                    <Radio value="false" state={value} onChange={handleChange} label="False"/>
                 </RadioSet>;
 
             case 'ByteVector':
                 return <>
                     <Select
                         value={byteVectorType}
-                        onChange={this.handleChangeByteVectorType}
+                        onChange={handleChangeByteVectorType}
                         css={[style, css`margin-right: 8px; max-width: 90px`]}
                     >
                         <Option value="base58">base58</Option>
                         <Option value="base64">base64</Option>
                     </Select>
                     <Input
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
-                        onBlur={this.validateByteVector}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e.target.value)}
+                        onBlur={validateByteVector}
                         value={value} css={style} spellCheck={false}
                     />
                 </>;
@@ -98,12 +91,12 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
                 return <InputNumber
                     value={value}
                     spellCheck={false}
-                    onChange={(e: string) => this.handleChange(!isNaN(+e) ? e : '0')}
+                    onChange={(e: string) => handleChange(!isNaN(+e) ? e : '0')}
                 />;
 
             case 'String':
                 return <Input
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e.target.value)}
                     value={value} css={style} spellCheck={false}
                 />;
 
@@ -112,12 +105,12 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
                     {console.log('listsTypes', listsTypes)}
                     <Select
                         value={byteVectorType}
-                        onChange={this.handleChangeByteVectorType}
+                        onChange={handleChangeByteVectorType}
                         css={[style, css`margin-right: 8px; max-width: 90px`]}
                     >
                         {listsTypes.map(type => <Option value={type}>{type}</Option>)}
                     </Select>
-                    {this.inputSwitcher()}
+                    {inputSwitcher()}
                 </>
 
             default:
@@ -125,11 +118,9 @@ export default class ArgumentInput extends React.Component<IArgumentInputProps, 
         }
     }
 
-    render() {
-        // let {type, value, css: style} = this.props;
-        // const {byteVectorType} = this.state;
-        // if (type.startsWith('List')) type = 'List';
-        // const listsTypes = convertListTypes(type)
-        return this.inputSwitcher()
-    }
-}
+    // let {type, value, css: style} = this.props;
+    // const {byteVectorType} = this.state;
+    // if (type.startsWith('List')) type = 'List';
+    // const listsTypes = convertListTypes(type)
+    return inputSwitcher()
+}))

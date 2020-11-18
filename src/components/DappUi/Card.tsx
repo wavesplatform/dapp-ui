@@ -7,7 +7,7 @@ import Attach from '@src/assets/icons/Attach';
 import {css, jsx} from '@emotion/core';
 import DappStore, {b58strTob64Str} from "@stores/DappStore";
 import {ICallableArgumentType, TCallableFuncArgumentsArray} from "@stores/MetaStore";
-import ArgumentInput from '@components/DappUi/ArgumentInput';
+import {ArgumentInput} from '@components/DappUi/ArgumentInput';
 import Close from '@src/assets/icons/Close';
 import {inject, observer} from 'mobx-react';
 import AccountStore from '@stores/AccountStore';

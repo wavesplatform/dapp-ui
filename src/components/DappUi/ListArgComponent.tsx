@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import {IArgumentInput} from "@components/DappUi/Card";
 import {centerEllipsis} from "@components/Home/Account";
-import ArgumentInput from "@components/DappUi/ArgumentInput";
+import {ArgumentInput} from "@components/DappUi/ArgumentInput";
 import {css, jsx} from "@emotion/core";
 import {ReactComponent as AttachIcon} from "@src/assets/icons/Attach/attach-icon.svg";
 import styled from "@emotion/styled";
@@ -13,7 +13,7 @@ import Close from "@src/assets/icons/Close";
 interface IProps {
     type: string,
     argName: string,
-    setValue: (value: IArgumentInput[]) => void
+    setValue: (value: IArgumentInput[]) => void,
 }
 
 export const ListArgComponent: React.FC<IProps> = (props) => {
@@ -28,6 +28,7 @@ export const ListArgComponent: React.FC<IProps> = (props) => {
     }
     const handleChangeValue = (name: string, type: ICallableArgumentType | string, value?: string) => {
         setValue({...values, [name]: {type: type, value: value}});
+        props.setValue(Object.values(values))
     };
 
 
