@@ -48,7 +48,7 @@ ${flexStyle};
 border-bottom: 1px solid #EBEDF2;
 padding-bottom: 20px;
 justify-content: space-between;
-margin: 0 0 20px 0;
+margin: 0 0 10px 0;
 `;
 
 const ArgumentsLayout = styled.div`
@@ -61,16 +61,18 @@ flex-direction: column;
 
 const ArgumentItem = styled.div`
 ${flexStyle};
+width: 100%;
+display: flex;
+justify-content: space-between;
 margin-bottom: 14px;
 `;
 
 const ArgumentTitle = styled.div`
-flex: 1;
+flex: 0.5;
 display: flex;
-margin-right: 20px;
+margin-right: 10px;
 align-items: center;
-justify-content: flex-end;
-min-width: 100px;
+justify-content: flex-start;
 max-width: 150px;
 `;
 
@@ -79,7 +81,12 @@ ${fonts.callableFuncArgFont};
  font-weight: bold;
 `;
 
-const ArgumentTitleVarType = styled.div`${fonts.callableFuncArgFont}`;
+const ArgumentTitleVarType = styled.div`
+margin-right: 10px;
+min-width: 88px;
+text-align: left !important;
+${fonts.callableFuncArgFont};
+`;
 
 const AttachPaymentBtn = styled.div`
 ${flexStyle};
@@ -107,6 +114,12 @@ align-items: center;
   margin-bottom: 14px;
  }
 `;
+
+const Wrapper = styled.div`
+width: 90%;
+display: flex;
+align-items: center;
+`
 
 const Title = styled.div`${fonts.cardTitleFont}`;
 
@@ -220,6 +233,7 @@ export default class Card extends React.Component<IProps, IState> {
     };
 
     handleChangeByteVectorType = (name: string, byteVectorType: 'base58' | 'base64', index?: number) => {
+        console.log('byteVectorType', byteVectorType)
         if (index === undefined) return this.setState({
             args: {
                 ...this.state.args,
@@ -302,16 +316,18 @@ export default class Card extends React.Component<IProps, IState> {
                                 <ArgumentTitle>
                                     <ArgumentTitleVarName>{centerEllipsis(argName, 7)}:</ArgumentTitleVarName>
                                     &nbsp;
-                                    <ArgumentTitleVarType>{type}</ArgumentTitleVarType>
                                 </ArgumentTitle>
-                                <ArgumentInput
-                                    css={css`flex:5`}
-                                    value={(args[argName] ? args[argName].value : defaultValue(type)) as string | undefined}
-                                    name={argName}
-                                    type={type}
-                                    onChange={this.handleChangeValue}
-                                    onChangeByteVectorType={this.handleChangeByteVectorType}
-                                />
+                                <Wrapper>
+                                    <ArgumentTitleVarType>{type}</ArgumentTitleVarType>
+                                    <ArgumentInput
+                                        css={css`width: 90%`}
+                                        value={(args[argName] ? args[argName].value : defaultValue(type)) as string | undefined}
+                                        name={argName}
+                                        type={type}
+                                        onChange={this.handleChangeValue}
+                                        onChangeByteVectorType={this.handleChangeByteVectorType}
+                                    />
+                                </Wrapper>
                             </ArgumentItem>
                     }
                 )}

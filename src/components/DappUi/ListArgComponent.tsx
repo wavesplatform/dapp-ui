@@ -14,7 +14,7 @@ interface IProps {
     argName: string,
     values: IArgumentInput[],
     setValue: (value: IArgumentInput[]) => void,
-    setByteVectorType: (name: string, byteVectorType: 'base58' | 'base64') => void
+    setByteVectorType: (name: string, byteVectorType: 'base58' | 'base64', index?: number) => void
 }
 
 export const ListArgComponent: React.FC<IProps> = (props) => {
@@ -29,13 +29,12 @@ export const ListArgComponent: React.FC<IProps> = (props) => {
     }
 
     const handleChangeValue = (name: string, type: ICallableArgumentType | string, value?: string, index?: number) => {
-        values[index] = {...values[index], value: value}
+        values[index!] = {...values[index!], value: value}
         setValue([...values]);
     };
 
-    const handleChangeType = (name: string, type: ICallableArgumentType | string) => {
-        const index = +name
-        values[index] = {...values[index], type: (type as ICallableArgumentType)}
+    const handleChangeType = (name: string, type: ICallableArgumentType | string, index?: number) => {
+        values[index!] = {...values[index!], type: (type as ICallableArgumentType)}
         setValue([...values]);
     };
 
@@ -48,26 +47,28 @@ export const ListArgComponent: React.FC<IProps> = (props) => {
             {values.map((item, index) => {
                 const type = item.type
                 const value = item.value
+                const byteVectorType = item.byteVectorType
                 return <Item key={Math.random()}>
-                    <ArgumentTitle>
-                        <ArgumentTitleVarType>{type}</ArgumentTitleVarType>
-                    </ArgumentTitle>
-                    <ArgumentInput
-                        css={css`flex:5`}
-                        value={value}
-                        name={argName}
-                        index={index}
-                        type={type}
-                        onChange={handleChangeValue}
-                        onChangeType={handleChangeType}
-                        onChangeByteVectorType={props.setByteVectorType}
-                    />
-                    {values.length > 1
-                        ? <Close style={{marginLeft: "10px", cursor: "pointer"}}
-                                 onClick={() => handleDeleteArgument(index)}/>
-                        : null}
-                    <AttachIcon style={{marginLeft: "10px", cursor: "pointer"}}
-                                onClick={() => handleAddArgument()}/>
+                    <ArgumentTitleVarType>{type}</ArgumentTitleVarType>
+                    <WrapperInput>
+                        <ArgumentInput
+                            css={css`flex:5`}
+                            value={value}
+                            name={argName}
+                            index={index}
+                            type={type}
+                            byteVectorType={byteVectorType}
+                            onChange={handleChangeValue}
+                            onChangeType={handleChangeType}
+                            onChangeByteVectorType={props.setByteVectorType}
+                        />
+                        {values.length > 1
+                            ? <Close style={{marginLeft: "10px", cursor: "pointer"}}
+                                     onClick={() => handleDeleteArgument(index)}/>
+                            : null}
+                        <AttachIcon style={{marginLeft: "10px", cursor: "pointer"}}
+                                    onClick={() => handleAddArgument()}/>
+                    </WrapperInput>
                 </Item>
             })}
         </Wrapper>
@@ -77,10 +78,11 @@ const Root = styled.div`
 width: 100%;
 display: flex;
 align-items: flex-start;
+justify-content: space-between;
 `
 
 const Wrapper = styled.div`
-flex: 5;
+width: 90%;
 display: flex;
 flex-direction: column;
 justify-content: flex-start;
@@ -98,10 +100,8 @@ const ArgumentTitle = styled.div`
 flex: 0.5;
 height: 40px;
 display: flex;
-margin-right: 20px;
+margin-right: 10px;
 align-items: center;
-//justify-content: flex-end;
-//min-width: 100px;
 max-width: 150px;
 `;
 
@@ -111,5 +111,13 @@ ${fonts.callableFuncArgFont};
 `;
 
 const ArgumentTitleVarType = styled.div`
-flex: 1;
+min-width: 88px;
+margin-right: 10px;
+text-align: left !important;
 ${fonts.callableFuncArgFont}`;
+
+const WrapperInput = styled.div`
+flex: 1;
+display: flex;
+align-items: center;
+`
