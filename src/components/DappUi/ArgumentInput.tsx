@@ -48,10 +48,15 @@ export const ArgumentInput: React.FC<IArgumentInputProps> = inject('notification
         props.onChangeByteVectorType(props.name, byteVectorType, index);
     };
 
-    const handleChange = debounce((value?: string) => {
+    const debouncedHandleChange = debounce((value?: string) => {
         setInputValue(value)
         props.onChange(name, type, inputValue, index)
     }, 1000)
+
+    const handleChange = (value?: string) => {
+        setInputValue(value)
+        props.onChange(name, type, inputValue, index);
+    }
 
     const validateByteVector = () => {
         if (byteVectorType === 'base58') {
@@ -66,8 +71,8 @@ export const ArgumentInput: React.FC<IArgumentInputProps> = inject('notification
     const singleInputSwitcher = (type: string): React.ReactElement => {
 
         if (type === 'Boolean') return <RadioSet css={style}>
-            <Radio value="true" state={inputValue} onChange={handleChange} label="True"/>
-            <Radio value="false" state={inputValue} onChange={handleChange} label="False"/>
+            <Radio value="true" state={value} onChange={handleChange} label="True"/>
+            <Radio value="false" state={value} onChange={handleChange} label="False"/>
         </RadioSet>;
 
         else if (type === 'ByteVector') return <Wrapper>
@@ -81,21 +86,21 @@ export const ArgumentInput: React.FC<IArgumentInputProps> = inject('notification
             </Select>
             <Input
                 defaultValue={value}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => debouncedHandleChange(e.target.value)}
                 onBlur={validateByteVector}
                 css={style} spellCheck={false}
             />
         </Wrapper>;
 
         else if (type === 'Int') return <InputNumber
-            value={inputValue}
+            defaultValue={inputValue}
             spellCheck={false}
-            onChange={(e: string) => handleChange(!isNaN(+e) ? e : '0')}
+            onChange={(e: string) => debouncedHandleChange(!isNaN(+e) ? e : '0')}
         />;
 
         else if (type === 'String') return <Input
             defaultValue={value}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => debouncedHandleChange(e.target.value)}
             css={style} spellCheck={false}
         />;
 
@@ -117,7 +122,7 @@ export const ArgumentInput: React.FC<IArgumentInputProps> = inject('notification
                         {listsTypes.map(t => <Option value={t}>{t}</Option>)}
                     </Select>
                     : null}
-                {singleInputSwitcher(type)}
+                {singleInputSwitcher(listsTypes.length > 1 ? type : listsTypes[0])}
             </Wrapper>
         } else return singleInputSwitcher(type);
     }
@@ -128,4 +133,5 @@ export const ArgumentInput: React.FC<IArgumentInputProps> = inject('notification
 const Wrapper = styled.div`
 flex: 1;
 display: flex;
+border: 1px solid red;
 `

@@ -48,11 +48,14 @@ class DappStore extends SubStore {
         if (type === 'Int' && !isNaN(+value)) return +value;
         if (byteVectorType === 'base58') return `base64:${b58strTob64Str(value as string)}`;
         if (byteVectorType === 'base64') return `base64:${value}`;
-        if (type.startsWith('List')) return (value as IArgumentInput[]).map(item => {
-            const a = {type: item.type, value: (this.convertArgValue(item) as string | number | boolean)};
-            return a;
-        });
-        else return (value as string | number | boolean | { type: string, value: string | number | boolean }[]);
+        if (type.startsWith('List')) {
+            console.log('value', value)
+            console.log('type', type)
+            return (value as IArgumentInput[]).map(item => {
+                const a = {type: item.type, value: (this.convertArgValue(item) as string | number | boolean)};
+                return a;
+            });
+        } else return (value as string | number | boolean | { type: string, value: string | number | boolean }[]);
     };
 
     private convertArgs = (args: IArgument[]): IKeeperTransactionDataCallArg[] =>
@@ -64,12 +67,12 @@ class DappStore extends SubStore {
     callCallableFunction = (address: string, func: string, inArgs: IArgument[], payment: IKeeperTransactionPayment[]) => {
         const {accountStore} = this.rootStore;
         let args: IKeeperTransactionDataCallArg[] = [];
-        try {
-            args = this.convertArgs(inArgs);
-        } catch (e) {
-            console.error(e);
-            this.rootStore.notificationStore.notify(e, {type: 'error'});
-        }
+        // try {
+        args = this.convertArgs(inArgs);
+        // } catch (e) {
+        //     console.error(e);
+        //     this.rootStore.notificationStore.notify(e, {type: 'error'});
+        // }
         const transactionData: IKeeperTransactionData = {
             dApp: address,
             call: {

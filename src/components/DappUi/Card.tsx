@@ -191,8 +191,15 @@ export default class Card extends React.Component<IProps, IState> {
         const {args, payments} = this.state;
         const {funcArgs} = this.props;
         const invalidPayment = payments.some(({assetId, tokens}) => !assetId || !tokens);
-        const invalidArgs = funcArgs.length !== Object.keys(args).length || Object.values(args)
-            .some(({value}) => value === undefined);
+        const invalidArgs = funcArgs.length !== Object.keys(args).length
+            || Object.values(args).some(({value}) => value === undefined || value === '')
+            || Object.values(args).some(({type, value}) => {
+                    if (type.startsWith('List')) return Object.values(value!).some(({type, value}) => value === undefined)
+                }
+            )
+        // console.log('args', Object.values(args))
+        // console.log('invalidArgs', invalidArgs)
+        // console.log('invalidPayment', invalidPayment)
         return invalidPayment || invalidArgs
     }
 
@@ -233,7 +240,7 @@ export default class Card extends React.Component<IProps, IState> {
     };
 
     handleChangeByteVectorType = (name: string, byteVectorType: 'base58' | 'base64', index?: number) => {
-        console.log('byteVectorType', byteVectorType)
+        // console.log('byteVectorType', byteVectorType)
         if (index === undefined) return this.setState({
             args: {
                 ...this.state.args,
@@ -281,14 +288,13 @@ export default class Card extends React.Component<IProps, IState> {
         dappStore!.callCallableFunction(address, func, args, this.state.payments.map(p => ({...p, tokens: +p.tokens})));
     };
 
-
     render() {
+        {
+            console.log(Object.values(this.state.args))
+        }
         const {funcName: title, accountStore} = this.props;
         const {args, payments} = this.state;
         return <Root>
-            {console.log('render')}
-            {console.log(args)}
-
             <Anchor id={title}/>
             <Header>
                 <Title>{centerEllipsis(title)}</Title>
@@ -376,6 +382,8 @@ export default class Card extends React.Component<IProps, IState> {
 
 const defaultValue = (type: ICallableArgumentType) => {
     if (type.startsWith('List')) {
+        const listTypes = convertListTypes(type)
+        if (listTypes.length === 1) type = listTypes[0] as ICallableArgumentType
         return [{type: type, value: ''}];
     } else return type === 'String' || type === 'ByteVector' ? '' : undefined
 };
