@@ -66,7 +66,7 @@ export const ListArgComponent: React.FC<IProps> = (props) => {
                             ? <Close style={{marginLeft: "10px", cursor: "pointer"}}
                                      onClick={() => handleDeleteArgument(index)}/>
                             : null}
-                        <AttachIcon style={{marginLeft: "10px", cursor: "pointer"}}
+                        <AttachIcon style={{marginLeft: "10px", cursor: "pointer", minWidth: "36px"}}
                                     onClick={() => handleAddArgument()}/>
                     </WrapperInput>
                 </Item>

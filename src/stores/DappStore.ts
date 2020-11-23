@@ -67,12 +67,12 @@ class DappStore extends SubStore {
     callCallableFunction = (address: string, func: string, inArgs: IArgument[], payment: IKeeperTransactionPayment[]) => {
         const {accountStore} = this.rootStore;
         let args: IKeeperTransactionDataCallArg[] = [];
-        // try {
+        try {
         args = this.convertArgs(inArgs);
-        // } catch (e) {
-        //     console.error(e);
-        //     this.rootStore.notificationStore.notify(e, {type: 'error'});
-        // }
+        } catch (e) {
+            console.error(e);
+            this.rootStore.notificationStore.notify(e, {type: 'error'});
+        }
         const transactionData: IKeeperTransactionData = {
             dApp: address,
             call: {
@@ -87,6 +87,8 @@ class DappStore extends SubStore {
             type: 16,
             data: transactionData
         };
+
+        console.log('transactionData', transactionData)
 
         if (!accountStore.isAuthorized || !accountStore.loginType) {
             this.rootStore.notificationStore.notify('Application is not authorized', {type: 'warning'});
@@ -111,6 +113,7 @@ export function b58strTob64Str(str = ''): string {
 }
 
 function convertArgType(type: ICallableArgumentType | string): string {
+    if(type.startsWith('List')) return 'list';
     switch (type) {
         case 'Boolean':
             return 'boolean';

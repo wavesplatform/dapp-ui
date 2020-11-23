@@ -4,6 +4,7 @@ import {base58Decode} from '@waves/ts-lib-crypto';
 import {IAsset, INetwork} from '@stores/KeeperStore';
 import {checkSlash} from '@utils/index';
 import {RootStore} from '@stores/RootStore';
+import axios from 'axios';
 
 class AccountStore extends SubStore {
     @observable assets: { [name: string]: IAsset } = {'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8}};
@@ -40,17 +41,29 @@ class AccountStore extends SubStore {
         const assets: { balances: { assetId: string, issueTransaction: { name: string, decimals: number } }[] } = data;
         assets.balances = [
             ...assets.balances,
-            ...nft.map(({originTransactionId, name, decimals}) => ({assetId: originTransactionId, issueTransaction: {name, decimals}}))
+            ...nft.map(({originTransactionId, name, decimals}) => ({
+                assetId: originTransactionId,
+                issueTransaction: {name, decimals}
+            }))
         ];
-        if ('balances' in assets) {
 
-            this.rootStore.accountStore.assets = {
-                'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8},
-                ...assets.balances.reduce((acc, {assetId, issueTransaction: {name, decimals}}) =>
-                    ({...acc, [assetId]: {assetId, name, decimals}}), {}),
-            };
-        }
+        const ids: any = assets.balances.filter(balance => balance.issueTransaction === null).map(x => x.assetId);
+        (await axios.post('/assets/details', {ids}, {baseURL: `${checkSlash(server)}`})).data.map((assetDetails: any) => {
+            assets.balances.filter(x => x.assetId === assetDetails.assetId).map(x => {
+                x.issueTransaction = {
+                    name: assetDetails.name,
+                    decimals: assetDetails.decimals
+                }
 
+                if ('balances' in assets && !assets.balances.some(x => x.issueTransaction === null)) {
+                    this.assets = {
+                        'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8},
+                        ...assets.balances.reduce((acc, {assetId, issueTransaction: {name, decimals}}) =>
+                            ({...acc, [assetId]: {assetId, name, decimals}}), {}),
+                    }
+                }
+            })
+        })
     }
 
     getNetworkByAddress = (address: string): INetwork | null => {
