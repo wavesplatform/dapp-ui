@@ -48,22 +48,23 @@ class AccountStore extends SubStore {
         ];
 
         const ids: any = assets.balances.filter(balance => balance.issueTransaction === null).map(x => x.assetId);
-        (await axios.post('/assets/details', {ids}, {baseURL: `${checkSlash(server)}`})).data.map((assetDetails: any) => {
+        console.log(assets.balances)
+        if (ids.length !== 0)(await axios.post('/assets/details', {ids}, {baseURL: `${checkSlash(server)}`})).data.map((assetDetails: any) => {
             assets.balances.filter(x => x.assetId === assetDetails.assetId).map(x => {
                 x.issueTransaction = {
                     name: assetDetails.name,
                     decimals: assetDetails.decimals
                 }
-
-                if ('balances' in assets && !assets.balances.some(x => x.issueTransaction === null)) {
-                    this.assets = {
-                        'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8},
-                        ...assets.balances.reduce((acc, {assetId, issueTransaction: {name, decimals}}) =>
-                            ({...acc, [assetId]: {assetId, name, decimals}}), {}),
-                    }
-                }
             })
         })
+
+        if ('balances' in assets && !assets.balances.some(x => x.issueTransaction === null)) {
+            this.rootStore.accountStore.assets = {
+                'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8},
+                ...assets.balances.reduce((acc, {assetId, issueTransaction: {name, decimals}}) =>
+                    ({...acc, [assetId]: {assetId, name, decimals}}), {}),
+            }
+        }
     }
 
     getNetworkByAddress = (address: string): INetwork | null => {
