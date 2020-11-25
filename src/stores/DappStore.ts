@@ -38,7 +38,7 @@ export interface IKeeperTransaction {
 class DappStore extends SubStore {
 
 
-    private convertArgValue = (arg: IArgument | IArgumentInput): (string | number | boolean | { type: string, value: string | number | boolean }[]) => {
+    private convertArgValue = (arg: IArgumentInput): (string | number | boolean) => {
         const {value, type, byteVectorType} = arg;
         if (value === undefined) {
             this.rootStore.notificationStore.notify('value is undefined', {type: 'error'});
@@ -48,27 +48,27 @@ class DappStore extends SubStore {
         if (type === 'Int' && !isNaN(+value)) return +value;
         if (byteVectorType === 'base58') return `base64:${b58strTob64Str(value as string)}`;
         if (byteVectorType === 'base64') return `base64:${value}`;
-        if (type.startsWith('List')) {
-            console.log('value', value)
-            console.log('type', type)
-            return (value as IArgumentInput[]).map(item => {
-                const a = {type: item.type, value: (this.convertArgValue(item) as string | number | boolean)};
-                return a;
-            });
-        } else return (value as string | number | boolean | { type: string, value: string | number | boolean }[]);
+        else return value;
     };
+
+    private convertArgValueList = (value: IArgumentInput[]): IArgumentInput[] => value.map(item => {
+        return {...item, type: convertArgType(item.type), value: this.convertArgValue(item)} as IArgumentInput;
+    });
 
     private convertArgs = (args: IArgument[]): IKeeperTransactionDataCallArg[] =>
         args.filter(({value}) => value !== undefined || !(value as unknown as IArgumentInput[]).some(item => item.value === undefined))
             .map(arg => {
-                return ({type: convertArgType(arg.type), value: this.convertArgValue(arg)})
+                const convertedValue = arg.type.startsWith('List')
+                    ? this.convertArgValueList(arg.value as IArgumentInput[])
+                    : this.convertArgValue(arg as IArgumentInput)
+                return ({type: convertArgType(arg.type), value: convertedValue} as IKeeperTransactionDataCallArg)
             });
 
     callCallableFunction = (address: string, func: string, inArgs: IArgument[], payment: IKeeperTransactionPayment[]) => {
         const {accountStore} = this.rootStore;
         let args: IKeeperTransactionDataCallArg[] = [];
         try {
-        args = this.convertArgs(inArgs);
+            args = this.convertArgs(inArgs);
         } catch (e) {
             console.error(e);
             this.rootStore.notificationStore.notify(e, {type: 'error'});
@@ -113,7 +113,7 @@ export function b58strTob64Str(str = ''): string {
 }
 
 function convertArgType(type: ICallableArgumentType | string): string {
-    if(type.startsWith('List')) return 'list';
+    if (type.startsWith('List')) return 'list';
     switch (type) {
         case 'Boolean':
             return 'boolean';

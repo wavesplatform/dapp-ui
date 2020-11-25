@@ -51,7 +51,7 @@ export const ArgumentInput: React.FC<IArgumentInputProps> = inject('notification
     const debouncedHandleChange = debounce((value?: string) => {
         setInputValue(value)
         props.onChange(name, type, inputValue, index)
-    }, 1000)
+    }, 700)
 
     const handleChange = (value?: string) => {
         setInputValue(value)
@@ -133,5 +133,4 @@ export const ArgumentInput: React.FC<IArgumentInputProps> = inject('notification
 const Wrapper = styled.div`
 flex: 1;
 display: flex;
-border: 1px solid red;
 `
