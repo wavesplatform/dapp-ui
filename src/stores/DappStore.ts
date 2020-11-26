@@ -44,7 +44,7 @@ class DappStore extends SubStore {
             this.rootStore.notificationStore.notify('value is undefined', {type: 'error'});
             return '';
         }
-        if (type === 'Boolean') return (value as string).includes('true');
+        if (type === 'Boolean' && ['true', 'false'].includes(value)) return value === 'true';
         if (type === 'Int' && !isNaN(+value)) return +value;
         if (byteVectorType === 'base58') return `base64:${b58strTob64Str(value as string)}`;
         if (byteVectorType === 'base64') return `base64:${value}`;
@@ -88,7 +88,6 @@ class DappStore extends SubStore {
             data: transactionData
         };
 
-        console.log('transactionData', transactionData)
 
         if (!accountStore.isAuthorized || !accountStore.loginType) {
             this.rootStore.notificationStore.notify('Application is not authorized', {type: 'warning'});

@@ -197,9 +197,6 @@ export default class Card extends React.Component<IProps, IState> {
                     if (type.startsWith('List')) return Object.values(value!).some(({type, value}) => value === undefined)
                 }
             )
-        // console.log('args', Object.values(args))
-        // console.log('invalidArgs', invalidArgs)
-        // console.log('invalidPayment', invalidPayment)
         return invalidPayment || invalidArgs
     }
 
@@ -240,7 +237,6 @@ export default class Card extends React.Component<IProps, IState> {
     };
 
     handleChangeByteVectorType = (name: string, byteVectorType: 'base58' | 'base64', index?: number) => {
-        // console.log('byteVectorType', byteVectorType)
         if (index === undefined) return this.setState({
             args: {
                 ...this.state.args,
@@ -289,9 +285,6 @@ export default class Card extends React.Component<IProps, IState> {
     };
 
     render() {
-        {
-            console.log(Object.values(this.state.args))
-        }
         const {funcName: title, accountStore} = this.props;
         const {args, payments} = this.state;
         return <Root>

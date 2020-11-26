@@ -182,20 +182,20 @@ class KeeperStore extends SubStore {
         const {notificationStore} = this.rootStore
         const link = network ? getExplorerLink(network!.code, transaction.id, 'tx') : undefined;
         console.dir(transaction);
-        // notificationStore.notify(`Transaction sent: ${transaction.id}\n`, {type: 'info'})
+        notificationStore.notify(`Transaction sent: ${transaction.id}\n`, {type: 'info'})
 
         const res = await waitForTx(transaction.id, {apiBase: network!.server}) as any
 
         const isFailed = res.applicationStatus && res.applicationStatus === 'script_execution_failed'
 
-        // notificationStore.notify(
-        //     isFailed
-        //         ? `Script execution failed`
-        //         : `Success`, {type: isFailed ? 'error' : 'success', link, linkTitle: 'View transaction'}
-        // )
+        notificationStore.notify(
+            isFailed
+                ? `Script execution failed`
+                : `Success`, {type: isFailed ? 'error' : 'success', link, linkTitle: 'View transaction'}
+        )
     }).catch((error: any) => {
         console.error(error);
-        // this.rootStore.notificationStore.notify(error.data, {type: 'error', title: error.message});
+        this.rootStore.notificationStore.notify(error.data, {type: 'error', title: error.message});
     })
 
     get isBrowserSupportsWavesKeeper(): boolean {
