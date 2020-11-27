@@ -1,5 +1,5 @@
 import React from 'react'
-import {IArgumentInput} from "@components/DappUi/Card";
+import {convertListTypes, IArgumentInput} from "@components/DappUi/Card";
 import {centerEllipsis} from "@components/Home/Account";
 import {ArgumentInput} from "@components/DappUi/ArgumentInput";
 import {css} from "@emotion/core";
@@ -18,7 +18,8 @@ interface IProps {
 }
 
 export const ListArgComponent: React.FC<IProps> = (props) => {
-    const initialValue = {type: props.type, value: ''} as IArgumentInput
+    const initialValueType = convertListTypes(props.type).length === 1 ? convertListTypes(props.type)[0] : props.type
+    const initialValue = {type: initialValueType, value: ''} as IArgumentInput
     const {values, setValue, type, argName} = props
 
     const handleAddArgument = () => setValue([...values, initialValue])
@@ -67,7 +68,7 @@ export const ListArgComponent: React.FC<IProps> = (props) => {
                                      onClick={() => handleDeleteArgument(index)}/>
                             : null}
                         <AttachIcon style={{marginLeft: "10px", cursor: "pointer", minWidth: "36px"}}
-                                    onClick={() => handleAddArgument()}/>
+                                    onClick={handleAddArgument}/>
                     </WrapperInput>
                 </Item>
             })}
