@@ -192,9 +192,9 @@ export default class Card extends React.Component<IProps, IState> {
         const {funcArgs} = this.props;
         const invalidPayment = payments.some(({assetId, tokens}) => !assetId || !tokens);
         const invalidArgs = funcArgs.length !== Object.keys(args).length
-            || Object.values(args).some(({value}) => value === undefined || value === '')
+            || Object.values(args).some((arg) => isValidArg(arg as IArgumentInput))
             || Object.values(args).some(({type, value}) => {
-                    if (type.startsWith('List')) return Object.values(value!).some(({type, value}) => value === undefined)
+                    if (type.startsWith('List')) return Object.values(value!).some((arg) => isValidArg(arg as IArgumentInput))
                 }
             )
         return invalidPayment || invalidArgs
@@ -397,4 +397,14 @@ export const convertListTypes = (listType: string) => {
         inputTypes.push('ByteVector')
     }
     return inputTypes
+}
+
+const isValidBase64 = (str: string) => !/^[A-Za-z0-9+/=]/g.test(str)
+const isValidBase58 = (str: string) => !/^[A-Za-z0-9=]|[O0Il+/]/g.test(str)
+
+const isValidArg = (arg: IArgumentInput) => {
+    const {value, type, byteVectorType} = arg
+    if (value === '') return !(type === 'String' || type === 'ByteVector')
+    else if (type === 'ByteVector' && value !== undefined) return !(byteVectorType === 'base58' ? isValidBase58(value as string) : isValidBase64(value as string))
+    else return value === undefined
 }
