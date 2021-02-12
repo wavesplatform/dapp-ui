@@ -1,13 +1,19 @@
-import {AccountStore, RootStore} from '@stores';
+import { RootStore} from '@stores';
 import {SubStore} from './SubStore';
-import Signer from '@waves/signer';
-import Provider from '@waves.exchange/provider-web';
+import {Signer} from '@waves/signer';
+import {ProviderWeb} from "@waves.exchange/provider-web";
+import {ProviderCloud} from "@waves.exchange/provider-cloud";
 import {action, observable} from 'mobx';
 import {INetwork} from '@stores/KeeperStore';
-import {getExplorerLink} from '@utils/index';
+import {getExplorerLink} from '@utils';
 import {networks} from "@stores/AccountStore";
 import {waitForTx} from "@waves/waves-transactions";
 import Decimal from 'decimal.js';
+
+export enum LoginType {
+    SEED,
+    EMAIL
+}
 
 class SignerStore extends SubStore {
 
@@ -17,16 +23,15 @@ class SignerStore extends SubStore {
 
     constructor(rootStore: RootStore) {
         super(rootStore);
-        this.initSigner()
     }
 
-    initSigner = async () => {
+    initSignerWeb = async () => {
         const pathname = this.rootStore.historyStore!.currentPath;
         const networkByAddress = this.rootStore.accountStore!.getNetworkByAddress(pathname);
         const network = (networkByAddress != null) ? networkByAddress : networks.mainnet;
         if (network.clientOrigin) {
             this.signer = new Signer({NODE_URL: network.server});
-            await this.signer.setProvider(new Provider(network.clientOrigin));
+            await this.signer.setProvider(new ProviderWeb(network.clientOrigin));
         } else {
             this.signer = undefined;
             this.rootStore.notificationStore.notify(
@@ -36,7 +41,27 @@ class SignerStore extends SubStore {
         }
     }
 
-    login = async () => {
+    initSignerCloud = async () => {
+        const pathname = this.rootStore.historyStore!.currentPath;
+        const networkByAddress = this.rootStore.accountStore!.getNetworkByAddress(pathname);
+        const network = (networkByAddress != null) ? networkByAddress : networks.mainnet;
+        if (network.clientOrigin) {
+            this.signer = new Signer({NODE_URL: network.server});
+            await this.signer.setProvider(new ProviderCloud());
+        } else {
+            this.signer = undefined;
+            this.rootStore.notificationStore.notify(
+                `Unfortunately, Exchange does not support a ${network.server} network at this time. Sign in with Keeper.`,
+                {type: 'error'}
+            )
+        }
+    }
+
+    login = async (type: LoginType) => {
+        if (type === LoginType.SEED) await this.initSignerWeb();
+        if (type === LoginType.EMAIL) await this.initSignerCloud();
+
+        console.log('type', type)
         const account = await this.signer!.login();
         if ('address' in account) {
             const byte = await this.signer!.getNetworkByte();

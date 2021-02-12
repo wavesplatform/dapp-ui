@@ -1,14 +1,15 @@
 /** @jsx jsx*/
 import React from 'react';
-import { inject, observer } from 'mobx-react';
+import {inject, observer} from 'mobx-react';
 import AccountStore from '@stores/AccountStore';
 import KeeperStore from '@stores/KeeperStore';
 import NotificationStore from '@stores/NotificationStore';
 import Button from '@components/DappUi/Button';
-import { SignerStore } from '@stores/index';
+import {SignerStore} from '@stores/index';
 import styled from '@emotion/styled';
-import { css, jsx } from '@emotion/core';
-import { fonts } from '@src/styles';
+import {css, jsx} from '@emotion/core';
+import {fonts} from '@src/styles';
+import {LoginType} from "@stores/SignerStore";
 
 interface IProps {
     accountStore?: AccountStore
@@ -63,6 +64,7 @@ const Icon = styled.svg`
 
 const Body = styled.div`
     display: flex;
+    flex-direction: column;
     justify-content:space-around;
     height: 100%;
     margin: 0 -4px ;
@@ -106,9 +108,14 @@ export default class SignDialog extends React.Component <IProps> {
             );
     };
 
-    handleSignWithExchange = () => {
+    handleSignWithExchangeSeed = () => {
         this.handleCloseDialog();
-        this.props.signerStore!.login();
+        this.props.signerStore!.login(LoginType.SEED);
+    };
+
+    handleSignWithExchangeMail = () => {
+        this.handleCloseDialog();
+        this.props.signerStore!.login(LoginType.EMAIL);
     };
 
     handleClickOutside = (event: any) => {
@@ -139,10 +146,14 @@ export default class SignDialog extends React.Component <IProps> {
                         }</Description>
                     </div>
                     <div>
-                        <Button css={css`width: 100%`} onClick={this.handleSignWithExchange} >
-                            Sign in with Exchange</Button>
+                        <Button css={css`width: 100%`} onClick={this.handleSignWithExchangeSeed} >
+                            Sign in with Exchange(Seed)</Button>
                         <Description><br/>The network will be MainNet by default</Description>
-                        {/*<Description><br/>Will be available soon</Description>*/}
+                    </div>
+                    <div>
+                        <Button css={css`width: 100%`} onClick={this.handleSignWithExchangeMail} >
+                            Sign in with Exchange(Email)</Button>
+                        <Description><br/>The network will be MainNet by default</Description>
                     </div>
                 </Body>
             </Dialog>
