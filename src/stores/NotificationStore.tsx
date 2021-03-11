@@ -16,13 +16,10 @@ export type TNotifyOptions = Partial<{
     style: { [key: string]: string | number }
 }>;
 
-
 const style = {
     boxShadow: '0px 6px 20px rgba(155, 166, 177, 0.3)',
     borderRadius: '0',
     padding: 0,
-
-
 };
 
 const styles = {
@@ -75,8 +72,6 @@ class NotificationStore extends SubStore {
         }catch(e){
             console.error(content)
         }
-
-
     }
 }
 

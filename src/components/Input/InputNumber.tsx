@@ -19,6 +19,9 @@ color: #6F7582;
     .rc-input-number-input{
         border-radius: 4px 0 0 4px;
         background: #F4F6FA;
+        padding: 0 10px;
+        text-align: left;
+        box-sizing: border-box;
     }
     .rc-input-number-handler-wrap{
       border-color:  #E7EBF4;

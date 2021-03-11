@@ -7,7 +7,7 @@ import Attach from '@src/assets/icons/Attach';
 import {css, jsx} from '@emotion/core';
 import DappStore, {b58strTob64Str} from "@stores/DappStore";
 import {ICallableArgumentType, TCallableFuncArgumentsArray} from "@stores/MetaStore";
-import ArgumentInput from '@components/DappUi/ArgumentInput';
+import {ArgumentInput} from '@components/DappUi/ArgumentInput';
 import Close from '@src/assets/icons/Close';
 import {inject, observer} from 'mobx-react';
 import AccountStore from '@stores/AccountStore';
@@ -18,6 +18,8 @@ import {autorun} from 'mobx';
 import InputNumber from '@components/Input/InputNumber';
 import Tooltip from 'rc-tooltip';
 import Decimal from "decimal.js";
+import {ReactComponent as AttachIcon} from "@src/assets/icons/Attach/attach-icon.svg";
+import {ListArgComponent} from "@components/DappUi/ListArgComponent";
 
 const flexStyle = css`display: flex;width: 100%;`;
 
@@ -46,7 +48,7 @@ ${flexStyle};
 border-bottom: 1px solid #EBEDF2;
 padding-bottom: 20px;
 justify-content: space-between;
-margin: 0 0 20px 0;
+margin: 0 0 10px 0;
 `;
 
 const ArgumentsLayout = styled.div`
@@ -59,16 +61,18 @@ flex-direction: column;
 
 const ArgumentItem = styled.div`
 ${flexStyle};
+width: 100%;
+display: flex;
+justify-content: space-between;
 margin-bottom: 14px;
 `;
 
 const ArgumentTitle = styled.div`
-flex: 1;
+flex: 0.5;
 display: flex;
-margin-right: 20px;
+margin-right: 10px;
 align-items: center;
-justify-content: flex-end;
-min-width: 100px;
+justify-content: flex-start;
 max-width: 150px;
 `;
 
@@ -77,7 +81,12 @@ ${fonts.callableFuncArgFont};
  font-weight: bold;
 `;
 
-const ArgumentTitleVarType = styled.div`${fonts.callableFuncArgFont}`;
+const ArgumentTitleVarType = styled.div`
+margin-right: 10px;
+min-width: 88px;
+text-align: left !important;
+${fonts.callableFuncArgFont};
+`;
 
 const AttachPaymentBtn = styled.div`
 ${flexStyle};
@@ -106,14 +115,25 @@ align-items: center;
  }
 `;
 
+const Wrapper = styled.div`
+width: 90%;
+display: flex;
+align-items: center;
+`
+
 const Title = styled.div`${fonts.cardTitleFont}`;
+
+export interface IArgument {
+    type: ICallableArgumentType,
+    value: string | undefined | IArgumentInput[]
+    byteVectorType?: 'base58' | 'base64'
+}
 
 export interface IArgumentInput {
     type: ICallableArgumentType,
     value: string | undefined
     byteVectorType?: 'base58' | 'base64'
 }
-
 
 const Anchor = styled.div`
 position:absolute;
@@ -133,7 +153,7 @@ interface IProps extends IInjectedProps {
 }
 
 interface IState {
-    args: { [name: string]: IArgumentInput }
+    args: { [name: string]: IArgument }
     payments: { assetId: string, tokens: string }[]
     address: string | null
 }
@@ -167,25 +187,17 @@ export default class Card extends React.Component<IProps, IState> {
         });
     }
 
-
     get isInvalid() {
         const {args, payments} = this.state;
         const {funcArgs} = this.props;
         const invalidPayment = payments.some(({assetId, tokens}) => !assetId || !tokens);
-        const invalidArgs = funcArgs.length !== Object.keys(args).length || Object.values(args)
-            .some(({value}) => value === undefined);
-        const invalidB58 = Object.values(args).some(({value, byteVectorType}) => {
-            let error = false;
-            if (byteVectorType && byteVectorType === 'base58') {
-                try {
-                    b58strTob64Str(value);
-                } catch (e) {
-                    error = true;
+        const invalidArgs = funcArgs.length !== Object.keys(args).length
+            || Object.values(args).some((arg) => isValidArg(arg as IArgumentInput))
+            || Object.values(args).some(({type, value}) => {
+                    if (type.startsWith('List')) return Object.values(value!).some((arg) => isValidArg(arg as IArgumentInput))
                 }
-            }
-            return error;
-        });
-        return invalidPayment || invalidArgs || invalidB58;
+            )
+        return invalidPayment || invalidArgs
     }
 
     handleAddAttach = () => this.state.payments.length < 2 && this.setState({
@@ -195,18 +207,56 @@ export default class Card extends React.Component<IProps, IState> {
         }]
     });
 
+
     handleRemoveAttach = (i: number) => () => {
         const payments = this.state.payments;
         payments.splice(i, 1);
         this.setState({payments});
     };
 
-    handleChangeValue = (name: string, type: ICallableArgumentType, value?: string) => {
-        // if (type === 'Int' && value && (isNaN(+value) || value.includes('e'))) value = value.replace('e', '');
-        this.setState({args: {...this.state.args, [name]: {...this.state.args[name], type, value}}});
+    handleChangeValue = (name: string, type: ICallableArgumentType | string, value?: string, index?: number) => {
+        if (index === undefined) return this.setState({
+            args: {
+                ...this.state.args,
+                [name]: {...this.state.args[name], type: (type as ICallableArgumentType), value}
+            }
+        })
+        else {
+            const newArgArray = this.state.args[name].value as IArgumentInput[]
+            newArgArray[index] = {...newArgArray[index], value, type: (type as ICallableArgumentType)}
+            return this.setState({
+                args: {
+                    ...this.state.args,
+                    [name]: {
+                        ...this.state.args[name],
+                        value: [...newArgArray]
+                    }
+                }
+            })
+        }
     };
-    handleChangeByteVectorType = (name: string, byteVectorType: 'base58' | 'base64') =>
-        this.setState({args: {...this.state.args, [name]: {...this.state.args[name], byteVectorType}}});
+
+    handleChangeByteVectorType = (name: string, byteVectorType: 'base58' | 'base64', index?: number) => {
+        if (index === undefined) return this.setState({
+            args: {
+                ...this.state.args,
+                [name]: {...this.state.args[name], byteVectorType}
+            }
+        })
+        else {
+            const newArgArray = this.state.args[name].value as IArgumentInput[]
+            newArgArray[index] = {...newArgArray[index], byteVectorType}
+            return this.setState({
+                args: {
+                    ...this.state.args,
+                    [name]: {
+                        ...this.state.args[name],
+                        value: [...newArgArray]
+                    }
+                }
+            })
+        }
+    }
 
     handleChangePaymentCount = (i: number) => (v: string | number) => {
         if (isNaN(+v) || +v < 0) return;
@@ -234,7 +284,6 @@ export default class Card extends React.Component<IProps, IState> {
         dappStore!.callCallableFunction(address, func, args, this.state.payments.map(p => ({...p, tokens: +p.tokens})));
     };
 
-
     render() {
         const {funcName: title, accountStore} = this.props;
         const {args, payments} = this.state;
@@ -246,22 +295,40 @@ export default class Card extends React.Component<IProps, IState> {
             </Header>
             {Object.keys(args).length > 0 &&
             <ArgumentsLayout>
-                {Object.entries(args).map(([argName, {type}], i: number) =>
-                    <ArgumentItem key={i}>
-                        <ArgumentTitle>
-                            <ArgumentTitleVarName>{centerEllipsis(argName, 7)}:</ArgumentTitleVarName>
-                            &nbsp;
-                            <ArgumentTitleVarType>{type}</ArgumentTitleVarType>
-                        </ArgumentTitle>
-                        <ArgumentInput
-                            css={css`flex:5`}
-                            value={args[argName] ? args[argName].value : defaultValue(type)}
-                            name={argName}
-                            type={type}
-                            onChange={this.handleChangeValue}
-                            onChangeByteVectorType={this.handleChangeByteVectorType}
-                        />
-                    </ArgumentItem>
+                {Object.entries(args).map(([argName, {type}], i: number) => {
+                        return type.startsWith('List')
+                            ? <ListArgComponent
+                                key={i}
+                                type={type}
+                                argName={argName}
+                                values={args[argName].value as IArgumentInput[]}
+                                setValue={(value) => this.setState({
+                                    args: {
+                                        ...this.state.args,
+                                        [argName]: {type: type, value: value}
+                                    }
+                                })}
+                                setByteVectorType={this.handleChangeByteVectorType}
+                            />
+                            :
+                            <ArgumentItem key={i}>
+                                <ArgumentTitle>
+                                    <ArgumentTitleVarName>{centerEllipsis(argName, 7)}:</ArgumentTitleVarName>
+                                    &nbsp;
+                                </ArgumentTitle>
+                                <Wrapper>
+                                    <ArgumentTitleVarType>{type}</ArgumentTitleVarType>
+                                    <ArgumentInput
+                                        css={css`width: 90%`}
+                                        value={(args[argName] ? args[argName].value : defaultValue(type)) as string | undefined}
+                                        name={argName}
+                                        type={type}
+                                        onChange={this.handleChangeValue}
+                                        onChangeByteVectorType={this.handleChangeByteVectorType}
+                                    />
+                                </Wrapper>
+                            </ArgumentItem>
+                    }
                 )}
             </ArgumentsLayout>
             }
@@ -306,4 +373,38 @@ export default class Card extends React.Component<IProps, IState> {
 }
 
 
-const defaultValue = (type: ICallableArgumentType) => type === 'String' || type === 'ByteVector' ? '' : undefined;
+const defaultValue = (type: ICallableArgumentType) => {
+    if (type.startsWith('List')) {
+        const listTypes = convertListTypes(type)
+        if (listTypes.length === 1) type = listTypes[0] as ICallableArgumentType
+        return [{type: type, value: ''}];
+    } else return type === 'String' || type === 'ByteVector' ? '' : undefined
+};
+
+export const convertListTypes = (listType: string) => {
+    listType.replace(' ', '')
+    const inputTypes = []
+    if (listType.includes('Int')) {
+        inputTypes.push('Int')
+    }
+    if (listType.includes('String')) {
+        inputTypes.push('String')
+    }
+    if (listType.includes('Boolean')) {
+        inputTypes.push('Boolean')
+    }
+    if (listType.includes('ByteVector')) {
+        inputTypes.push('ByteVector')
+    }
+    return inputTypes
+}
+
+const isValidBase64 = (str: string) => !/^[A-Za-z0-9+/=]/g.test(str)
+const isValidBase58 = (str: string) => !/^[A-Za-z0-9=]|[O0Il+/]/g.test(str)
+
+const isValidArg = (arg: IArgumentInput) => {
+    const {value, type, byteVectorType} = arg
+    if (value === '') return !(type === 'String' || type === 'ByteVector')
+    else if (type === 'ByteVector' && value !== undefined) return !(byteVectorType === 'base58' ? isValidBase58(value as string) : isValidBase64(value as string))
+    else return value === undefined
+}
