@@ -71,7 +71,7 @@
     "react": "^16.11.0",
     "react-app-polyfill": "^1.0.4",
     "react-collapse": "^5.0.1",
-    "react-dev-utils": "^9.1.0",
+    "react-dev-utils": "^11.0.4",
     "react-dom": "^16.11.0",
     "react-perfect-scrollbar": "^1.5.3",
     "react-router-dom": "^5.1.2",
