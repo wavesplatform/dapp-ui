@@ -5,7 +5,7 @@ import {fonts} from '@src/styles';
 import Button from '@components/DappUi/Button';
 import Attach from '@src/assets/icons/Attach';
 import {css, jsx} from '@emotion/core';
-import DappStore, {b58strTob64Str} from "@stores/DappStore";
+import DappStore from "@stores/DappStore";
 import {ICallableArgumentType, TCallableFuncArgumentsArray} from "@stores/MetaStore";
 import {ArgumentInput} from '@components/DappUi/ArgumentInput';
 import Close from '@src/assets/icons/Close';
@@ -18,7 +18,6 @@ import {autorun} from 'mobx';
 import InputNumber from '@components/Input/InputNumber';
 import Tooltip from 'rc-tooltip';
 import Decimal from "decimal.js";
-import {ReactComponent as AttachIcon} from "@src/assets/icons/Attach/attach-icon.svg";
 import {ListArgComponent} from "@components/DappUi/ListArgComponent";
 
 const flexStyle = css`display: flex;width: 100%;`;
@@ -399,8 +398,8 @@ export const convertListTypes = (listType: string) => {
     return inputTypes
 }
 
-const isValidBase64 = (str: string) => !/^[A-Za-z0-9+/=]/g.test(str)
-const isValidBase58 = (str: string) => !/^[A-Za-z0-9=]|[O0Il+/]/g.test(str)
+const isValidBase64 = (str: string) => /^[A-Za-z0-9+/=]+/g.test(str) || str.length === 0
+const isValidBase58 = (str: string) => (/^[A-Za-z1-9=]+/g.test(str) && !/[O0Il+/]/g.test(str)) || str.length === 0
 
 const isValidArg = (arg: IArgumentInput) => {
     const {value, type, byteVectorType} = arg
