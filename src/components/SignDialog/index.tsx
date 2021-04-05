@@ -100,7 +100,7 @@ export default class SignDialog extends React.Component <IProps> {
         }
         keeperStore.login()
             .catch(e => this.props.notificationStore!.notify(
-                <a href="https://wavesplatform.com/technology/keeper"  target="_blank" rel="noopener noreferrer">
+                <a href="https://docs.waves.tech/en/ecosystem/waves-keeper"  target="_blank" rel="noopener noreferrer">
                     install WavesKeeper</a>,
                 {type: 'error', title: 'keeper is not installed'})
             );

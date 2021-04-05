@@ -123,11 +123,11 @@ class KeeperStore extends SubStore {
                 if (attemptsCount === 2) {
                     reaction.dispose();
                     console.error('keeper is not installed');
-                    this.rootStore.notificationStore.notify('keeper is not installed', {
-                        type: 'warning',
-                        link: 'https://wavesplatform.com/technology/keeper',
-                        linkTitle: 'install waves keeper'
-                    });
+                    // this.rootStore.notificationStore.notify('keeper is not installed', {
+                    //     type: 'warning',
+                    //     link: 'https://wavesplatform.com/technology/keeper',
+                    //     linkTitle: 'install waves keeper'
+                    // });
                 } else if (window['WavesKeeper']) {
                     reaction.dispose();
                     this.isWavesKeeperInstalled = true;
