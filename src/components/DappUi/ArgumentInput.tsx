@@ -1,6 +1,6 @@
-import React from 'react';
-import {b58strTob64Str } from '@stores/DappStore';
-import { ICallableArgumentType } from '@stores/MetaStore';
+import React, {useState} from 'react';
+import {b58strTob64Str} from '@stores/DappStore';
+import {ICallableArgumentType} from '@stores/MetaStore';
 
 import Input from '@components/Input';
 import Select from '@components/Select';
@@ -11,21 +11,20 @@ import {inject, observer} from 'mobx-react';
 import InputNumber from '@components/Input/InputNumber';
 import Radio from "@components/Input/Radio";
 import styled from "@emotion/styled";
+import {convertListTypes} from "@components/DappUi/Card";
+import {debounce} from "debounce";
 
 interface IArgumentInputProps {
     name: string
-    type: ICallableArgumentType
-    onChange: (name: string, type: ICallableArgumentType, value?: string) => void
-    onChangeByteVectorType: (name: string, byteVectorType: 'base58' | 'base64') => void
+    type: string
+    onChange: (name: string, type: ICallableArgumentType | string, value?: string, index?: number) => void
+    onChangeType?: (name: string, type: ICallableArgumentType | string, index?: number) => void
+    onChangeByteVectorType: (name: string, byteVectorType: 'base58' | 'base64', index?: number) => void
+    index?: number
     value?: string
     css?: any
-
     notificationStore?: NotificationStore
-
-}
-
-interface IArgumentInputState {
-    byteVectorType: 'base58' | 'base64'
+    byteVectorType?: string | undefined
 }
 
 const RadioSet = styled.div`
@@ -37,74 +36,101 @@ margin: 0 -15px;
 }
 `
 
-@inject('notificationStore')
-@observer
-export default class ArgumentInput extends React.Component<IArgumentInputProps, IArgumentInputState> {
+export const ArgumentInput: React.FC<IArgumentInputProps> = inject('notificationStore')(observer((props) => {
+    let {type, value, css: style, index, name} = props;
+    const [byteVectorType, setByteVectorType] = useState('')
+    let inputValue = value
+    const setInputValue = (value: string | undefined) => inputValue = value
 
-    state: IArgumentInputState = {byteVectorType: 'base58'};
-
-    handleChangeByteVectorType = (byteVectorType: string) => {
+    const handleChangeByteVectorType = (byteVectorType: string) => {
         if (byteVectorType !== 'base58' && byteVectorType !== 'base64') return;
-        this.setState({byteVectorType});
-        this.props.onChangeByteVectorType(this.props.name, byteVectorType);
+        setByteVectorType(byteVectorType);
+        props.onChangeByteVectorType(props.name, byteVectorType, index);
     };
 
-    handleChange = (value?: string) => {
-        console.log(value)
-        this.props.onChange(this.props.name, this.props.type, value);
+    const debouncedHandleChange = debounce((value?: string) => {
+        setInputValue(value)
+        props.onChange(name, type, inputValue, index)
+    }, 700)
+
+    const handleChange = (value?: string) => {
+        setInputValue(value)
+        props.onChange(name, type, inputValue, index);
     }
-    validateByteVector = (e: any) => {
-        if (this.state.byteVectorType === 'base58') {
+
+    const validateByteVector = () => {
+        if (byteVectorType === 'base58') {
             try {
-                b58strTob64Str(e.target.value);
+                b58strTob64Str(value);
             } catch (e) {
-                this.props.notificationStore!.notify(e, {type: 'error'});
+                props.notificationStore!.notify(e, {type: 'error'});
             }
         }
     };
 
-    render() {
-        const {type, value, css: style} = this.props;
-        const {byteVectorType} = this.state;
-        switch (type) {
-            case 'Boolean':
-                return <RadioSet css={style}>
-                    <Radio value="true" state={value} onChange={this.handleChange} label="True"/>
-                    <Radio value="false" state={value} onChange={this.handleChange} label="False"/>
-                </RadioSet>;
+    const singleInputSwitcher = (type: string): React.ReactElement => {
 
-            case 'ByteVector':
-                return <>
-                    <Select
-                        value={byteVectorType}
-                        onChange={this.handleChangeByteVectorType}
-                        css={[style, css`margin-right: 8px; max-width: 90px`]}
-                    >
-                        <Option value="base58">base58</Option>
-                        <Option value="base64">base64</Option>
-                    </Select>
-                    <Input
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
-                        onBlur={this.validateByteVector}
-                        value={value} css={style} spellCheck={false}
-                    />
-                </>;
+        if (type === 'Boolean') return <RadioSet css={style}>
+            <Radio value="true" state={value} onChange={handleChange} label="True"/>
+            <Radio value="false" state={value} onChange={handleChange} label="False"/>
+        </RadioSet>;
 
-            case 'Int':
-                return <InputNumber
-                    value={value}
-                    spellCheck={false}
-                    onChange={(e: string) => this.handleChange(!isNaN(+e) ? e : '0')}
-                />;
+        else if (type === 'ByteVector') return <Wrapper>
+            <Select
+                value={props.byteVectorType || byteVectorType}
+                onChange={handleChangeByteVectorType}
+                css={[style, css`margin-right: 8px; max-width: 90px`]}
+            >
+                <Option value="base58">base58</Option>
+                <Option value="base64">base64</Option>
+            </Select>
+            <Input
+                defaultValue={value}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => debouncedHandleChange(e.target.value)}
+                onBlur={validateByteVector}
+                css={style} spellCheck={false}
+            />
+        </Wrapper>;
 
-            case 'String':
-                return <Input
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e.target.value)}
-                    value={value} css={style} spellCheck={false}
-                />;
-            default:
-                return <Input css={style} disabled/>;
-        }
+        else if (type === 'Int') return <InputNumber
+            defaultValue={inputValue}
+            spellCheck={false}
+            onChange={(e: string) => debouncedHandleChange(!isNaN(+e) ? e : '0')}
+        />;
+
+        else if (type === 'String') return <Input
+            defaultValue={value}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => debouncedHandleChange(e.target.value)}
+            css={style} spellCheck={false}
+        />;
+
+        else return <Input css={style} disabled/>;
     }
-}
 
+    const inputSwitcher = (type: string): React.ReactElement => {
+        if (type.startsWith('List')) {
+            const listsTypes = convertListTypes(type);
+            return <Wrapper>
+                {listsTypes.length > 1
+                    ? <Select
+                        value={undefined}
+                        onChange={(selectedType) => {
+                            props.onChangeType!(name, selectedType, index)
+                        }}
+                        css={[style, css`margin-right: 8px; max-width: 100px`]}
+                    >
+                        {listsTypes.map(t => <Option value={t}>{t}</Option>)}
+                    </Select>
+                    : null}
+                {singleInputSwitcher(listsTypes.length > 1 ? type : listsTypes[0])}
+            </Wrapper>
+        } else return singleInputSwitcher(type);
+    }
+
+    return inputSwitcher(type)
+}))
+
+const Wrapper = styled.div`
+flex: 1;
+display: flex;
+`

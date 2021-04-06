@@ -1,21 +1,20 @@
 /** @jsx jsx **/
 import React from "react";
-import { css, jsx } from '@emotion/core'
-import { inject, observer } from "mobx-react";
+import {css, jsx} from '@emotion/core'
+import {inject, observer} from "mobx-react";
 import styled from "@emotion/styled";
-import { AccountStore, DappStore, HistoryStore, MetaStore } from "@stores/index";
-import { isArrayArguments, isRecordArguments, ICallableFuncTypesArray, TCallableFuncArgumentsArray, TCallableFuncArguments } from "@stores/MetaStore";
+import {AccountStore, DappStore, HistoryStore, MetaStore} from "@stores/index";
 import DappBody from "@components/DappUi/DappBody";
 import NotificationStore from "@stores/NotificationStore";
 import Head from "@components/Head";
 import ScrollBar from 'react-perfect-scrollbar'
 import Footer from "@components/Footer";
-import { getExplorerLink } from "@utils/index";
+import {getExplorerLink} from "@utils/index";
 import EmptyDapp from './EmptyDapp'
-import { Explorer } from "@components/DappUi/Explorer";
+import {Explorer} from "@components/DappUi/Explorer";
 import Loading from "@components/DappUi/Loading";
 import Modal from "@components/Modal";
-import { Collapse } from 'react-collapse';
+import {Collapse} from 'react-collapse';
 
 interface IInjectedProps {
     accountStore?: AccountStore

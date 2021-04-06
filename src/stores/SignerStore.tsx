@@ -1,4 +1,4 @@
-import { RootStore} from '@stores';
+import {RootStore} from '@stores';
 import {SubStore} from './SubStore';
 import {Signer} from '@waves/signer';
 import {ProviderWeb} from "@waves.exchange/provider-web";
@@ -92,7 +92,6 @@ class SignerStore extends SubStore {
             const id = (transaction as any).id || '';
             const {accountStore: {network}, notificationStore} = this.rootStore;
             const link = network ? getExplorerLink(network!.code, id, 'tx') : undefined;
-            console.dir(transaction);
             notificationStore.notify(`Transaction sent: ${transaction.id}\n`, {type: 'info'})
 
             const res = await waitForTx(transaction.id, {apiBase: network!.server}) as any

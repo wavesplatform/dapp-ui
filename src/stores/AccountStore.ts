@@ -48,7 +48,6 @@ class AccountStore extends SubStore {
         ];
 
         const ids: any = assets.balances.filter(balance => balance.issueTransaction === null).map(x => x.assetId);
-        console.log(assets.balances)
         if (ids.length !== 0)(await axios.post('/assets/details', {ids}, {baseURL: `${checkSlash(server)}`})).data.map((assetDetails: any) => {
             assets.balances.filter(x => x.assetId === assetDetails.assetId).map(x => {
                 x.issueTransaction = {
