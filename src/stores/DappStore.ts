@@ -73,6 +73,7 @@ class DappStore extends SubStore {
             console.error(e);
             this.rootStore.notificationStore.notify(e, {type: 'error'});
         }
+
         const transactionData: IKeeperTransactionData = {
             dApp: address,
             call: {
@@ -94,7 +95,10 @@ class DappStore extends SubStore {
             return;
         }
 
-        if (accountStore.loginType === 'keeper') this.rootStore.keeperStore.sendTx(tx)
+        if (accountStore.loginType === 'keeper') {
+            console.log('tx', tx)
+            return this.rootStore.keeperStore.sendTx(tx)
+        }
 
         if (accountStore.loginType === 'exchange') this.rootStore.signerStore.sendTx(tx)
 

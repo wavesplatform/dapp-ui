@@ -200,7 +200,7 @@ export default class Card extends React.Component<IProps, IState> {
         return invalidPayment || invalidArgs
     }
 
-    handleAddAttach = () => this.state.payments.length < 2 && this.setState({
+    handleAddAttach = () => this.state.payments.length < 10 && this.setState({
         payments: [...this.state.payments, {
             assetId: 'WAVES',
             tokens: (0).toFixed(8)
@@ -343,7 +343,7 @@ export default class Card extends React.Component<IProps, IState> {
                             <ArgumentTitle>
                                 <ArgumentTitleVarName>Payments:</ArgumentTitleVarName>
                                 &nbsp;
-                                <ArgumentTitleVarType>{i + 1}/2</ArgumentTitleVarType>
+                                <ArgumentTitleVarType>{i + 1}/10</ArgumentTitleVarType>
                             </ArgumentTitle>
                             <Select onChange={this.handleChangePaymentAsset(i)} value={assetId}>
                                 {Object.values(accountStore!.assets).map(({assetId, name}) =>
@@ -365,7 +365,7 @@ export default class Card extends React.Component<IProps, IState> {
                         </AttachPaymentItem>;
                     })}
                 </AttachPaymentItems>
-                {payments.length < 2 && <AttachPaymentBtn><Attach
+                {payments.length < 10 && <AttachPaymentBtn><Attach
                     onClick={this.handleAddAttach}/></AttachPaymentBtn>}
             </FlexBlock>
         </Root>;

@@ -45,13 +45,13 @@ class KeeperStore extends SubStore {
         if (this.isBrowserSupportsWavesKeeper) {
             this.setupWavesKeeper();
         }
-        // else {
-        //     this.rootStore.notificationStore!.notify('you use unsupported browser', {
-        //         type: 'warning',
-        //         link: "https://wavesplatform.com/technology/keeper",
-        //         linkTitle: 'more'
-        //     });
-        // }
+        else {
+            this.rootStore.notificationStore!.notify('you use unsupported browser', {
+                type: 'warning',
+                link: "https://docs.waves.tech/en/ecosystem/waves-keeper",
+                linkTitle: 'more'
+            });
+        }
     }
 
     @observable wavesKeeperAccount?: IWavesKeeperAccount;
@@ -78,6 +78,8 @@ class KeeperStore extends SubStore {
     @action
     updateWavesKeeperAccount = async (publicState: any) => {
         this.rootStore.accountStore.scripted = (await nodeInteraction.scriptInfo(publicState.account.address, publicState.network.server)).script != null;
+        const scripted = (await nodeInteraction.scriptInfo(publicState.account.address, publicState.network.server)).script;
+        console.log('scripted', scripted)
         this.wavesKeeperAccount && set(this.wavesKeeperAccount, {
             ...publicState.account
         });
