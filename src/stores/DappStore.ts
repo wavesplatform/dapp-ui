@@ -96,7 +96,6 @@ class DappStore extends SubStore {
         }
 
         if (accountStore.loginType === 'keeper') {
-            console.log('tx', tx)
             return this.rootStore.keeperStore.sendTx(tx)
         }
 
