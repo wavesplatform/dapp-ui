@@ -197,7 +197,7 @@ class KeeperStore extends SubStore {
         )
     }).catch((error: any) => {
         console.error(error);
-        this.rootStore.notificationStore.notify(error.data, {type: 'error', title: error.message});
+        this.rootStore.notificationStore.notify(!!error.data ? error.data.toString() : error.data, {type: 'error', title: error.message});
     })
 
     get isBrowserSupportsWavesKeeper(): boolean {
