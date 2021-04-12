@@ -102,6 +102,45 @@ class DappStore extends SubStore {
         if (accountStore.loginType === 'exchange') this.rootStore.signerStore.sendTx(tx)
 
     };
+
+    getTransactionJson = (address: string, func: string, inArgs: IArgument[], payment: IKeeperTransactionPayment[]) => {
+        const {accountStore} = this.rootStore;
+        let args: IKeeperTransactionDataCallArg[] = [];
+        try {
+            args = this.convertArgs(inArgs);
+        } catch (e) {
+            console.error(e);
+            this.rootStore.notificationStore.notify(e, {type: 'error'});
+        }
+
+        const transactionData: IKeeperTransactionData = {
+            dApp: address,
+            call: {
+                function: func,
+                args
+            },
+            fee: {tokens: this.rootStore.accountStore.fee, assetId: 'WAVES'},
+            payment
+        };
+
+        const tx: IKeeperTransaction = {
+            type: 16,
+            data: transactionData
+        };
+
+
+        if (!accountStore.isAuthorized || !accountStore.loginType) {
+            this.rootStore.notificationStore.notify('Application is not authorized', {type: 'warning'});
+            return;
+        }
+
+        if (accountStore.loginType === 'keeper') {
+            return this.rootStore.keeperStore.buildTx(tx)
+        }
+
+        if (accountStore.loginType === 'exchange') this.rootStore.signerStore.buildTx(tx)
+
+    };
 }
 
 

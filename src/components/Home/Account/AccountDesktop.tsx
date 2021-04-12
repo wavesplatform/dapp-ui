@@ -91,12 +91,9 @@ export default class AccountDesktop extends React.Component<IProps> {
                     <Settings onClick={this.handleOpenModal}>
                         <SettingsIcon/>
                     </Settings>
-                    {
-                        this.state.isModalOpen ? <SettingsModal handleClose={this.handleCloseModal}>
-
-                            </SettingsModal>
-                            : null
-                    }
+                    {this.state.isModalOpen
+                        ? <SettingsModal handleClose={this.handleCloseModal}/>
+                        : null}
                     <AccountDescription>
                         <div css={fonts.addressFont}>
                             {centerEllipsis(address)}

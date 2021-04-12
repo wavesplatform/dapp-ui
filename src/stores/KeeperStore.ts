@@ -200,6 +200,12 @@ class KeeperStore extends SubStore {
         this.rootStore.notificationStore.notify(!!error.data ? error.data.toString() : error.data, {type: 'error', title: error.message});
     })
 
+
+    buildTx = (tx: any) => window['WavesKeeper'].signTransaction(tx).then((tx: any) => JSON.parse(tx)).catch((error: any) => {
+        console.error(error);
+        this.rootStore.notificationStore.notify(!!error.data ? error.data.toString() : error.data, {type: 'error', title: error.message});
+    })
+
     get isBrowserSupportsWavesKeeper(): boolean {
         const browser = getCurrentBrowser();
         return ['chrome', 'firefox', 'opera', 'edge'].includes(browser);

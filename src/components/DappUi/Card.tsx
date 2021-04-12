@@ -284,6 +284,13 @@ export default class Card extends React.Component<IProps, IState> {
         dappStore!.callCallableFunction(address, func, args, this.state.payments.map(p => ({...p, tokens: +p.tokens})));
     };
 
+    handleOpenJson = async () => {
+        const {dappStore, address, funcName: func} = this.props;
+        const args = Object.values(this.state.args);
+        const json = await dappStore!.getTransactionJson(address, func, args, this.state.payments.map(p => ({...p, tokens: +p.tokens})));
+        console.log('json', json)
+    };
+
     render() {
         const {funcName: title, accountStore} = this.props;
         const {args, payments} = this.state;
@@ -291,7 +298,7 @@ export default class Card extends React.Component<IProps, IState> {
             <Anchor id={title}/>
             <Header>
                 <Title>{centerEllipsis(title)}</Title>
-                <JsonIcon/>
+                <JsonIcon onClick={this.handleOpenJson}/>
                 <Button onClick={this.handleCall} disabled={this.isInvalid}>Invoke</Button>
             </Header>
             {Object.keys(args).length > 0 &&

@@ -17,7 +17,7 @@ export enum LoginType {
 
 class SignerStore extends SubStore {
 
-    signer?: any;
+    signer?: Signer | undefined;
 
     @observable isApplicationAuthorizedInWavesExchange = false;
 
@@ -61,7 +61,7 @@ class SignerStore extends SubStore {
         if (type === LoginType.SEED) await this.initSignerWeb();
         if (type === LoginType.EMAIL) await this.initSignerCloud();
 
-        console.log('type', type)
+        console.log('this.signer', this.signer)
         const account = await this.signer!.login();
         if ('address' in account) {
             const byte = await this.signer!.getNetworkByte();
@@ -73,13 +73,31 @@ class SignerStore extends SubStore {
     };
 
     @action
-    async sendTx({data: tx}: any, opts: { notStopWait?: boolean } = {}) {
+    async buildTx({data: tx}: any, opts: { notStopWait?: boolean } = {}) {
         if ('payment' in tx) {
-
             tx.payment = tx.payment.map(({tokens: amount, assetId}: any) => {
                 const decimals = this.rootStore.accountStore.assets[assetId].decimals
                 return ({amount: new Decimal(10).pow(decimals).mul(+amount).toNumber(), assetId})
         }
+            )
+        }
+
+        try {
+            return this.signer!.invoke(tx).sign();
+        } catch (err) {
+            console.error(err);
+            this.rootStore.notificationStore.notify((typeof err === 'string' ? err : err.message), {type: 'error'})
+        }
+    }
+
+    @action
+    async sendTx({data: tx}: any, opts: { notStopWait?: boolean } = {}) {
+        if ('payment' in tx) {
+
+            tx.payment = tx.payment.map(({tokens: amount, assetId}: any) => {
+                    const decimals = this.rootStore.accountStore.assets[assetId].decimals
+                    return ({amount: new Decimal(10).pow(decimals).mul(+amount).toNumber(), assetId})
+                }
             )
         }
         if ('fee' in tx) {
