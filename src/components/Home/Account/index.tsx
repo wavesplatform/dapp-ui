@@ -1,13 +1,13 @@
 /** @jsx jsx */
 import React from 'react';
-import { css, jsx } from '@emotion/core';
+import {css, jsx} from '@emotion/core';
 import AccountDesktop from '@components/Home/Account/AccountDesktop';
-import { useWindowDimensions } from '@utils/dimensions';
+import {useWindowDimensions} from '@utils/dimensions';
 import AccountMobile from '@components/Home/Account/AccountMobile';
 import styled from '@emotion/styled';
 import Wifi from '@src/assets/icons/Wifi';
-import { fonts } from '@src/styles';
-import { INetwork } from '@stores/KeeperStore';
+import {fonts} from '@src/styles';
+import {INetwork} from '@stores/KeeperStore';
 
 const Account: React.FC = () => {
     const {width} = useWindowDimensions();

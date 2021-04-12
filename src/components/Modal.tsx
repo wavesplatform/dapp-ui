@@ -29,11 +29,14 @@ z-index: 3;
 `
 
 const ExitBtn: React.FunctionComponent<{ onClick: () => void }> = ({onClick}) => <ExitBtnRoot>
-    <svg onClick={onClick} width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="6.4541" y="22.9705" width="24" height="3" rx="1.5" transform="rotate(-45 6.4541 22.9705)"
-              fill="black"/>
-        <rect x="8.5752" y="6" width="24" height="3" rx="1.5" transform="rotate(45 8.5752 6)" fill="black"/>
-    </svg>
+    <div style={{cursor: 'pointer'}}>
+        <svg onClick={onClick} width="32" height="32" viewBox="0 0 32 32" fill="none"
+             xmlns="http://www.w3.org/2000/svg">
+            <rect x="6.4541" y="22.9705" width="24" height="3" rx="1.5" transform="rotate(-45 6.4541 22.9705)"
+                  fill="black"/>
+            <rect x="8.5752" y="6" width="24" height="3" rx="1.5" transform="rotate(45 8.5752 6)" fill="black"/>
+        </svg>
+    </div>
 </ExitBtnRoot>
 
 interface IProps {

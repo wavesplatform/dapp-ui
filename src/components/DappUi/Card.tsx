@@ -19,6 +19,7 @@ import InputNumber from '@components/Input/InputNumber';
 import Tooltip from 'rc-tooltip';
 import Decimal from "decimal.js";
 import {ListArgComponent} from "@components/DappUi/ListArgComponent";
+import {ReactComponent as JsonIcon} from "@assets/icons/json.svg";
 
 const flexStyle = css`display: flex;width: 100%;`;
 
@@ -290,6 +291,7 @@ export default class Card extends React.Component<IProps, IState> {
             <Anchor id={title}/>
             <Header>
                 <Title>{centerEllipsis(title)}</Title>
+                <JsonIcon/>
                 <Button onClick={this.handleCall} disabled={this.isInvalid}>Invoke</Button>
             </Header>
             {Object.keys(args).length > 0 &&
