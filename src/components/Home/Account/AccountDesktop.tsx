@@ -11,7 +11,7 @@ import HistoryStore from '@stores/HistoryStore';
 import NotificationStore from '@stores/NotificationStore';
 import {AccountDetails, centerEllipsis, Copy, SignIn} from '@components/Home/Account/index';
 import {ReactComponent as SettingsIcon} from '@src/assets/icons/settings.svg';
-import {SettingsModal} from "@components/SettingsModal";
+import SettingsModal from "@components/SettingsModal";
 
 const Root = styled.div`
 display: flex;

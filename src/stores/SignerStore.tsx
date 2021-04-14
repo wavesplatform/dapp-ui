@@ -82,6 +82,12 @@ class SignerStore extends SubStore {
             )
         }
 
+        if ('fee' in tx) {
+            delete tx.feeAssetId;
+            tx.fee = new Decimal(10).pow(8).mul(+this.rootStore.accountStore.fee).toNumber();
+        }
+
+
         try {
             return this.signer!.invoke(tx).sign();
         } catch (err) {
@@ -102,7 +108,8 @@ class SignerStore extends SubStore {
         }
         if ('fee' in tx) {
             delete tx.feeAssetId;
-            tx.fee = new Decimal(10).pow(8).mul(+this.rootStore.accountStore.fee).toNumber();
+            delete tx.fee;
+            // tx.fee = new Decimal(10).pow(8).mul(+this.rootStore.accountStore.fee).toNumber();
         }
 
         try {

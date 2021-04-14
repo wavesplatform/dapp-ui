@@ -20,6 +20,9 @@ import Tooltip from 'rc-tooltip';
 import Decimal from "decimal.js";
 import {ListArgComponent} from "@components/DappUi/ListArgComponent";
 import {ReactComponent as JsonIcon} from "@assets/icons/json.svg";
+import {SettingsStore} from "@stores/SettingsStore";
+import {base64Encode} from "@waves/ts-lib-crypto/conversions/base-xx";
+import {base58Encode} from "@waves/ts-lib-crypto";
 
 const flexStyle = css`display: flex;width: 100%;`;
 
@@ -140,9 +143,14 @@ position:absolute;
 top:-100px;
 `;
 
+const ButtonsWrapper = styled.div`
+display: flex;
+align-items: center;
+`
 interface IInjectedProps {
     dappStore?: DappStore
     accountStore?: AccountStore
+    settingsStore?: SettingsStore
 }
 
 interface IProps extends IInjectedProps {
@@ -158,7 +166,7 @@ interface IState {
     address: string | null
 }
 
-@inject('dappStore', 'accountStore')
+@inject('dappStore', 'accountStore', 'settingsStore')
 @observer
 export default class Card extends React.Component<IProps, IState> {
 
@@ -288,6 +296,14 @@ export default class Card extends React.Component<IProps, IState> {
         const {dappStore, address, funcName: func} = this.props;
         const args = Object.values(this.state.args);
         const json = await dappStore!.getTransactionJson(address, func, args, this.state.payments.map(p => ({...p, tokens: +p.tokens})));
+
+        console.log('json', json)
+        const dataObjectString = JSON.stringify(json)
+        console.log('dataObjectString', dataObjectString)
+        const dataObjectBase64 = base58Encode(window.btoa(dataObjectString))
+        // const dataObjectBase64 = window.btoa(dataObjectString)
+        console.log('dataObjectBase64', dataObjectBase64)
+        window.open(`/json/${dataObjectBase64}`)
         console.log('json', json)
     };
 
@@ -298,8 +314,10 @@ export default class Card extends React.Component<IProps, IState> {
             <Anchor id={title}/>
             <Header>
                 <Title>{centerEllipsis(title)}</Title>
-                <JsonIcon onClick={this.handleOpenJson}/>
-                <Button onClick={this.handleCall} disabled={this.isInvalid}>Invoke</Button>
+                <ButtonsWrapper>
+                    {(this.props.accountStore?.isAuthorized && this.props.settingsStore?.jsonSettingValue) ? <JsonIcon onClick={this.handleOpenJson}/> : null}
+                    <Button onClick={this.handleCall} disabled={this.isInvalid} style={{marginLeft: '10px'}}>Invoke</Button>
+                </ButtonsWrapper>
             </Header>
             {Object.keys(args).length > 0 &&
             <ArgumentsLayout>
@@ -342,6 +360,7 @@ export default class Card extends React.Component<IProps, IState> {
             }
             <FlexBlock>
                 <AttachPaymentItems>
+                    {console.log(this.state.payments)}
                     {this.state.payments.map(({assetId, tokens}, i) => {
                         const decimals = (accountStore!.assets[assetId]
                             && (accountStore!.assets[assetId].decimals || accountStore!.assets[assetId].decimals === 0))

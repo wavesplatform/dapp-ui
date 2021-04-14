@@ -1,5 +1,7 @@
 import React, {useState} from "react";
 import styled from "@emotion/styled";
+import {inject, observer} from "mobx-react";
+import {SettingsStore} from "@stores/SettingsStore";
 
 
 const Root = styled.div`
@@ -88,38 +90,45 @@ const ExitBtn: React.FunctionComponent<{ onClick: () => void }> = ({onClick}) =>
 </ExitBtnRoot>
 
 interface IProps {
-    handleClose: () => void
+    handleClose: () => void,
+    settingsStore?: SettingsStore
 }
 
-export const SettingsModal: React.FC<IProps> = (props) => {
+@inject('settingsStore')
+@observer
+export default class SettingsModal extends React.Component<IProps> {
 
-    const jsonSettingsFromStorage = localStorage.getItem('jsonSettings') === 'true'
-    const [jsonSetting, setJsonSetting] = useState(jsonSettingsFromStorage as boolean)
-
-    const handleJsonSettings = () => {
-        setJsonSetting(!jsonSetting)
+    state = {
+        jsonSettingValue: this.props.settingsStore!.jsonSettingValue
     }
 
-    const saveAndApply = () => {
-        localStorage.setItem('jsonSettings', jsonSetting!.toString())
-        props.handleClose()
+    handleJsonSettings = () => {
+        this.setState({jsonSettingValue: !this.state.jsonSettingValue})
     }
 
-    return <Root>
-        <Content>
-            <Title>
-                Settings
-                <ExitBtn onClick={props.handleClose}/>
-            </Title>
-            <Body>
-                <SettingItem onClick={handleJsonSettings}>
-                    <Checkbox type={'checkbox'} checked={jsonSetting} onChange={handleJsonSettings}/>
-                    Show JSON transaction receipt button
-                </SettingItem>
-            </Body>
-            <SaveButton onClick={saveAndApply}>
-                Save and apply
-            </SaveButton>
-        </Content>
-    </Root>
+    saveAndApply = () => {
+        this.props.settingsStore!.setJsonSettingValue(this.state.jsonSettingValue)
+        this.props.handleClose()
+    }
+
+
+    render() {
+        return <Root>
+            <Content>
+                <Title>
+                    Settings
+                    <ExitBtn onClick={this.props.handleClose}/>
+                </Title>
+                <Body>
+                    <SettingItem onClick={this.handleJsonSettings}>
+                        <Checkbox type={'checkbox'} checked={this.state.jsonSettingValue} onChange={this.handleJsonSettings}/>
+                        Show JSON transaction receipt button
+                    </SettingItem>
+                </Body>
+                <SaveButton onClick={this.saveAndApply}>
+                    Save and apply
+                </SaveButton>
+            </Content>
+        </Root>
+    }
 }
