@@ -2,7 +2,7 @@ import {action, autorun, computed, observable} from 'mobx';
 import {SubStore} from './SubStore';
 import {base58Decode} from '@waves/ts-lib-crypto';
 import {IAsset, INetwork} from '@stores/KeeperStore';
-import {checkSlash} from '@utils/index';
+import {checkSlash} from '@utils';
 import {RootStore} from '@stores/RootStore';
 import axios from 'axios';
 
@@ -36,13 +36,14 @@ class AccountStore extends SubStore {
         const data = (await (resp).json());
 
         const nftResp = await fetch(`${checkSlash(server)}assets/nft/${address}/limit/1000`);
-        const nft: { 'originTransactionId': 'string', 'name': 'string', 'decimals': 0 }[] = (await (nftResp).json());
+        const nft: { 'assetId': 'string', 'name': 'string', 'decimals': 0 }[] = (await (nftResp).json());
 
         const assets: { balances: { assetId: string, issueTransaction: { name: string, decimals: number } }[] } = data;
+
         assets.balances = [
             ...assets.balances,
-            ...nft.map(({originTransactionId, name, decimals}) => ({
-                assetId: originTransactionId,
+            ...nft.map(({assetId, name, decimals}) => ({
+                assetId: assetId,
                 issueTransaction: {name, decimals}
             }))
         ];
