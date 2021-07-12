@@ -82,12 +82,9 @@ class SignerStore extends SubStore {
         }
             )
         }
-        if ('fee' in tx) {
-            delete tx.feeAssetId;
-            tx.fee = new Decimal(10).pow(8).mul(+this.rootStore.accountStore.fee).toNumber();
-        }
 
         try {
+            delete tx.fee;
             const transaction = await this.signer!.invoke(tx).broadcast() as any;
             const id = (transaction as any).id || '';
             const {accountStore: {network}, notificationStore} = this.rootStore;
