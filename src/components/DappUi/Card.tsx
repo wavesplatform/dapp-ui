@@ -289,7 +289,7 @@ export default class Card extends React.Component<IProps, IState> {
         return <Root>
             <Anchor id={title}/>
             <Header>
-                <Title>{centerEllipsis(title)}</Title>
+                <Title title={title.length  >= 20 ? title : ''}>{centerEllipsis(title, 20)}</Title>
                 <Button onClick={this.handleCall} disabled={this.isInvalid}>Invoke</Button>
             </Header>
             {Object.keys(args).length > 0 &&
@@ -312,7 +312,7 @@ export default class Card extends React.Component<IProps, IState> {
                             :
                             <ArgumentItem key={i}>
                                 <ArgumentTitle>
-                                    <ArgumentTitleVarName>{centerEllipsis(argName, 7)}:</ArgumentTitleVarName>
+                                    <ArgumentTitleVarName title={argName.length >= 12 ? argName : ''}>{centerEllipsis(argName, 12)}:</ArgumentTitleVarName>
                                     &nbsp;
                                 </ArgumentTitle>
                                 <Wrapper>
@@ -348,7 +348,9 @@ export default class Card extends React.Component<IProps, IState> {
                                 {Object.values(accountStore!.assets).map(({assetId, name}) =>
                                     <Option key={assetId} value={assetId}>
                                         <Tooltip placement="right" trigger={['hover']} overlay={<span>{assetId}</span>}>
-                                            <div>{name}({centerEllipsis(assetId, 6)})</div>
+                                            <div title={assetId.length >= 6 ? name+centerEllipsis(assetId, 6) : ''}>
+                                                {name}({centerEllipsis(assetId, 6)})
+                                            </div>
                                         </Tooltip>
                                     </Option>)}
                             </Select>

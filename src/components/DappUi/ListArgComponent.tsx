@@ -41,7 +41,7 @@ export const ListArgComponent: React.FC<IProps> = (props) => {
 
     return <Root>
         <ArgumentTitle>
-            <ArgumentTitleVarName>{centerEllipsis(props.argName, 7)}:</ArgumentTitleVarName>
+            <ArgumentTitleVarName title={props.argName}>{centerEllipsis(props.argName, 7)}:</ArgumentTitleVarName>
             &nbsp;
         </ArgumentTitle>
         <Wrapper>
