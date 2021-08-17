@@ -82,7 +82,6 @@ ${fonts.callableFuncArgFont};
 
 const ArgumentTitleVarType = styled.div`
 margin-right: 10px;
-min-width: 88px;
 text-align: left !important;
 ${fonts.callableFuncArgFont};
 `;
@@ -120,7 +119,13 @@ display: flex;
 align-items: center;
 `
 
-const Title = styled.div`${fonts.cardTitleFont}`;
+const Title = styled.div`
+max-width: calc(100% - 150px);
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+${fonts.cardTitleFont}
+`
 
 export interface IArgument {
     type: ICallableArgumentType,
@@ -289,7 +294,7 @@ export default class Card extends React.Component<IProps, IState> {
         return <Root>
             <Anchor id={title}/>
             <Header>
-                <Title title={title.length  >= 20 ? title : ''}>{centerEllipsis(title, 20)}</Title>
+                <Title title={title.length  >= 20 ? title : ''}>{title}</Title>
                 <Button onClick={this.handleCall} disabled={this.isInvalid}>Invoke</Button>
             </Header>
             {Object.keys(args).length > 0 &&
@@ -312,7 +317,7 @@ export default class Card extends React.Component<IProps, IState> {
                             :
                             <ArgumentItem key={i}>
                                 <ArgumentTitle>
-                                    <ArgumentTitleVarName title={argName.length >= 12 ? argName : ''}>{centerEllipsis(argName, 12)}:</ArgumentTitleVarName>
+                                    <ArgumentTitleVarName title={argName.length >= 16 ? argName : ''}>{centerEllipsis(argName, 16)}:</ArgumentTitleVarName>
                                     &nbsp;
                                 </ArgumentTitle>
                                 <Wrapper>

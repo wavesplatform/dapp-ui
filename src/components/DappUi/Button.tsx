@@ -4,7 +4,7 @@ import { fonts } from '@src/styles';
 const Button = styled.button`
 background: #7CA1FD;
 border-radius: 4px;
-width: 150px;
+min-width: 150px;
 height: 40px;
 color: white;
 outline: none;
