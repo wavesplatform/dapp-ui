@@ -3,6 +3,7 @@ import {SubStore} from './SubStore';
 import {Signer} from '@waves/signer';
 import {ProviderWeb} from "@waves.exchange/provider-web";
 import {ProviderCloud} from "@waves.exchange/provider-cloud";
+import ProviderMetamask from "@waves/provider-metamask";
 import {action, observable} from 'mobx';
 import {INetwork} from '@stores/KeeperStore';
 import {getExplorerLink} from '@utils';
@@ -12,7 +13,8 @@ import Decimal from 'decimal.js';
 
 export enum LoginType {
     SEED,
-    EMAIL
+    EMAIL,
+    METAMASK,
 }
 
 class SignerStore extends SubStore {
@@ -57,9 +59,15 @@ class SignerStore extends SubStore {
         }
     }
 
+    initSignerMetamask = async () => {
+        this.signer = new Signer();
+        await this.signer.setProvider(new ProviderMetamask());
+    }
+
     login = async (type: LoginType) => {
         if (type === LoginType.SEED) await this.initSignerWeb();
         if (type === LoginType.EMAIL) await this.initSignerCloud();
+        if (type === LoginType.METAMASK) await this.initSignerMetamask();
 
         console.log('type', type)
         const account = await this.signer!.login();
@@ -75,12 +83,10 @@ class SignerStore extends SubStore {
     @action
     async sendTx({data: tx}: any, opts: { notStopWait?: boolean } = {}) {
         if ('payment' in tx) {
-
             tx.payment = tx.payment.map(({tokens: amount, assetId}: any) => {
                 const decimals = this.rootStore.accountStore.assets[assetId].decimals
                 return ({amount: new Decimal(10).pow(decimals).mul(+amount).toNumber(), assetId})
-        }
-            )
+            });
         }
 
         try {
