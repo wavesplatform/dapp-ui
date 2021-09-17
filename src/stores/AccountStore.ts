@@ -82,6 +82,8 @@ class AccountStore extends SubStore {
                     return networks.devnet;
                 case 'R':
                     return networks.private;
+                case 'C':
+                    return networks.devnetС;
             }
 
         } catch (e) {
@@ -109,7 +111,8 @@ export const networks = {
         clientOrigin: 'https://waves.exchange/signer/'
     },
     'devnet': {server: 'https://devnet1-htz-nbg1-1.wavesnodes.com', code: 'D'},
-    'private': {server: 'http://localhost:6869', code: 'R'}
+    'private': {server: 'http://localhost:6869', code: 'R'},
+    'devnetС': {server: 'https://devnet1-htz-nbg1-4.wavesnodes.com/', code: 'С'},
 }
 
 export default AccountStore;
