@@ -1,13 +1,13 @@
+import {action, observable} from 'mobx';
 import {RootStore} from '@stores';
 import {SubStore} from './SubStore';
 import {Signer} from '@waves/signer';
 import {ProviderWeb} from "@waves.exchange/provider-web";
 import {ProviderCloud} from "@waves.exchange/provider-cloud";
 import ProviderMetamask from "@waves/provider-metamask";
-import {action, observable} from 'mobx';
-import {INetwork} from '@stores/KeeperStore';
-import {getExplorerLink} from '@utils';
-import {networks} from "@stores/AccountStore";
+import {getExplorerLink, networks, Network, INetwork} from '@utils';
+import {} from "@stores/AccountStore";
+import {ELoginType} from "@src/interface";
 import {waitForTx} from "@waves/waves-transactions";
 import Decimal from 'decimal.js';
 
@@ -60,7 +60,9 @@ class SignerStore extends SubStore {
     }
 
     initSignerMetamask = async () => {
-        this.signer = new Signer();
+        const network = networks.devnetС; // todo get from... MM ?
+        this.signer = new Signer({ NODE_URL: network.server });
+
         await this.signer.setProvider(new ProviderMetamask());
     }
 
@@ -69,13 +71,13 @@ class SignerStore extends SubStore {
         if (type === LoginType.EMAIL) await this.initSignerCloud();
         if (type === LoginType.METAMASK) await this.initSignerMetamask();
 
-        console.log('type', type)
         const account = await this.signer!.login();
+
         if ('address' in account) {
             const byte = await this.signer!.getNetworkByte();
             this.rootStore.accountStore.network = this.getNetworkByCharCode(byte);
             this.isApplicationAuthorizedInWavesExchange = true;
-            this.rootStore.accountStore.loginType = 'exchange';
+            this.rootStore.accountStore.loginType = ELoginType.EXCHANGE;
             this.rootStore.accountStore.address = account.address;
         }
     };
@@ -114,15 +116,8 @@ class SignerStore extends SubStore {
 
     getNetworkByCharCode = (byte: number): INetwork | null => {
         try {
-            switch (byte) {
-                case 84:
-                    return networks.testnet;
-                case 83:
-                    return networks.stagenet;
-                case 87:
-                    return networks.mainnet;
-            }
-
+            const network = Network.getNetworkByByte(byte);
+            return network ? network : null;
         } catch (e) {
             this.rootStore.notificationStore.notify(e.message, {type: 'error'});
         }

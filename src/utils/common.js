@@ -1,3 +1,4 @@
+
 export const checkSlash = (url) => url[url.length - 1] === '/' ? url : url + '/';
 
 export function getCurrentBrowser() {

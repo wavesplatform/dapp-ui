@@ -2,6 +2,7 @@ import {SubStore} from './SubStore';
 import {ICallableArgumentType} from './MetaStore';
 import {IArgument, IArgumentInput} from '@components/DappUi/Card';
 import {base58Decode, base64Encode} from '@waves/ts-lib-crypto';
+import { ELoginType } from '@src/interface';
 
 interface IKeeperTransactionDataCallArg {
     type: string,
@@ -95,11 +96,11 @@ class DappStore extends SubStore {
             return;
         }
 
-        if (accountStore.loginType === 'keeper') {
+        if (accountStore.loginType === ELoginType.KEEPER) {
             return this.rootStore.keeperStore.sendTx(tx)
         }
 
-        if (accountStore.loginType === 'exchange') this.rootStore.signerStore.sendTx(tx)
+        if (accountStore.loginType === ELoginType.EXCHANGE) this.rootStore.signerStore.sendTx(tx)
 
     };
 }

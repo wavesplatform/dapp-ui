@@ -7,7 +7,7 @@ import AccountMobile from '@components/Home/Account/AccountMobile';
 import styled from '@emotion/styled';
 import Wifi from '@src/assets/icons/Wifi';
 import { fonts } from '@src/styles';
-import { INetwork } from '@stores/KeeperStore';
+import { INetwork } from '@utils';
 
 const Account: React.FC = () => {
     const {width} = useWindowDimensions();
