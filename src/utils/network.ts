@@ -32,7 +32,7 @@ export const networks = {
     },
     'devnet': {server: 'https://devnet1-htz-nbg1-1.wavesnodes.com', code: 'D'},
     'private': {server: 'http://localhost:6869', code: 'R'},
-    'devnetС': {server: 'https://devnet1-htz-nbg1-4.wavesnodes.com', code: 'С'},
+    'devnetC': {server: 'https://devnet1-htz-nbg1-4.wavesnodes.com', code: 'C'},
 };
 
 export const Network = {
@@ -50,7 +50,7 @@ export const Network = {
             case ENetworkByte.PRIVATE:
                 return networks.private;
             case ENetworkByte.DEVNET_C:
-                return networks.devnetС;
+                return networks.devnetC;
         }
     }
 

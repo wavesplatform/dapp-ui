@@ -19,12 +19,15 @@ export enum LoginType {
 
 class SignerStore extends SubStore {
 
+    loginType: LoginType | null;
     signer?: any;
 
     @observable isApplicationAuthorizedInWavesExchange = false;
 
     constructor(rootStore: RootStore) {
         super(rootStore);
+
+        this.loginType = null;
     }
 
     initSignerWeb = async () => {
@@ -60,13 +63,22 @@ class SignerStore extends SubStore {
     }
 
     initSignerMetamask = async () => {
-        const network = networks.devnetС; // todo get from... MM ?
+        const network = networks.devnetC; // todo get from... MM ?
         this.signer = new Signer({ NODE_URL: network.server });
+        const provider = new ProviderMetamask({
+            debug: true,
+            wavesConfig: {
+                nodeUrl: network.server,
+                chainId: network.code.charCodeAt(0)
+            }
+        });
 
-        await this.signer.setProvider(new ProviderMetamask());
+        await this.signer.setProvider(provider);
     }
 
     login = async (type: LoginType) => {
+        this.loginType = type;
+
         if (type === LoginType.SEED) await this.initSignerWeb();
         if (type === LoginType.EMAIL) await this.initSignerCloud();
         if (type === LoginType.METAMASK) await this.initSignerMetamask();
@@ -92,14 +104,21 @@ class SignerStore extends SubStore {
         }
 
         try {
-            delete tx.fee;
-            const transaction = await this.signer!.invoke(tx).broadcast() as any;
-            const id = (transaction as any).id || '';
-            const {accountStore: {network}, notificationStore} = this.rootStore;
-            const link = network ? getExplorerLink(network!.code, id, 'tx') : undefined;
-            notificationStore.notify(`Transaction sent: ${transaction.id}\n`, {type: 'info'})
+            let txId;
 
-            const res = await waitForTx(transaction.id, {apiBase: network!.server}) as any
+            delete tx.fee;
+            if (this.loginType == LoginType.METAMASK) {
+                txId = await this.signer!.invoke(tx).broadcast() as any;
+            } else {
+                const transaction = await this.signer!.invoke(tx).broadcast() as any;
+                txId = (transaction as any).id || '';
+            }
+
+            const {accountStore: {network}, notificationStore} = this.rootStore;
+            const link = network ? getExplorerLink(network!.code, txId, 'tx') : undefined;
+            notificationStore.notify(`Transaction sent: ${txId}\n`, {type: 'info'})
+
+            const res = await waitForTx(txId, {apiBase: network!.server}) as any
 
             const isFailed = res.applicationStatus && res.applicationStatus === 'script_execution_failed'
 
