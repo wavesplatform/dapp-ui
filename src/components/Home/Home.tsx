@@ -14,7 +14,6 @@ import Head from "@components/Head";
 import styled from "@emotion/styled";
 import HistoryStore from "@stores/HistoryStore";
 
-
 const FormBg = styled.div`
     height: 100px;
     background: white;
@@ -55,7 +54,7 @@ interface IState {
 
 @inject('accountStore', 'notificationStore', 'historyStore')
 @observer
-class Home extends React.Component<IProps, IState> {
+class HomeComponent extends React.Component<IProps, IState> {
 
     historyUnregisterCallback: null | UnregisterCallback = null;
 
@@ -96,6 +95,4 @@ class Home extends React.Component<IProps, IState> {
 }
 
 
-export default Home;
-
-
+export const Home = HomeComponent;

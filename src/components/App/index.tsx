@@ -4,7 +4,7 @@ import { AccountStore } from "@stores";
 import { Route, Router } from 'react-router-dom';
 import DappUi from "@components/DappUi";
 import NotificationStore from "@stores/NotificationStore";
-import Home from "@components/Home";
+import { Home } from "@components";
 import HistoryStore from "@stores/HistoryStore";
 import SignDialog from '@components/SignDialog';
 

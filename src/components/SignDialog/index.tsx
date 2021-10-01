@@ -9,7 +9,7 @@ import {SignerStore} from '@stores/index';
 import styled from '@emotion/styled';
 import {css, jsx} from '@emotion/core';
 import {fonts} from '@src/styles';
-import {LoginType} from "@stores/SignerStore";
+import {LoginType} from "@src/interface";
 
 interface IProps {
     accountStore?: AccountStore

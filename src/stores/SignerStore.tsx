@@ -6,16 +6,9 @@ import {ProviderWeb} from "@waves.exchange/provider-web";
 import {ProviderCloud} from "@waves.exchange/provider-cloud";
 import ProviderMetamask from "@waves/provider-metamask";
 import {getExplorerLink, networks, Network, INetwork} from '@utils';
-import {} from "@stores/AccountStore";
-import {ELoginType} from "@src/interface";
+import {LoginType, ELoginType} from "@src/interface";
 import {waitForTx} from "@waves/waves-transactions";
 import Decimal from 'decimal.js';
-
-export enum LoginType {
-    SEED,
-    EMAIL,
-    METAMASK,
-}
 
 class SignerStore extends SubStore {
 
