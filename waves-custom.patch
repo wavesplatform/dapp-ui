@@ -1,0 +1,450 @@
+diff --git a/src/constants.json b/src/constants.json
+index e5db8a4..8e71a18 100644
+--- a/src/constants.json
++++ b/src/constants.json
+@@ -286,7 +286,7 @@
+       "type": "event"
+     }
+   ],
+-  "piggybankBytecode": "0x608060405234801561001057600080fd5b5033600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506000808190555061023b806100686000396000f300608060405260043610610057576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680632e1a7d4d1461005c5780638da5cb5b1461009d578063d0e30db0146100f4575b600080fd5b34801561006857600080fd5b5061008760048036038101908080359060200190929190505050610112565b6040518082815260200191505060405180910390f35b3480156100a957600080fd5b506100b26101d0565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6100fc6101f6565b6040518082815260200191505060405180910390f35b6000600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561017057600080fd5b8160008082825403925050819055503373ffffffffffffffffffffffffffffffffffffffff166108fc839081150290604051600060405180830381858888f193505050501580156101c5573d6000803e3d6000fd5b506000549050919050565b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b60003460008082825401925050819055506000549050905600a165627a7a72305820f237db3ec816a52589d82512117bc85bc08d3537683ffeff9059108caf3e5d400029",
++  "piggybankBytecode": "0x",
+   "piggybankAbi": [
+     {
+       "constant": false,
+@@ -323,16 +323,67 @@
+     },
+     {
+       "constant": false,
+-      "inputs": [],
++      "inputs": [
++        {
++          "name": "b",
++          "type": "bool"
++        },
++        {
++          "name": "i",
++          "type": "int64"
++        },
++        {
++          "name": "bStr",
++          "type": "bytes"
++        },
++        {
++          "name": "str",
++          "type": "string"
++        },
++        {
++          "name": "strList",
++          "type": "string[]"
++        },
++        {
++          "name": "oneUnion",
++          "type": "tuple",
++          "components": [
++            {"name": "typeIndex", "type": "uint8"},
++            {"name": "unStr", "type": "string"},
++            {"name": "unBool", "type": "bool"},
++            {"name": "unByteStr", "type": "bytes"},
++            {"name": "unInt", "type": "int64"}
++          ]
++        },
++        {
++          "name": "listOfUnion",
++          "type": "tuple[]",
++          "components": [
++            {"name": "typeIndex", "type": "uint8"},
++            {"name": "unStr", "type": "string"},
++            {"name": "unBool", "type": "bool"},
++            {"name": "unByteStr", "type": "bytes"},
++            {"name": "unInt", "type": "int64"}
++          ]
++        },
++        {
++          "name": "payments",
++          "type": "tuple[]",
++          "components": [
++            { "type": "bytes", "name": "id" },
++            { "type": "int64", "name": "value" }
++          ]
++        }
++      ],
+       "name": "deposit",
+       "outputs": [
+         {
+-          "name": "",
++          "name": "remainingBal",
+           "type": "uint256"
+         }
+       ],
+-      "payable": true,
+-      "stateMutability": "payable",
++      "payable": false,
++      "stateMutability": "nonpayable",
+       "type": "function"
+     },
+     {
+diff --git a/src/index.html b/src/index.html
+index 8c9299e..2f5e0f1 100644
+--- a/src/index.html
++++ b/src/index.html
+@@ -163,7 +163,6 @@
+                 <button
+                   class="btn btn-primary btn-lg btn-block mb-3"
+                   id="depositButton"
+-                  disabled
+                 >
+                   Deposit
+                 </button>
+@@ -248,6 +247,7 @@
+           </div>
+           <div
+             class="col-xl-4 col-lg-6 col-md-12 col-sm-12 col-12 d-flex align-items-stretch"
++            style="display:none !important;"
+           >
+             <div class="card full-width">
+               <div class="card-body">
+@@ -313,6 +313,7 @@
+         <div class="row">
+           <div
+             class="col-xl-4 col-lg-6 col-md-12 col-sm-12 col-12 d-flex align-items-stretch"
++            style="display:none !important;"
+           >
+             <div class="card full-width">
+               <div class="card-body">
+@@ -336,6 +337,7 @@
+           </div>
+           <div
+             class="col-xl-4 col-lg-6 col-md-12 col-sm-12 col-12 d-flex align-items-stretch"
++            style="display:none !important;"
+           >
+             <div class="card full-width">
+               <div class="card-body">
+@@ -376,6 +378,7 @@
+           </div>
+           <div
+             class="col-xl-4 col-lg-6 col-md-12 col-sm-12 col-12 d-flex align-items-stretch"
++            style="display:none !important;"
+           >
+             <div class="card full-width">
+               <div class="card-body">
+@@ -412,6 +415,7 @@
+           </div>
+           <div
+             class="col-xl-4 col-lg-6 col-md-12 col-sm-12 col-12 d-flex align-items-stretch"
++            style="display:none !important;"
+           >
+             <div class="card full-width">
+               <div class="card-body">
+diff --git a/src/index.js b/src/index.js
+index 3a84d83..3692e79 100644
+--- a/src/index.js
++++ b/src/index.js
+@@ -20,6 +20,96 @@ let ethersProvider;
+ let hstFactory;
+ let piggybankFactory;
+ 
++const issuedTokenAddress = "0xa8138A5051968CEC17F186D14A9A8aCE9372a71f"
++const orderModel = {
++  "types": {
++    "EIP712Domain": [
++      {
++        "name": "name",
++        "type": "string"
++      },
++      {
++        "name": "version",
++        "type": "string"
++      },
++      {
++        "name": "chainId",
++        "type": "uint256"
++      },
++      {
++        "name": "verifyingContract",
++        "type": "address"
++      }
++    ],
++    "Order": [
++      {
++        "name": "version",
++        "type": "int32"
++      },
++      {
++        "name": "matcherPublicKey",
++        "type": "string"
++      },
++      {
++        "name": "amountAsset",
++        "type": "string"
++      },
++      {
++        "name": "priceAsset",
++        "type": "string"
++      },
++      {
++        "name": "orderType",
++        "type": "string"
++      },
++      {
++        "name": "amount",
++        "type": "int64"
++      },
++      {
++        "name": "price",
++        "type": "int64"
++      },
++      {
++        "name": "timestamp",
++        "type": "int64"
++      },
++      {
++        "name": "expiration",
++        "type": "int64"
++      },
++      {
++        "name": "matcherFee",
++        "type": "int64"
++      },
++      {
++        "name": "matcherFeeAssetId",
++        "type": "string"
++      }
++    ]
++  },
++  "primaryType": "Order",
++  "domain": {
++    "name": "Waves Exchange",
++    "version": "1",
++    "chainId": 67,
++    "verifyingContract": "0x4343434343434343434343434343434343434343"
++  },
++  "message": {
++    "version": 4,
++    "matcherPublicKey": "9cpfKN9suPNvfeUNphzxXMjcnn974eme8ZhWUjaktzU5",
++    "amountAsset": "4LHHvYGNKJUg5hj65aGD5vgScvCBmLpdRFtjokvCjSL8",
++    "priceAsset": "WAVES",
++    "orderType": "BUY",
++    "amount": 10000000,
++    "price": 100000000,
++    "timestamp": 1628254368949,
++    "expiration": 1629982368949,
++    "matcherFee": 300000,
++    "matcherFeeAssetId": "WAVES"
++  }
++}
++
+ const currentUrl = new URL(window.location.href);
+ const forwarderOrigin =
+   currentUrl.hostname === 'localhost' ? 'http://localhost:9010' : undefined;
+@@ -275,8 +365,8 @@ const initialize = async () => {
+       contractStatus.innerHTML = 'Deploying';
+ 
+       try {
+-        contract = await piggybankFactory.deploy();
+-        await contract.deployTransaction.wait();
++        contract = await piggybankFactory.attach("0xa8138A5051968CEC17F186D14A9A8aCE9372a71f");
++        // await contract.deployTransaction.wait();
+       } catch (error) {
+         contractStatus.innerHTML = 'Deployment Failed';
+         throw error;
+@@ -287,7 +377,7 @@ const initialize = async () => {
+       }
+ 
+       console.log(
+-        `Contract mined! address: ${contract.address} transactionHash: ${contract.transactionHash}`,
++        ethersProvider
+       );
+       contractStatus.innerHTML = 'Deployed';
+       depositButton.disabled = false;
+@@ -295,10 +385,23 @@ const initialize = async () => {
+ 
+       depositButton.onclick = async () => {
+         contractStatus.innerHTML = 'Deposit initiated';
+-        const result = await contract.deposit({
+-          from: accounts[0],
+-          value: '0x3782dace9d900000',
+-        });
++        const result = await contract.deposit(
++            true,
++            100500,
++            '0x414243',
++            "Arg string",
++            ["One str", "Two str", "Last strrr"],
++            [1, "Union str", false, '0x78795a', 123456],
++            [
++                [0, "List union str", true, '0x', 0],
++                [1, "", false, '0x', 0],
++                [2, "", true, '0x664770', 0],
++                [3, "", true, '0x', 456789]
++            ],
++            [
++                ['0x', 42]
++            ]
++        );
+         console.log(result);
+         contractStatus.innerHTML = 'Deposit completed';
+       };
+@@ -351,22 +454,13 @@ const initialize = async () => {
+ 
+     createToken.onclick = async () => {
+       const _initialAmount = 100;
+-      const _tokenName = 'TST';
+-      const _decimalUnits = 0;
+-      const _tokenSymbol = 'TST';
++      const _tokenName = 'ERC20_1';
++      const _decimalUnits = 6;
++      const _tokenSymbol = 'ERC20_1';
+ 
+       try {
+-        const contract = await hstFactory.deploy(
+-          _initialAmount,
+-          _tokenName,
+-          _decimalUnits,
+-          _tokenSymbol,
+-        );
+-        await contract.deployTransaction.wait();
+-        if (contract.address === undefined) {
+-          return undefined;
+-        }
+-
++        const contract = await hstFactory.attach(issuedTokenAddress);
++        
+         console.log(
+           `Contract mined! address: ${contract.address} transactionHash: ${contract.transactionHash}`,
+         );
+@@ -822,68 +916,19 @@ const initialize = async () => {
+       signTypedDataV3VerifyResult.innerHTML = `Error: ${err.message}`;
+     }
+   };
+-
++  
+   /**
+    * Sign Typed Data V4
+    */
+   signTypedDataV4.onclick = async () => {
+     const networkId = parseInt(networkDiv.innerHTML, 10);
+     const chainId = parseInt(chainIdDiv.innerHTML, 16) || networkId;
+-    const msgParams = {
+-      domain: {
+-        chainId: chainId.toString(),
+-        name: 'Ether Mail',
+-        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+-        version: '1',
+-      },
+-      message: {
+-        contents: 'Hello, Bob!',
+-        from: {
+-          name: 'Cow',
+-          wallets: [
+-            '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+-            '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF',
+-          ],
+-        },
+-        to: [
+-          {
+-            name: 'Bob',
+-            wallets: [
+-              '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+-              '0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57',
+-              '0xB0B0b0b0b0b0B000000000000000000000000000',
+-            ],
+-          },
+-        ],
+-      },
+-      primaryType: 'Mail',
+-      types: {
+-        EIP712Domain: [
+-          { name: 'name', type: 'string' },
+-          { name: 'version', type: 'string' },
+-          { name: 'chainId', type: 'uint256' },
+-          { name: 'verifyingContract', type: 'address' },
+-        ],
+-        Group: [
+-          { name: 'name', type: 'string' },
+-          { name: 'members', type: 'Person[]' },
+-        ],
+-        Mail: [
+-          { name: 'from', type: 'Person' },
+-          { name: 'to', type: 'Person[]' },
+-          { name: 'contents', type: 'string' },
+-        ],
+-        Person: [
+-          { name: 'name', type: 'string' },
+-          { name: 'wallets', type: 'address[]' },
+-        ],
+-      },
+-    };
++    
+     try {
+       const from = accounts[0];
+       const sign = await ethereum.request({
+         method: 'eth_signTypedData_v4',
+-        params: [from, JSON.stringify(msgParams)],
++        params: [from, JSON.stringify(orderModel)],
+       });
+       signTypedDataV4Result.innerHTML = sign;
+       signTypedDataV4Verify.disabled = false;
+@@ -899,61 +944,12 @@ const initialize = async () => {
+   signTypedDataV4Verify.onclick = async () => {
+     const networkId = parseInt(networkDiv.innerHTML, 10);
+     const chainId = parseInt(chainIdDiv.innerHTML, 16) || networkId;
+-    const msgParams = {
+-      domain: {
+-        chainId,
+-        name: 'Ether Mail',
+-        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+-        version: '1',
+-      },
+-      message: {
+-        contents: 'Hello, Bob!',
+-        from: {
+-          name: 'Cow',
+-          wallets: [
+-            '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+-            '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF',
+-          ],
+-        },
+-        to: [
+-          {
+-            name: 'Bob',
+-            wallets: [
+-              '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+-              '0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57',
+-              '0xB0B0b0b0b0b0B000000000000000000000000000',
+-            ],
+-          },
+-        ],
+-      },
+-      primaryType: 'Mail',
+-      types: {
+-        EIP712Domain: [
+-          { name: 'name', type: 'string' },
+-          { name: 'version', type: 'string' },
+-          { name: 'chainId', type: 'uint256' },
+-          { name: 'verifyingContract', type: 'address' },
+-        ],
+-        Group: [
+-          { name: 'name', type: 'string' },
+-          { name: 'members', type: 'Person[]' },
+-        ],
+-        Mail: [
+-          { name: 'from', type: 'Person' },
+-          { name: 'to', type: 'Person[]' },
+-          { name: 'contents', type: 'string' },
+-        ],
+-        Person: [
+-          { name: 'name', type: 'string' },
+-          { name: 'wallets', type: 'address[]' },
+-        ],
+-      },
+-    };
++    console.log(orderModel)
+     try {
+       const from = accounts[0];
+       const sign = signTypedDataV4Result.innerHTML;
+       const recoveredAddr = recoverTypedSignatureV4({
+-        data: msgParams,
++        data: orderModel,
+         sig: sign,
+       });
+       if (toChecksumAddress(recoveredAddr) === toChecksumAddress(from)) {
