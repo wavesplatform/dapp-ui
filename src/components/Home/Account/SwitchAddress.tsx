@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
+
 import { IconEthereum } from './IconEthereum';
 import { IconWaves } from './IconWaves';
 

@@ -198,9 +198,12 @@ export default class Card extends React.Component<IProps, IState> {
         const invalidArgs = funcArgs.length !== Object.keys(args).length
             || Object.values(args).some((arg) => isValidArg(arg as IArgumentInput))
             || Object.values(args).some(({type, value}) => {
-                    if (type.startsWith('List')) return Object.values(value!).some((arg) => isValidArg(arg as IArgumentInput))
+                if (type.startsWith('List')) {
+                    return Object.values(value!).some((arg) => isValidArg(arg as IArgumentInput));
+                } else {
+                    return false;
                 }
-            )
+            })
         return invalidPayment || invalidArgs
     }
 

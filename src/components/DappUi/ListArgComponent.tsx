@@ -20,7 +20,7 @@ interface IProps {
 export const ListArgComponent: React.FC<IProps> = (props) => {
     const initialValueType = convertListTypes(props.type).length === 1 ? convertListTypes(props.type)[0] : props.type
     const initialValue = {type: initialValueType, value: ''} as IArgumentInput
-    const {values, setValue, type, argName} = props
+    const {values, setValue, argName} = props
 
     const handleAddArgument = () => setValue([...values, initialValue])
 

@@ -100,7 +100,7 @@ class SignerStore extends SubStore {
             let txId;
 
             delete tx.fee;
-            if (this.loginType == LoginType.METAMASK) {
+            if (this.loginType === LoginType.METAMASK) {
                 const transaction = await this.signer!.invoke(tx).sign() as any;
 
                 txId = transaction.id;

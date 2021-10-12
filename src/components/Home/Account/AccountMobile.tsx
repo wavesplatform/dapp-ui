@@ -8,7 +8,6 @@ import HistoryStore from '@stores/HistoryStore';
 import NotificationStore from '@stores/NotificationStore';
 import SignerStore from '@stores/SignerStore';
 import { Collapse } from 'react-collapse';
-import {  } from '@components/Home/Account';
 
 import { EAddressType } from './interface';
 import { addressByType } from './helpers';
