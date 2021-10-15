@@ -59,11 +59,11 @@ export const getExplorerLink = (chainId, address, type) => {
         case 'W':
             return `https://wavesexplorer.com/${type}/${address}`;
         case 'T':
-            return `https://wavesexplorer.com/testnet/${type}/${address}`;
+            return `https://testnet.wavesexplorer.com/${type}/${address}`;
         case 'S':
-            return `https://wavesexplorer.com/stagenet/${type}/${address}`;
-        case 'C':
             return `https://stagenet.wavesexplorer.com/${type}/${address}`;
+        case 'C':
+            return `https://stagenet.wavesexplorer.com/custom/${type}/${address}`;
         default:
             return `https://wavesexplorer.com/custom/${type}/${address}`;
     }
