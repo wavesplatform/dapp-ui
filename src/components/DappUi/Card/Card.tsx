@@ -10,6 +10,7 @@ import { css, jsx } from '@emotion/core';
 import Attach from '@src/assets/icons/Attach';
 import Close from '@src/assets/icons/Close';
 import { ICallableArgumentType } from "@stores/MetaStore";
+import { IAsset } from '@stores/KeeperStore';
 import { ArgumentInput } from '@components/DappUi/ArgumentInput';
 import Button from '@components/DappUi/Button';
 import Select from '@components/Select';
@@ -201,6 +202,7 @@ export class Card extends React.Component<IProps, IState> {
     render() {
         const { funcName: title, accountStore } = this.props;
         const { args, payments } = this.state;
+        const sortedAssetList = this.getSortedAssets(Object.values(accountStore!.assets));
 
         return <Root>
             <Anchor id={title}/>
@@ -252,10 +254,12 @@ export class Card extends React.Component<IProps, IState> {
             <FlexBlock>
                 <AttachPaymentItems>
                     {this.state.payments.map(({assetId, tokens}, i) => {
-                        const decimals = (accountStore!.assets[assetId]
-                            && (accountStore!.assets[assetId].decimals || accountStore!.assets[assetId].decimals === 0))
-                            ? accountStore!.assets[assetId].decimals
+                        const assetInfo = accountStore!.assets[assetId];
+                        const decimals = (assetInfo
+                            && (assetInfo.decimals || assetInfo.decimals === 0))
+                            ? assetInfo.decimals
                             : 8;
+
                         return <AttachPaymentItem key={i}>
                             <ArgumentTitle>
                                 <ArgumentTitleVarName>Payments:</ArgumentTitleVarName>
@@ -263,14 +267,23 @@ export class Card extends React.Component<IProps, IState> {
                                 <ArgumentTitleVarType>{i + 1}/10</ArgumentTitleVarType>
                             </ArgumentTitle>
                             <Select onChange={this.handleChangePaymentAsset(i)} value={assetId}>
-                                {Object.values(accountStore!.assets).map(({assetId, name}) =>
-                                    <Option key={assetId} value={assetId}>
-                                        <Tooltip placement="right" trigger={['hover']} overlay={<span>{assetId}</span>}>
-                                            <div title={assetId.length >= 6 ? name+centerEllipsis(assetId, 6) : ''}>
-                                                {name}({centerEllipsis(assetId, 6)})
-                                            </div>
-                                        </Tooltip>
-                                    </Option>)}
+                                {sortedAssetList
+                                    .map(({assetId, name}) => {
+                                        return (
+                                            <Option key={assetId} value={assetId}>
+                                                <Tooltip
+                                                    placement="right"
+                                                    trigger={['hover']}
+                                                    overlay={<span>{assetId}</span>}
+                                                >
+                                                    <div title={assetId.length >= 6 ? name + centerEllipsis(assetId, 6) : ''}>
+                                                        {name}({centerEllipsis(assetId, 6)})
+                                                    </div>
+                                                </Tooltip>
+                                            </Option>
+                                        );
+                                    })
+                                }
                             </Select>
                             <InputNumber
                                 min={0}
@@ -288,5 +301,25 @@ export class Card extends React.Component<IProps, IState> {
                     onClick={this.handleAddAttach}/></AttachPaymentBtn>}
             </FlexBlock>
         </Root>;
+    }
+
+    getSortedAssets(list: IAsset[]): IAsset[] {
+        const sortedList = [...list];
+
+        sortedList.sort((assetA, assetB) => {
+            if (assetA.name === 'WAVES') {
+                return -1;
+            } else if (assetB.name === 'WAVES') {
+                return 1;
+            } else {
+                if (assetA.name !== assetB.name) {
+                    return assetA.name < assetB.name ? -1 : 1;
+                } else {
+                    return assetA.assetId < assetB.assetId ? -1 : 1;
+                }
+            }
+        });
+
+        return sortedList;
     }
 }
