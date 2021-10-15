@@ -54,12 +54,13 @@ class NotificationStore extends SubStore {
     }
 
     notify(content: string | JSX.Element, opts: TNotifyOptions = {}) {
+        console.log(opts);
         if (opts.key) {
             this._instance.removeNotice(opts.key);
         }
         const type = opts.type || 'info';
 
-        try{
+        try {
             this._instance && this._instance.notice({
                 ...opts,
                 content: getAlert(content, {...opts, type}),
@@ -69,7 +70,7 @@ class NotificationStore extends SubStore {
                 closable: true,
                 closeIcon: closeAlertIcon
             });
-        }catch(e){
+        } catch(e) {
             console.error(content)
         }
     }

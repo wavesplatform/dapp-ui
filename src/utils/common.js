@@ -62,11 +62,12 @@ export const getExplorerLink = (chainId, address, type) => {
             return `https://wavesexplorer.com/testnet/${type}/${address}`;
         case 'S':
             return `https://wavesexplorer.com/stagenet/${type}/${address}`;
+        case 'C':
+            return `https://stagenet.wavesexplorer.com/${type}/${address}`;
         default:
             return `https://wavesexplorer.com/custom/${type}/${address}`;
     }
 };
-
 
 export const saveState = (state) => {
     localStorage.setItem('store', JSON.stringify(state));

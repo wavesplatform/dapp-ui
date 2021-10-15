@@ -17,6 +17,8 @@ import { centerEllipsis } from '@components/Home/Account';
 import InputNumber from '@components/Input/InputNumber';
 import { ListArgComponent } from "@components/DappUi/ListArgComponent";
 
+import { isList  } from '../helpers';
+
 import {
     Root,
     FlexBlock,
@@ -35,7 +37,7 @@ import {
 } from './Styled';
 
 import { IArgumentInput, IProps, IState } from './Card.interface'
-import { defaultValue, isValidArg  } from './Card.helpers';
+import { defaultValue, isValidArg } from './Card.helpers';
 
 @inject('dappStore', 'accountStore')
 @observer
@@ -67,20 +69,19 @@ export class Card extends React.Component<IProps, IState> {
     }
 
     get isInvalid() {
-console.log('CHECK');
         const { args, payments } = this.state;
         const { funcArgs } = this.props;
         const invalidPayment = payments.some(({assetId, tokens}) => !assetId || !tokens);
         const invalidArgs = funcArgs.length !== Object.keys(args).length
             || Object.values(args).some((arg) => isValidArg(arg as IArgumentInput))
             || Object.values(args).some(({type, value}) => {
-                if (type.startsWith('List')) {
+                if (isList(type)) {
                     return Object.values(value!).some((arg) => isValidArg(arg as IArgumentInput));
                 } else {
                     return false;
                 }
             });
-console.log(invalidPayment, invalidArgs);
+
         return invalidPayment || invalidArgs;
     }
 
@@ -99,13 +100,14 @@ console.log(invalidPayment, invalidArgs);
     };
 
     handleChangeValue = (name: string, type: ICallableArgumentType | string, value?: string, index?: number) => {
-        if (index === undefined) return this.setState({
-            args: {
-                ...this.state.args,
-                [name]: {...this.state.args[name], type: (type as ICallableArgumentType), value}
-            }
-        })
-        else {
+        if (index === undefined) {
+            return this.setState({
+                args: {
+                    ...this.state.args,
+                    [name]: {...this.state.args[name], type: (type as ICallableArgumentType), value}
+                }
+            });
+        } else {
             const newArgArray = this.state.args[name].value as IArgumentInput[]
             newArgArray[index] = {...newArgArray[index], value, type: (type as ICallableArgumentType)}
             return this.setState({
@@ -121,13 +123,14 @@ console.log(invalidPayment, invalidArgs);
     };
 
     handleChangeByteVectorType = (name: string, byteVectorType: 'base58' | 'base64', index?: number) => {
-        if (index === undefined) return this.setState({
-            args: {
-                ...this.state.args,
-                [name]: {...this.state.args[name], byteVectorType}
-            }
-        })
-        else {
+        if (index === undefined) {
+            return this.setState({
+                args: {
+                    ...this.state.args,
+                    [name]: {...this.state.args[name], byteVectorType}
+                }
+            });
+        } else {
             const newArgArray = this.state.args[name].value as IArgumentInput[]
             newArgArray[index] = {...newArgArray[index], byteVectorType}
             return this.setState({
@@ -142,8 +145,35 @@ console.log(invalidPayment, invalidArgs);
         }
     }
 
+
+    handleChangeUnionSubType = (name: string, unionSubType: string, index?: number) => {
+        // if (index === undefined) {
+        //     return this.setState({
+        //         args: {
+        //             ...this.state.args,
+        //             [name]: {...this.state.args[name], unionSubType}
+        //         }
+        //     });
+        // } else {
+        //     const newArgArray = this.state.args[name].value as IArgumentInput[]
+        //     newArgArray[index] = {...newArgArray[index], unionSubType}
+        //     return this.setState({
+        //         args: {
+        //             ...this.state.args,
+        //             [name]: {
+        //                 ...this.state.args[name],
+        //                 value: [...newArgArray]
+        //             }
+        //         }
+        //     })
+        // }
+    }
+
     handleChangePaymentCount = (i: number) => (v: string | number) => {
-        if (isNaN(+v) || +v < 0) return;
+        if (isNaN(+v) || +v < 0) {
+            return;
+        }
+
         const payments = this.state.payments;
         payments[i].tokens = String(v);
         this.setState({payments});
@@ -169,8 +199,9 @@ console.log(invalidPayment, invalidArgs);
     };
 
     render() {
-        const {funcName: title, accountStore} = this.props;
-        const {args, payments} = this.state;
+        const { funcName: title, accountStore } = this.props;
+        const { args, payments } = this.state;
+
         return <Root>
             <Anchor id={title}/>
             <Header>
@@ -180,19 +211,20 @@ console.log(invalidPayment, invalidArgs);
             {Object.keys(args).length > 0 &&
             <ArgumentsLayout>
                 {Object.entries(args).map(([argName, {type}], i: number) => {
-                        return type.startsWith('List')
+                        return isList(type)
                             ? <ListArgComponent
                                 key={i}
                                 type={type}
                                 argName={argName}
                                 values={args[argName].value as IArgumentInput[]}
-                                setValue={(value) => this.setState({
+                                setValue={(value: any) => this.setState({
                                     args: {
                                         ...this.state.args,
                                         [argName]: {type: type, value: value}
                                     }
                                 })}
                                 setByteVectorType={this.handleChangeByteVectorType}
+                                setUnionSubType={this.handleChangeUnionSubType}
                             />
                             :
                             <ArgumentItem key={i}>
@@ -209,6 +241,7 @@ console.log(invalidPayment, invalidArgs);
                                         type={type}
                                         onChange={this.handleChangeValue}
                                         onChangeByteVectorType={this.handleChangeByteVectorType}
+                                        onChangeUnionSubType={this.handleChangeUnionSubType}
                                     />
                                 </Wrapper>
                             </ArgumentItem>
