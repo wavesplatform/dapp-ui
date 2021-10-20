@@ -3,6 +3,7 @@ import {action, autorun, observable, set} from 'mobx';
 import {nodeInteraction, waitForTx} from '@waves/waves-transactions';
 import {RootStore} from '@stores/RootStore';
 import {getCurrentBrowser, getExplorerLink} from '@utils/index';
+import {ELoginType} from '@src/interface';
 
 interface IWavesKeeperAccount {
     address: string
@@ -18,13 +19,6 @@ interface IWavesKeeperAccount {
     }
 }
 
-export interface INetwork {
-    code: string,
-    server: string,
-    clientOrigin?: string
-    matcher?: string
-}
-
 interface IKeeperError {
     code: string
     data: any
@@ -36,7 +30,6 @@ export interface IAsset {
     name: string
     decimals: number
 }
-
 
 class KeeperStore extends SubStore {
 
@@ -68,7 +61,7 @@ class KeeperStore extends SubStore {
         if (publicState.account && publicState.account.address) {
             this.updateNetwork(publicState)
             this.rootStore.accountStore.address = publicState.account.address;
-            this.rootStore.accountStore.loginType = 'keeper';
+            this.rootStore.accountStore.loginType = ELoginType.KEEPER;
 
         }
         return resp;

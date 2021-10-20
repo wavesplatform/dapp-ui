@@ -24,7 +24,7 @@ interface IProps {
     onClick?: () => void
 }
 
-const Avatar: React.FunctionComponent<IProps> = (props) => {
+export const Avatar: React.FunctionComponent<IProps> = (props) => {
     const {size = SIZE, address, onClick} = props;
     avatar.config({rows: 8, cells: 8});
     const src = address ? avatar.create(address, {size: size * 3}) : '';
@@ -57,6 +57,5 @@ export const Logout = ({onClick}: { onClick?: () => void }) => <svg css={css`rig
         </clipPath>
     </defs>
 </svg>;
-
 
 export default Avatar;

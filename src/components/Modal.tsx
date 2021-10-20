@@ -40,7 +40,7 @@ interface IProps {
     handleClose: () => void
 }
 
-export default class Modal extends React.Component<IProps> {
+class ModalComponent extends React.Component<IProps> {
 
     render() {
         return <Root>
@@ -51,3 +51,6 @@ export default class Modal extends React.Component<IProps> {
         </Root>
     }
 }
+
+export const Modal = ModalComponent;
+export default ModalComponent;

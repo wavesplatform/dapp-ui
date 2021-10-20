@@ -1,3 +1,4 @@
+
 export const checkSlash = (url) => url[url.length - 1] === '/' ? url : url + '/';
 
 export function getCurrentBrowser() {
@@ -58,14 +59,15 @@ export const getExplorerLink = (chainId, address, type) => {
         case 'W':
             return `https://wavesexplorer.com/${type}/${address}`;
         case 'T':
-            return `https://wavesexplorer.com/testnet/${type}/${address}`;
+            return `https://testnet.wavesexplorer.com/${type}/${address}`;
         case 'S':
-            return `https://wavesexplorer.com/stagenet/${type}/${address}`;
+            return `https://stagenet.wavesexplorer.com/${type}/${address}`;
+        case 'C':
+            return `https://stagenet.wavesexplorer.com/custom/${type}/${address}`;
         default:
             return `https://wavesexplorer.com/custom/${type}/${address}`;
     }
 };
-
 
 export const saveState = (state) => {
     localStorage.setItem('store', JSON.stringify(state));

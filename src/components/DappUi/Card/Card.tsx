@@ -1,170 +1,47 @@
 /** @jsx jsx **/
 import React from 'react';
-import styled from '@emotion/styled';
-import {fonts} from '@src/styles';
-import Button from '@components/DappUi/Button';
-import Attach from '@src/assets/icons/Attach';
-import {css, jsx} from '@emotion/core';
-import DappStore from "@stores/DappStore";
-import {ICallableArgumentType, TCallableFuncArgumentsArray} from "@stores/MetaStore";
-import {ArgumentInput} from '@components/DappUi/ArgumentInput';
-import Close from '@src/assets/icons/Close';
-import {inject, observer} from 'mobx-react';
-import AccountStore from '@stores/AccountStore';
-import Select from '@components/Select';
-import {Option} from 'rc-select';
-import {centerEllipsis} from '@components/Home/Account';
-import {autorun} from 'mobx';
-import InputNumber from '@components/Input/InputNumber';
+import { autorun } from 'mobx';
+import { inject, observer } from 'mobx-react';
 import Tooltip from 'rc-tooltip';
 import Decimal from "decimal.js";
-import {ListArgComponent} from "@components/DappUi/ListArgComponent";
+import { Option } from 'rc-select';
+import { css, jsx } from '@emotion/core';
 
-const flexStyle = css`display: flex;width: 100%;`;
+import Attach from '@src/assets/icons/Attach';
+import Close from '@src/assets/icons/Close';
+import { ICallableArgumentType } from "@stores/MetaStore";
+import { ArgumentInput } from '@components/DappUi/ArgumentInput';
+import Button from '@components/DappUi/Button';
+import Select from '@components/Select';
+import { centerEllipsis } from '@components/Home/Account';
+import InputNumber from '@components/Input/InputNumber';
+import { ListArgComponent } from "@components/DappUi/ListArgComponent";
 
-const Root = styled.div`
-flex-shrink: 0;
-position: relative;
-display: flex;
-background: white;
-box-shadow: 0 5px 16px rgba(134, 142, 164, 0.05);
-border-radius: 4px;
-margin-bottom: 10px;
-padding: 30px 40px;
-flex-direction: column;
-justify-content: flex-end;
-`;
+import { isList  } from '../helpers';
 
-const FlexBlock = styled.div`
-${flexStyle};
-@media(max-width: 1280px){
-  flex-direction: column;
-}
-`;
+import {
+    Root,
+    FlexBlock,
+    Header,
+    ArgumentsLayout,
+    ArgumentItem,
+    ArgumentTitle,
+    ArgumentTitleVarName,
+    ArgumentTitleVarType,
+    AttachPaymentBtn,
+    AttachPaymentItems,
+    AttachPaymentItem,
+    Wrapper,
+    Title,
+    Anchor,
+} from './Styled';
 
-const Header = styled.div`
-${flexStyle};
-border-bottom: 1px solid #EBEDF2;
-padding-bottom: 20px;
-justify-content: space-between;
-margin: 0 0 10px 0;
-`;
-
-const ArgumentsLayout = styled.div`
-${flexStyle};
-//margin: 0 0 20px 0;
-border-bottom: 1px solid #EBEDF2;
-margin-bottom: 16px;
-flex-direction: column;
-`;
-
-const ArgumentItem = styled.div`
-${flexStyle};
-width: 100%;
-display: flex;
-justify-content: space-between;
-margin-bottom: 14px;
-`;
-
-const ArgumentTitle = styled.div`
-flex: 0.5;
-display: flex;
-margin-right: 10px;
-align-items: center;
-justify-content: flex-start;
-max-width: 150px;
-`;
-
-const ArgumentTitleVarName = styled.div`
-${fonts.callableFuncArgFont};
- font-weight: bold;
-`;
-
-const ArgumentTitleVarType = styled.div`
-margin-right: 10px;
-text-align: left !important;
-${fonts.callableFuncArgFont};
-`;
-
-const AttachPaymentBtn = styled.div`
-${flexStyle};
-justify-content: flex-end;
-flex: 1;
-`;
-
-const AttachPaymentItems = styled.div`
-${flexStyle};
-flex-direction: column;
-flex: 3;
-//@media(max-width: 1280px){
-//  flex: 2;
-//}
-`;
-
-const AttachPaymentItem = styled.div`
-${flexStyle};
-align-items: center;
-  margin: 0 -10px;
- & > *{
-  margin: 0 10px;
-}
- & > * {
-  margin-bottom: 14px;
- }
-`;
-
-const Wrapper = styled.div`
-width: 90%;
-display: flex;
-align-items: center;
-`
-
-const Title = styled.div`
-max-width: calc(100% - 150px);
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
-${fonts.cardTitleFont}
-`
-
-export interface IArgument {
-    type: ICallableArgumentType,
-    value: string | undefined | IArgumentInput[]
-    byteVectorType?: 'base58' | 'base64'
-}
-
-export interface IArgumentInput {
-    type: ICallableArgumentType,
-    value: string | undefined
-    byteVectorType?: 'base58' | 'base64'
-}
-
-const Anchor = styled.div`
-position:absolute;
-top:-100px;
-`;
-
-interface IInjectedProps {
-    dappStore?: DappStore
-    accountStore?: AccountStore
-}
-
-interface IProps extends IInjectedProps {
-    funcName: string
-    funcArgs: TCallableFuncArgumentsArray
-    address: string
-    key?: string
-}
-
-interface IState {
-    args: { [name: string]: IArgument }
-    payments: { assetId: string, tokens: string }[]
-    address: string | null
-}
+import { IArgumentInput, IProps, IState } from './Card.interface'
+import { defaultValue, isValidArg } from './Card.helpers';
 
 @inject('dappStore', 'accountStore')
 @observer
-export default class Card extends React.Component<IProps, IState> {
+export class Card extends React.Component<IProps, IState> {
 
     state: IState = {
         args: this.props.funcArgs.reduce((acc, arg) =>
@@ -192,16 +69,20 @@ export default class Card extends React.Component<IProps, IState> {
     }
 
     get isInvalid() {
-        const {args, payments} = this.state;
-        const {funcArgs} = this.props;
+        const { args, payments } = this.state;
+        const { funcArgs } = this.props;
         const invalidPayment = payments.some(({assetId, tokens}) => !assetId || !tokens);
         const invalidArgs = funcArgs.length !== Object.keys(args).length
             || Object.values(args).some((arg) => isValidArg(arg as IArgumentInput))
             || Object.values(args).some(({type, value}) => {
-                    if (type.startsWith('List')) return Object.values(value!).some((arg) => isValidArg(arg as IArgumentInput))
+                if (isList(type)) {
+                    return Object.values(value!).some((arg) => isValidArg(arg as IArgumentInput));
+                } else {
+                    return false;
                 }
-            )
-        return invalidPayment || invalidArgs
+            });
+
+        return invalidPayment || invalidArgs;
     }
 
     handleAddAttach = () => this.state.payments.length < 10 && this.setState({
@@ -219,13 +100,14 @@ export default class Card extends React.Component<IProps, IState> {
     };
 
     handleChangeValue = (name: string, type: ICallableArgumentType | string, value?: string, index?: number) => {
-        if (index === undefined) return this.setState({
-            args: {
-                ...this.state.args,
-                [name]: {...this.state.args[name], type: (type as ICallableArgumentType), value}
-            }
-        })
-        else {
+        if (index === undefined) {
+            return this.setState({
+                args: {
+                    ...this.state.args,
+                    [name]: {...this.state.args[name], type: (type as ICallableArgumentType), value}
+                }
+            });
+        } else {
             const newArgArray = this.state.args[name].value as IArgumentInput[]
             newArgArray[index] = {...newArgArray[index], value, type: (type as ICallableArgumentType)}
             return this.setState({
@@ -241,13 +123,14 @@ export default class Card extends React.Component<IProps, IState> {
     };
 
     handleChangeByteVectorType = (name: string, byteVectorType: 'base58' | 'base64', index?: number) => {
-        if (index === undefined) return this.setState({
-            args: {
-                ...this.state.args,
-                [name]: {...this.state.args[name], byteVectorType}
-            }
-        })
-        else {
+        if (index === undefined) {
+            return this.setState({
+                args: {
+                    ...this.state.args,
+                    [name]: {...this.state.args[name], byteVectorType}
+                }
+            });
+        } else {
             const newArgArray = this.state.args[name].value as IArgumentInput[]
             newArgArray[index] = {...newArgArray[index], byteVectorType}
             return this.setState({
@@ -262,8 +145,35 @@ export default class Card extends React.Component<IProps, IState> {
         }
     }
 
+
+    handleChangeUnionSubType = (name: string, unionSubType: string, index?: number) => {
+        // if (index === undefined) {
+        //     return this.setState({
+        //         args: {
+        //             ...this.state.args,
+        //             [name]: {...this.state.args[name], unionSubType}
+        //         }
+        //     });
+        // } else {
+        //     const newArgArray = this.state.args[name].value as IArgumentInput[]
+        //     newArgArray[index] = {...newArgArray[index], unionSubType}
+        //     return this.setState({
+        //         args: {
+        //             ...this.state.args,
+        //             [name]: {
+        //                 ...this.state.args[name],
+        //                 value: [...newArgArray]
+        //             }
+        //         }
+        //     })
+        // }
+    }
+
     handleChangePaymentCount = (i: number) => (v: string | number) => {
-        if (isNaN(+v) || +v < 0) return;
+        if (isNaN(+v) || +v < 0) {
+            return;
+        }
+
         const payments = this.state.payments;
         payments[i].tokens = String(v);
         this.setState({payments});
@@ -289,8 +199,9 @@ export default class Card extends React.Component<IProps, IState> {
     };
 
     render() {
-        const {funcName: title, accountStore} = this.props;
-        const {args, payments} = this.state;
+        const { funcName: title, accountStore } = this.props;
+        const { args, payments } = this.state;
+
         return <Root>
             <Anchor id={title}/>
             <Header>
@@ -300,19 +211,20 @@ export default class Card extends React.Component<IProps, IState> {
             {Object.keys(args).length > 0 &&
             <ArgumentsLayout>
                 {Object.entries(args).map(([argName, {type}], i: number) => {
-                        return type.startsWith('List')
+                        return isList(type)
                             ? <ListArgComponent
                                 key={i}
                                 type={type}
                                 argName={argName}
                                 values={args[argName].value as IArgumentInput[]}
-                                setValue={(value) => this.setState({
+                                setValue={(value: any) => this.setState({
                                     args: {
                                         ...this.state.args,
                                         [argName]: {type: type, value: value}
                                     }
                                 })}
                                 setByteVectorType={this.handleChangeByteVectorType}
+                                setUnionSubType={this.handleChangeUnionSubType}
                             />
                             :
                             <ArgumentItem key={i}>
@@ -329,6 +241,7 @@ export default class Card extends React.Component<IProps, IState> {
                                         type={type}
                                         onChange={this.handleChangeValue}
                                         onChangeByteVectorType={this.handleChangeByteVectorType}
+                                        onChangeUnionSubType={this.handleChangeUnionSubType}
                                     />
                                 </Wrapper>
                             </ArgumentItem>
@@ -376,41 +289,4 @@ export default class Card extends React.Component<IProps, IState> {
             </FlexBlock>
         </Root>;
     }
-}
-
-
-const defaultValue = (type: ICallableArgumentType) => {
-    if (type.startsWith('List')) {
-        const listTypes = convertListTypes(type)
-        if (listTypes.length === 1) type = listTypes[0] as ICallableArgumentType
-        return [{type: type, value: ''}];
-    } else return type === 'String' || type === 'ByteVector' ? '' : undefined
-};
-
-export const convertListTypes = (listType: string) => {
-    listType.replace(' ', '')
-    const inputTypes = []
-    if (listType.includes('Int')) {
-        inputTypes.push('Int')
-    }
-    if (listType.includes('String')) {
-        inputTypes.push('String')
-    }
-    if (listType.includes('Boolean')) {
-        inputTypes.push('Boolean')
-    }
-    if (listType.includes('ByteVector')) {
-        inputTypes.push('ByteVector')
-    }
-    return inputTypes
-}
-
-const isValidBase64 = (str: string) => /^[A-Za-z0-9+/=]+/g.test(str) || str.length === 0
-const isValidBase58 = (str: string) => (/^[A-Za-z1-9=]+/g.test(str) && !/[O0Il+/]/g.test(str)) || str.length === 0
-
-const isValidArg = (arg: IArgumentInput) => {
-    const {value, type, byteVectorType} = arg
-    if (value === '') return !(type === 'String' || type === 'ByteVector')
-    else if (type === 'ByteVector' && value !== undefined) return !(byteVectorType === 'base58' ? isValidBase58(value as string) : isValidBase64(value as string))
-    else return value === undefined
 }
