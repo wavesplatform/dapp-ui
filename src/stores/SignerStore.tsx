@@ -24,9 +24,8 @@ class SignerStore extends SubStore {
     }
 
     initSignerWeb = async () => {
-        const pathname = this.rootStore.historyStore!.currentPath;
-        const networkByAddress = this.rootStore.accountStore!.getNetworkByAddress(pathname);
-        const network = (networkByAddress != null) ? networkByAddress : networks.mainnet;
+        const network = this.getNetworkByDapp();
+
         if (network.clientOrigin) {
             this.signer = new Signer({NODE_URL: network.server});
             await this.signer.setProvider(new ProviderWeb(network.clientOrigin));
@@ -40,9 +39,8 @@ class SignerStore extends SubStore {
     }
 
     initSignerCloud = async () => {
-        const pathname = this.rootStore.historyStore!.currentPath;
-        const networkByAddress = this.rootStore.accountStore!.getNetworkByAddress(pathname);
-        const network = (networkByAddress != null) ? networkByAddress : networks.mainnet;
+        const network = this.getNetworkByDapp();
+
         if (network.clientOrigin) {
             this.signer = new Signer({NODE_URL: network.server});
             await this.signer.setProvider(new ProviderCloud());
@@ -56,7 +54,8 @@ class SignerStore extends SubStore {
     }
 
     initSignerMetamask = async () => {
-        const network = networks.devnetC; // todo get from... MM ?
+        const network = this.getNetworkByDapp();
+
         this.signer = new Signer({ NODE_URL: network.server });
         const provider = new ProviderMetamask({
             debug: true,
@@ -87,6 +86,14 @@ class SignerStore extends SubStore {
         }
     };
 
+    getNetworkByDapp = () => {
+        const pathname = this.rootStore.historyStore!.currentPath;
+        const networkByAddress = this.rootStore.accountStore!.getNetworkByAddress(pathname);
+        const network = (networkByAddress != null) ? networkByAddress : networks.mainnet;
+
+        return network;
+    }
+
     @action
     async sendTx({data: tx}: any, opts: { notStopWait?: boolean } = {}) {
         if ('payment' in tx) {
@@ -101,7 +108,7 @@ class SignerStore extends SubStore {
 
             delete tx.fee;
             if (this.loginType === LoginType.METAMASK) {
-                const transaction = await this.signer!.invoke(tx).sign() as any;
+                const transaction = await this.signer!.invoke(tx).broadcast() as any;
 
                 txId = transaction.id;
             } else {
