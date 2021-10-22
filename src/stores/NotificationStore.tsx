@@ -1,8 +1,8 @@
+import { observable } from 'mobx';
 import notification from 'rc-notification';
 import { SubStore } from '@stores/SubStore';
 import { RootStore } from '@stores/RootStore';
 import getAlert, {closeAlertIcon} from '@utils/alertUtil'
-import { observable } from 'mobx';
 
 export type TNotifyOptions = Partial<{
     duration: number,
@@ -44,24 +44,32 @@ const styles = {
 class NotificationStore extends SubStore {
     _instance?: any;
 
+    @observable private keys: string[] = [];
+
     @observable isOpenLoginDialog = false;
     @observable isOpenMobileExplorer = false;
     @observable isOpenMobileAccount = false;
 
-    constructor(rootStore: RootStore) {
-        super(rootStore);
-        notification.newInstance({closeIcon: closeAlertIcon}, (notification: any) => this._instance = notification);
-    }
+    async notify(content: string | JSX.Element, opts: TNotifyOptions = {}) {
 
-    notify(content: string | JSX.Element, opts: TNotifyOptions = {}) {
-        console.log(opts);
+        if(!this._instance) {
+            await this.init();
+        }
+
         if (opts.key) {
             this._instance.removeNotice(opts.key);
+        } else{
+            opts.key = this.makeNoticeId();
         }
+
+        if (!this.keys.includes(opts.key)) {
+            this.keys.push(opts.key);
+        }
+
         const type = opts.type || 'info';
 
         try {
-            this._instance && this._instance.notice({
+            const notice = this._instance.notice({
                 ...opts,
                 content: getAlert(content, {...opts, type}),
                 style: {...styles[type], ...opts.style},
@@ -70,9 +78,32 @@ class NotificationStore extends SubStore {
                 closable: true,
                 closeIcon: closeAlertIcon
             });
+            console.log(notice);
         } catch(e) {
             console.error(content)
         }
+    }
+
+    async init() {
+        notification.newInstance({
+            closeIcon: closeAlertIcon,
+            getContainer: () => {
+                return document.querySelector('.notices-list-container');
+            }
+        }, (notification: any) => this._instance = notification);
+    }
+
+    closeAll() {
+        this.keys.forEach((key) => this._instance.removeNotice(key))
+        this.keys = [];
+    }
+
+    count() {
+        return this.keys.length;
+    }
+
+    private makeNoticeId(): string {
+        return String(Date.now());
     }
 }
 
