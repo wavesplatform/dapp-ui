@@ -1,7 +1,6 @@
 import { observable } from 'mobx';
 import notification from 'rc-notification';
 import { SubStore } from '@stores/SubStore';
-import { RootStore } from '@stores/RootStore';
 import getAlert, {closeAlertIcon} from '@utils/alertUtil'
 
 export type TNotifyOptions = Partial<{
