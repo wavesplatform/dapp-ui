@@ -4,7 +4,7 @@ import {SubStore} from './SubStore';
 import {Signer} from '@waves/signer';
 import {ProviderWeb} from "@waves.exchange/provider-web";
 import {ProviderCloud} from "@waves.exchange/provider-cloud";
-import ProviderMetamask from "@waves/provider-metamask";
+import ProviderMetamask, { isMetaMaskInstalled } from "@waves/provider-metamask";
 import {getExplorerLink, networks, Network, INetwork} from '@utils';
 import {LoginType, ELoginType} from "@src/interface";
 import {waitForTx} from "@waves/waves-transactions";
@@ -54,7 +54,18 @@ class SignerStore extends SubStore {
     }
 
     initSignerMetamask = async () => {
+        if (!isMetaMaskInstalled()) {
+            this.rootStore.notificationStore.notify('You should install Metamask', { type: 'error' });
+            return;
+        }
+
         const network = this.getNetworkByDapp();
+
+        // todo Remove after release metamask in mainnet
+        if (network.code === 'W') {
+            this.rootStore.notificationStore.notify('Network is not supported for Metamask', { type: 'error' });
+            return;
+        }
 
         this.signer = new Signer({ NODE_URL: network.server });
         const provider = new ProviderMetamask({
@@ -75,7 +86,11 @@ class SignerStore extends SubStore {
         if (type === LoginType.EMAIL) await this.initSignerCloud();
         if (type === LoginType.METAMASK) await this.initSignerMetamask();
 
-        const account = await this.signer!.login();
+        if(!this.signer) {
+            return;
+        }
+
+        const account = await this.signer.login();
 
         if ('address' in account) {
             const byte = await this.signer!.getNetworkByte();
