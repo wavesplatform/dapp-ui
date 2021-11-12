@@ -1,6 +1,7 @@
 /** @jsx jsx **/
+import { ICallableArgumentType, TCallableFuncArgumentsArray } from "@src/interface";
+
 import DappStore from "@stores/DappStore";
-import { ICallableArgumentType, TCallableFuncArgumentsArray } from "@stores/MetaStore";
 import AccountStore from '@stores/AccountStore';
 
 export interface IArgument {

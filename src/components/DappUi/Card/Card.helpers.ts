@@ -1,4 +1,4 @@
-import { ICallableArgumentType } from "@stores/MetaStore";
+import { ICallableArgumentType } from "@src/interface";
 import { IArgumentInput } from './Card.interface';
 
 export const convertListTypes = (listType: string) => {

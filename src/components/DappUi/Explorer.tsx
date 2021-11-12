@@ -1,10 +1,12 @@
 /** @jsx jsx **/
 import React from "react";
-import { IScriptInfoMeta, TCallableFuncArguments } from "@stores/MetaStore";
 import ScrollBar from "react-perfect-scrollbar";
 import { css, jsx } from "@emotion/core";
 import styled from "@emotion/styled";
+
 import { fonts } from "@src/styles";
+import  {TCallableFuncArguments } from '@src/interface'
+import { IScriptInfoMeta } from "@stores/MetaStore";
 import { centerEllipsis } from '@components/Home/Account';
 
 
