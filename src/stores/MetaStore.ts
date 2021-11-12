@@ -1,15 +1,16 @@
+import { action, autorun, observable } from "mobx";
+
 import { SubStore } from '@stores/SubStore';
 import { RootStore } from "@stores/RootStore";
-import { action, autorun, observable } from "mobx";
+
 import { checkSlash } from '@utils'
 
-export type ICallableArgumentType = 'Int' | 'String' | 'ByteVector' | 'Boolean'
-
-export type TCallableFuncArgumentsArray = { name: string, type: ICallableArgumentType }[]
-export type TCallableFuncArgumentsRecord = Record<string, ICallableArgumentType>
-export type TCallableFuncArguments = TCallableFuncArgumentsArray | TCallableFuncArgumentsRecord 
-
-export type ICallableFuncTypesArray = Record<string, TCallableFuncArgumentsArray>
+import {
+    TCallableFuncArguments,
+    TCallableFuncArgumentsArray,
+    ICallableFuncTypesArray,
+    TCallableFuncArgumentsRecord,
+} from '@src/interface'
 
 export interface IScriptInfoMeta<TArguments extends TCallableFuncArguments> {
     version: string

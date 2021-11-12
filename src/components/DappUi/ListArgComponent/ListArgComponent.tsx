@@ -1,10 +1,12 @@
 import React from 'react'
+import {css} from "@emotion/core";
+
 import {convertListTypes, IArgumentInput} from "@components/DappUi/Card";
 import {centerEllipsis} from "@components/Home/Account";
 import {ArgumentInput} from "@components/DappUi/ArgumentInput";
-import {css} from "@emotion/core";
+
 import {ReactComponent as AttachIcon} from "@src/assets/icons/Attach/attach-icon.svg";
-import {ICallableArgumentType} from "@stores/MetaStore";
+import {ICallableArgumentType} from "@src/interface";
 import Close from "@src/assets/icons/Close";
 
 import {

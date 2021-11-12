@@ -1,8 +1,9 @@
-import {SubStore} from './SubStore';
-import {ICallableArgumentType} from './MetaStore';
-import {IArgument, IArgumentInput} from '@components/DappUi/Card';
 import {base58Decode, base64Encode} from '@waves/ts-lib-crypto';
-import { ELoginType } from '@src/interface';
+
+import {IArgument, IArgumentInput} from '@components/DappUi/Card';
+import { ELoginType, ICallableArgumentType } from '@src/interface';
+
+import {SubStore} from './SubStore';
 
 interface IKeeperTransactionDataCallArg {
     type: string,

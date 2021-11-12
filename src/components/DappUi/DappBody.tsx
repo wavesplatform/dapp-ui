@@ -1,5 +1,5 @@
 import React from "react";
-import { ICallableFuncTypesArray } from "@stores/MetaStore";
+import { ICallableFuncTypesArray } from "@src/interface";
 import { Card } from "@components/DappUi/Card";
 
 interface IProps {

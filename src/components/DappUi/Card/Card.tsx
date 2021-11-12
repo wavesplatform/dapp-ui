@@ -7,9 +7,10 @@ import Decimal from "decimal.js";
 import { Option } from 'rc-select';
 import { css, jsx } from '@emotion/core';
 
+import { ICallableArgumentType } from "@src/interface";
 import Attach from '@src/assets/icons/Attach';
 import Close from '@src/assets/icons/Close';
-import { ICallableArgumentType } from "@stores/MetaStore";
+
 import { ArgumentInput } from '@components/DappUi/ArgumentInput';
 import Button from '@components/DappUi/Button';
 import Select from '@components/Select';
