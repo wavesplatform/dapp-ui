@@ -3,6 +3,7 @@ import { ICallableArgumentType, TCallableFuncArgumentsArray } from "@src/interfa
 
 import DappStore from "@stores/DappStore";
 import AccountStore from '@stores/AccountStore';
+import {SettingsStore} from "@stores/SettingsStore";
 
 export interface IArgument {
     type: ICallableArgumentType,
@@ -19,6 +20,7 @@ export interface IArgumentInput {
 export interface IInjectedProps {
     dappStore?: DappStore
     accountStore?: AccountStore
+    settingsStore?: SettingsStore
 }
 
 export interface IProps extends IInjectedProps {

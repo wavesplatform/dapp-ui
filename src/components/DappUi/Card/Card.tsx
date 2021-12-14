@@ -1,24 +1,22 @@
 /** @jsx jsx **/
 import React from 'react';
-import { autorun } from 'mobx';
-import { inject, observer } from 'mobx-react';
+import {autorun} from 'mobx';
+import {inject, observer} from 'mobx-react';
 import Tooltip from 'rc-tooltip';
 import Decimal from "decimal.js";
-import { Option } from 'rc-select';
-import { css, jsx } from '@emotion/core';
-
-import { ICallableArgumentType } from "@src/interface";
+import {Option} from 'rc-select';
+import {css, jsx} from '@emotion/core';
+import {ICallableArgumentType} from "@src/interface";
 import Attach from '@src/assets/icons/Attach';
 import Close from '@src/assets/icons/Close';
-
-import { ArgumentInput } from '@components/DappUi/ArgumentInput';
+import {ArgumentInput} from '@components/DappUi/ArgumentInput';
 import Button from '@components/DappUi/Button';
 import Select from '@components/Select';
-import { centerEllipsis } from '@components/Home/Account';
+import {centerEllipsis} from '@components/Home/Account';
 import InputNumber from '@components/Input/InputNumber';
-import { ListArgComponent } from "@components/DappUi/ListArgComponent";
-
-import { isList  } from '../helpers';
+import {ListArgComponent} from "@components/DappUi/ListArgComponent";
+import {ReactComponent as JsonIcon} from "@assets/icons/json.svg";
+import {isList} from '../helpers';
 
 import {
     Root,
@@ -35,12 +33,14 @@ import {
     Wrapper,
     Title,
     Anchor,
+    ButtonsWrapper
 } from './Styled';
 
-import { IArgumentInput, IProps, IState } from './Card.interface'
-import { defaultValue, isValidArg } from './Card.helpers';
+import {IArgumentInput, IProps, IState} from './Card.interface'
+import {defaultValue, isValidArg} from './Card.helpers';
+import {base58Encode, base64Encode} from '@waves/ts-lib-crypto';
 
-@inject('dappStore', 'accountStore')
+@inject('dappStore', 'accountStore', 'settingsStore')
 @observer
 export class Card extends React.Component<IProps, IState> {
 
@@ -70,8 +70,8 @@ export class Card extends React.Component<IProps, IState> {
     }
 
     get isInvalid() {
-        const { args, payments } = this.state;
-        const { funcArgs } = this.props;
+        const {args, payments} = this.state;
+        const {funcArgs} = this.props;
         const invalidPayment = payments.some(({assetId, tokens}) => !assetId || !tokens);
         const invalidArgs = funcArgs.length !== Object.keys(args).length
             || Object.values(args).some((arg) => isValidArg(arg as IArgumentInput))
@@ -199,15 +199,39 @@ export class Card extends React.Component<IProps, IState> {
         dappStore!.callCallableFunction(address, func, args, this.state.payments.map(p => ({...p, tokens: +p.tokens})));
     };
 
+    handleOpenJson = async () => {
+        try {
+            const {dappStore, address, funcName: func} = this.props;
+            const args = Object.values(this.state.args);
+            const data = await dappStore!.getTransactionJson(address, func, args, this.state.payments.map(p => ({
+                ...p,
+                tokens: +p.tokens
+            })));
+
+            const json = JSON.stringify(data)
+            const jsonWindow = window.open(`/json`)
+            if (jsonWindow) {
+                jsonWindow.document.write(`<pre style="word-wrap: break-word; white-space: pre-wrap;">${json}</pre>`)
+            }
+        } catch (e) {
+            console.error(e)
+        }
+    };
+
     render() {
-        const { funcName: title, accountStore } = this.props;
-        const { args, payments } = this.state;
+        const {funcName: title, accountStore} = this.props;
+        const {args, payments} = this.state;
 
         return <Root>
             <Anchor id={title}/>
             <Header>
-                <Title title={title.length  >= 20 ? title : ''}>{title}</Title>
-                <Button onClick={this.handleCall} disabled={this.isInvalid}>Invoke</Button>
+                <Title title={title.length >= 20 ? title : ''}>{title}</Title>
+                <ButtonsWrapper>
+                    {(this.props.accountStore?.isAuthorized && this.props.settingsStore?.jsonSettingValue) ?
+                        <JsonIcon onClick={this.handleOpenJson}/> : null}
+                    <Button onClick={this.handleCall} disabled={this.isInvalid}
+                            style={{marginLeft: '10px'}}>Invoke</Button>
+                </ButtonsWrapper>
             </Header>
             {Object.keys(args).length > 0 &&
             <ArgumentsLayout>
@@ -230,7 +254,8 @@ export class Card extends React.Component<IProps, IState> {
                             :
                             <ArgumentItem key={i}>
                                 <ArgumentTitle>
-                                    <ArgumentTitleVarName title={argName.length >= 16 ? argName : ''}>{centerEllipsis(argName, 16)}:</ArgumentTitleVarName>
+                                    <ArgumentTitleVarName
+                                        title={argName.length >= 16 ? argName : ''}>{centerEllipsis(argName, 16)}:</ArgumentTitleVarName>
                                     &nbsp;
                                 </ArgumentTitle>
                                 <Wrapper>
@@ -267,7 +292,7 @@ export class Card extends React.Component<IProps, IState> {
                                 {Object.values(accountStore!.assets).map(({assetId, name}) =>
                                     <Option key={assetId} value={assetId}>
                                         <Tooltip placement="right" trigger={['hover']} overlay={<span>{assetId}</span>}>
-                                            <div title={assetId.length >= 6 ? name+centerEllipsis(assetId, 6) : ''}>
+                                            <div title={assetId.length >= 6 ? name + centerEllipsis(assetId, 6) : ''}>
                                                 {name}({centerEllipsis(assetId, 6)})
                                             </div>
                                         </Tooltip>

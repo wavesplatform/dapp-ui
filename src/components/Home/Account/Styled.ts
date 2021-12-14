@@ -61,3 +61,16 @@ export const AvatarWrapper = styled.div`width: 46px`;
 export const AddressContainer = styled.div`
 display: flex;
 `;
+
+export const Settings = styled.div`
+width: 40px;
+height: 40px;
+box-sizing: border-box;
+border-radius: 6px;
+background-color: #F4F6FA;
+display: flex;
+justify-content: center;
+align-items: center;
+margin-right: 14px;
+cursor: pointer;
+`

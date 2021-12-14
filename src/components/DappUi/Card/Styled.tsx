@@ -114,3 +114,8 @@ export const Anchor = styled.div`
 position:absolute;
 top:-100px;
 `;
+
+export const ButtonsWrapper = styled.div`
+display: flex;
+align-items: center;
+`

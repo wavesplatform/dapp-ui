@@ -4,7 +4,7 @@ import {SubStore} from './SubStore';
 import {Signer} from '@waves/signer';
 import {ProviderWeb} from "@waves.exchange/provider-web";
 import {ProviderCloud} from "@waves.exchange/provider-cloud";
-import ProviderMetamask, { isMetaMaskInstalled } from "@waves/provider-metamask";
+import ProviderMetamask, {isMetaMaskInstalled} from "@waves/provider-metamask";
 import {getExplorerLink, networks, Network, INetwork} from '@utils';
 import {LoginType, ELoginType} from "@src/interface";
 import {waitForTx} from "@waves/waves-transactions";
@@ -55,7 +55,7 @@ class SignerStore extends SubStore {
 
     initSignerMetamask = async () => {
         if (!isMetaMaskInstalled()) {
-            this.rootStore.notificationStore.notify('You should install Metamask', { type: 'error' });
+            this.rootStore.notificationStore.notify('You should install Metamask', {type: 'error'});
             return;
         }
 
@@ -63,11 +63,11 @@ class SignerStore extends SubStore {
 
         // todo Remove after release metamask in mainnet
         if (network.code === 'W') {
-            this.rootStore.notificationStore.notify('Network is not supported for Metamask', { type: 'error' });
+            this.rootStore.notificationStore.notify('Network is not supported for Metamask', {type: 'error'});
             return;
         }
 
-        this.signer = new Signer({ NODE_URL: network.server });
+        this.signer = new Signer({NODE_URL: network.server});
         const provider = new ProviderMetamask({
             debug: true,
             wavesConfig: {
@@ -86,7 +86,7 @@ class SignerStore extends SubStore {
         if (type === LoginType.EMAIL) await this.initSignerCloud();
         if (type === LoginType.METAMASK) await this.initSignerMetamask();
 
-        if(!this.signer) {
+        if (!this.signer) {
             return;
         }
 
@@ -110,12 +110,42 @@ class SignerStore extends SubStore {
     }
 
     @action
-    async sendTx({data: tx}: any, opts: { notStopWait?: boolean } = {}) {
+    async buildTx({data: tx}: any, opts: { notStopWait?: boolean } = {}) {
         if ('payment' in tx) {
             tx.payment = tx.payment.map(({tokens: amount, assetId}: any) => {
                 const decimals = this.rootStore.accountStore.assets[assetId].decimals
                 return ({amount: new Decimal(10).pow(decimals).mul(+amount).toNumber(), assetId})
-            });
+            })
+        }
+
+        if ('fee' in tx) {
+            delete tx.feeAssetId;
+            tx.fee = new Decimal(10).pow(8).mul(+this.rootStore.accountStore.fee).toNumber();
+        }
+
+
+        try {
+            return this.signer!.invoke(tx).sign();
+        } catch (err) {
+            console.error(err);
+            this.rootStore.notificationStore.notify((typeof err === 'string' ? err : err.message), {type: 'error'})
+        }
+    }
+
+    @action
+    async sendTx({data: tx}: any, opts: { notStopWait?: boolean } = {}) {
+        if ('payment' in tx) {
+
+            tx.payment = tx.payment.map(({tokens: amount, assetId}: any) => {
+                    const decimals = this.rootStore.accountStore.assets[assetId].decimals
+                    return ({amount: new Decimal(10).pow(decimals).mul(+amount).toNumber(), assetId})
+                }
+            )
+        }
+        if ('fee' in tx) {
+            delete tx.feeAssetId;
+            delete tx.fee;
+            // tx.fee = new Decimal(10).pow(8).mul(+this.rootStore.accountStore.fee).toNumber();
         }
 
         try {

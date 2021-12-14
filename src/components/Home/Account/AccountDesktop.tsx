@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { inject, observer } from 'mobx-react';
+import {inject, observer} from 'mobx-react';
 import React from 'react';
 import copyToClipboard from 'copy-to-clipboard';
 import { fonts } from '@src/styles';
@@ -18,7 +18,10 @@ import {
     AccountDescription,
     Body,
     Wrapper,
+    Settings
 } from './Styled';
+import {ReactComponent as SettingsIcon} from '@src/assets/icons/settings.svg';
+import SettingsModal from "@components/SettingsModal";
 
 interface IProps {
     accountStore?: AccountStore;
@@ -28,19 +31,20 @@ interface IProps {
 }
 
 interface IState {
-    addressType: EAddressType
+    addressType: EAddressType,
+    isModalOpen: boolean
 }
 
 @inject('accountStore', 'historyStore', 'notificationStore', 'signerStore')
 @observer
 export default class AccountDesktop extends React.Component<IProps, IState> {
     // handleExit = () => window.location.reload();
-
     constructor(props: IProps) {
         super(props);
 
         this.state = {
-            addressType: EAddressType.WAVES
+            addressType: EAddressType.WAVES,
+            isModalOpen: false
         };
     }
 
@@ -65,6 +69,8 @@ export default class AccountDesktop extends React.Component<IProps, IState> {
             addressType: addressType === EAddressType.WAVES ? EAddressType.ETHEREUM : EAddressType.WAVES
         });
     }
+    handleOpenModal = () => this.setState({isModalOpen: true})
+    handleCloseModal = () => this.setState({isModalOpen: false})
 
     render() {
         const props = this.props;
@@ -78,6 +84,12 @@ export default class AccountDesktop extends React.Component<IProps, IState> {
         return <Wrapper>{
             address && network
                 ? <Body>
+                    <Settings onClick={this.handleOpenModal}>
+                        <SettingsIcon/>
+                    </Settings>
+                    {this.state.isModalOpen
+                        ? <SettingsModal handleClose={this.handleCloseModal}/>
+                        : null}
                     <AccountDescription>
                         <div css={fonts.addressFont}>
                             {this.switchAddressButton()}&nbsp;&nbsp;
