@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import styled from "@emotion/styled";
 import {inject, observer} from "mobx-react";
 import {SettingsStore} from "@stores/SettingsStore";

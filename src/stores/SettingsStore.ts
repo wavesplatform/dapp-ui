@@ -1,5 +1,5 @@
 import {SubStore} from './SubStore';
-import {action, computed, observable} from "mobx";
+import {action, observable} from "mobx";
 
 class SettingsStore extends SubStore {
     @observable jsonSettingValue = localStorage.getItem('jsonSettings') === 'true'

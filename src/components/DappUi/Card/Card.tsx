@@ -38,7 +38,6 @@ import {
 
 import {IArgumentInput, IProps, IState} from './Card.interface'
 import {defaultValue, isValidArg} from './Card.helpers';
-import {base58Encode, base64Encode} from '@waves/ts-lib-crypto';
 
 @inject('dappStore', 'accountStore', 'settingsStore')
 @observer
