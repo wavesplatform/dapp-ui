@@ -19,6 +19,7 @@
     "@waves.exchange/provider-cloud": "1.0.2",
     "@waves.exchange/provider-web": "1.0.2",
     "@waves/node-api-js": "^1.2.5-beta.14",
+    "@waves/provider-ledger": "^0.1.2",
     "@waves/provider-metamask": "^1.0.3",
     "@waves/signer": "1.0.5",
     "@waves/ts-lib-crypto": "^1.4.3",

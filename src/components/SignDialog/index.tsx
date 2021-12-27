@@ -123,6 +123,11 @@ export default class SignDialog extends React.Component <IProps> {
         this.props.signerStore!.login(LoginType.METAMASK);
     };
 
+    handleSignWithLeder = () => {
+        this.handleCloseDialog();
+        this.props.signerStore!.login(LoginType.LEDGER);
+    };
+
     handleClickOutside = (event: any) => {
         const path = event.path || event.composedPath();
         if (!(path.some((element: any) => element.dataset && element.dataset.owner === 'sign'))) {
@@ -163,7 +168,13 @@ export default class SignDialog extends React.Component <IProps> {
                     <div>
                         <Button css={css`width: 100%`} onClick={this.handleSignWithMetamask} >
                             Sign in with Metamask</Button>
-                        <Description><br/>The network will get from matamask plugin</Description>
+                        <Description><br/>The network will be MainNet by default</Description>
+                    </div>
+
+                    <div>
+                        <Button css={css`width: 100%`} onClick={this.handleSignWithLeder} >
+                            Sign in with Ledger</Button>
+                        <Description><br/>The network will be MainNet by default</Description>
                     </div>
                 </Body>
             </Dialog>
