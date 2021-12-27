@@ -77,7 +77,7 @@ class SignerStore extends SubStore {
             }
         });
 
-        await this.signer.setProvider(provider)
+        await this.signer.setProvider(provider);
     }
 
     initSignerLedger = async () => {
