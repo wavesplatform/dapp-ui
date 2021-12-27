@@ -2,12 +2,13 @@ import {action, observable} from 'mobx';
 import {RootStore} from '@stores';
 import {SubStore} from './SubStore';
 import {Signer} from '@waves/signer';
-import {ProviderWeb} from "@waves.exchange/provider-web";
-import {ProviderCloud} from "@waves.exchange/provider-cloud";
-import ProviderMetamask, { isMetaMaskInstalled } from "@waves/provider-metamask";
+import {ProviderWeb} from '@waves.exchange/provider-web';
+import {ProviderCloud} from '@waves.exchange/provider-cloud';
+import ProviderMetamask, { isMetaMaskInstalled } from '@waves/provider-metamask';
+import { ProviderLedger } from '@waves/provider-ledger';
 import {getExplorerLink, networks, Network, INetwork} from '@utils';
-import {LoginType, ELoginType} from "@src/interface";
-import {waitForTx} from "@waves/waves-transactions";
+import {LoginType, ELoginType} from '@src/interface';
+import {waitForTx} from '@waves/waves-transactions';
 import Decimal from 'decimal.js';
 
 class SignerStore extends SubStore {
@@ -76,7 +77,24 @@ class SignerStore extends SubStore {
             }
         });
 
-        await this.signer.setProvider(provider);
+        await this.signer.setProvider(provider)
+    }
+
+    initSignerLedger = async () => {
+        const network = this.getNetworkByDapp();
+
+        if (network.clientOrigin) {
+            this.signer = new Signer({ NODE_URL: network.server });
+            await this.signer.setProvider(new ProviderLedger({ wavesLedgerConfig: {
+                networkCode: network.code.charCodeAt(0)
+            }}));
+        } else {
+            this.signer = undefined;
+            this.rootStore.notificationStore.notify(
+                'Init ledger error',
+                {type: 'error'}
+            )
+        } 
     }
 
     login = async (type: LoginType) => {
@@ -85,6 +103,7 @@ class SignerStore extends SubStore {
         if (type === LoginType.SEED) await this.initSignerWeb();
         if (type === LoginType.EMAIL) await this.initSignerCloud();
         if (type === LoginType.METAMASK) await this.initSignerMetamask();
+        if (type === LoginType.LEDGER) await this.initSignerLedger();
 
         if(!this.signer) {
             return;

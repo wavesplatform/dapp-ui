@@ -10,4 +10,5 @@ export enum LoginType {
     SEED,
     EMAIL,
     METAMASK,
+    LEDGER,
 }
