@@ -47,7 +47,7 @@ const Title = styled.div`
 `
 
 const SaveButton = styled.div`
-  margin: 0 30px 20px 30px;
+  margin: 0 0 0 30px;
   padding: 15px 25px;
   background: #1F5AF6;
   border-radius: 6px;
@@ -57,6 +57,13 @@ const SaveButton = styled.div`
   width: max-content;
   align-self: end;
   cursor: pointer;
+`
+
+const Wrapper = styled.div`
+  margin: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 `
 
 interface IProps {
@@ -107,9 +114,14 @@ export default class JsonModal extends React.Component<IProps> {
                     <ReactJson src={this.props.data} displayDataTypes={false}
                                style={{fontFamily: 'Roboto', fontSize: '12px', padding: '25px 35px'}} name={''}/>
                 </ScrollBar>
-                <SaveButton onClick={this.broadcast}>
-                    Invoke
-                </SaveButton>
+                <Wrapper>
+                    <SaveButton onClick={this.broadcast}>
+                        Invoke
+                    </SaveButton>
+                    <SaveButton onClick={this.props.handleClose}>
+                        Close
+                    </SaveButton>
+                </Wrapper>
             </Content>
         </Root>
     }
