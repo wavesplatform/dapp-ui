@@ -56,6 +56,7 @@ const SaveButton = styled.div`
   color: #F8F9FB;
   width: max-content;
   align-self: end;
+  cursor: pointer;
 `
 
 interface IProps {
@@ -100,7 +101,7 @@ export default class JsonModal extends React.Component<IProps> {
                         JSON
                         <Copy onClick={this.handleCopy}/>
                     </div>
-                    <Close onClick={this.props.handleClose}/>
+                    <Close onClick={this.props.handleClose} style={{height: '30px', width: '30px'}}/>
                 </Title>
                 <ScrollBar>
                     <ReactJson src={this.props.data} displayDataTypes={false}
