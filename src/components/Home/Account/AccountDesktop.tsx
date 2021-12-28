@@ -18,10 +18,7 @@ import {
     AccountDescription,
     Body,
     Wrapper,
-    Settings
 } from './Styled';
-import {ReactComponent as SettingsIcon} from '@src/assets/icons/settings.svg';
-import SettingsModal from "@components/SettingsModal";
 
 interface IProps {
     accountStore?: AccountStore;
@@ -69,8 +66,6 @@ export default class AccountDesktop extends React.Component<IProps, IState> {
             addressType: addressType === EAddressType.WAVES ? EAddressType.ETHEREUM : EAddressType.WAVES
         });
     }
-    handleOpenModal = () => this.setState({isModalOpen: true})
-    handleCloseModal = () => this.setState({isModalOpen: false})
 
     render() {
         const props = this.props;
@@ -84,12 +79,6 @@ export default class AccountDesktop extends React.Component<IProps, IState> {
         return <Wrapper>{
             address && network
                 ? <Body>
-                    <Settings onClick={this.handleOpenModal}>
-                        <SettingsIcon/>
-                    </Settings>
-                    {this.state.isModalOpen
-                        ? <SettingsModal handleClose={this.handleCloseModal}/>
-                        : null}
                     <AccountDescription>
                         <div css={fonts.addressFont}>
                             {this.switchAddressButton()}&nbsp;&nbsp;

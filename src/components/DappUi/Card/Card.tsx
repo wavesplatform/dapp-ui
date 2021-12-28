@@ -17,7 +17,6 @@ import InputNumber from '@components/Input/InputNumber';
 import {ListArgComponent} from "@components/DappUi/ListArgComponent";
 import {ReactComponent as JsonIcon} from "@assets/icons/json.svg";
 import {isList} from '../helpers';
-
 import {
     Root,
     FlexBlock,
@@ -38,8 +37,9 @@ import {
 
 import {IArgumentInput, IProps, IState} from './Card.interface'
 import {defaultValue, isValidArg} from './Card.helpers';
+import JsonModal from "@components/JsonModal";
 
-@inject('dappStore', 'accountStore', 'settingsStore')
+@inject('dappStore', 'accountStore')
 @observer
 export class Card extends React.Component<IProps, IState> {
 
@@ -54,7 +54,9 @@ export class Card extends React.Component<IProps, IState> {
                 }
             }), {}),
         payments: [],
-        address: this.props.accountStore!.address
+        address: this.props.accountStore!.address,
+        isJsonModalOpen: false,
+        transactionData: undefined
     };
 
     componentDidMount() {
@@ -198,7 +200,7 @@ export class Card extends React.Component<IProps, IState> {
         dappStore!.callCallableFunction(address, func, args, this.state.payments.map(p => ({...p, tokens: +p.tokens})));
     };
 
-    handleOpenJson = async () => {
+    handleOpenJsonModal = async () => {
         try {
             const {dappStore, address, funcName: func} = this.props;
             const args = Object.values(this.state.args);
@@ -207,15 +209,17 @@ export class Card extends React.Component<IProps, IState> {
                 tokens: +p.tokens
             })));
 
-            const json = JSON.stringify(data)
-            const jsonWindow = window.open(`/json`)
-            if (jsonWindow) {
-                jsonWindow.document.write(`<pre style="word-wrap: break-word; white-space: pre-wrap;">${json}</pre>`)
-            }
+            this.setState({isJsonModalOpen: true})
+            this.setState({transactionData: data})
+
+
         } catch (e) {
             console.error(e)
         }
     };
+
+
+    handleCloseModal = () => this.setState({isJsonModalOpen: false})
 
     render() {
         const {funcName: title, accountStore} = this.props;
@@ -226,8 +230,10 @@ export class Card extends React.Component<IProps, IState> {
             <Header>
                 <Title title={title.length >= 20 ? title : ''}>{title}</Title>
                 <ButtonsWrapper>
-                    {(this.props.accountStore?.isAuthorized && this.props.settingsStore?.jsonSettingValue) ?
-                        <JsonIcon onClick={this.handleOpenJson}/> : null}
+                    {(this.props.accountStore?.isAuthorized) ?
+                        <JsonIcon onClick={this.handleOpenJsonModal} style={{cursor: 'pointer'}}/> : null}
+                    {this.state.transactionData && this.state.isJsonModalOpen ?
+                        <JsonModal data={this.state.transactionData} handleClose={this.handleCloseModal}/> : null}
                     <Button onClick={this.handleCall} disabled={this.isInvalid}
                             style={{marginLeft: '10px'}}>Invoke</Button>
                 </ButtonsWrapper>

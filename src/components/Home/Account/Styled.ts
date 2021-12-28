@@ -48,7 +48,7 @@ export const AccountDescription = styled.div`
 display: flex;
 flex-direction: column;
 justify-content: space-between;
-height: 100%;
+height: max-content;
 `;
 
 export const AddressFont = styled.div`

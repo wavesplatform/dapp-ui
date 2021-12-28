@@ -3,7 +3,7 @@ import { ICallableArgumentType, TCallableFuncArgumentsArray } from "@src/interfa
 
 import DappStore from "@stores/DappStore";
 import AccountStore from '@stores/AccountStore';
-import {SettingsStore} from "@stores/SettingsStore";
+import {InvokeScriptTransaction, SignedTransaction} from "@waves/ts-types";
 
 export interface IArgument {
     type: ICallableArgumentType,
@@ -20,7 +20,6 @@ export interface IArgumentInput {
 export interface IInjectedProps {
     dappStore?: DappStore
     accountStore?: AccountStore
-    settingsStore?: SettingsStore
 }
 
 export interface IProps extends IInjectedProps {
@@ -34,4 +33,6 @@ export interface IState {
     args: { [name: string]: IArgument }
     payments: { assetId: string, tokens: string }[]
     address: string | null
+    isJsonModalOpen: boolean
+    transactionData: undefined | SignedTransaction<InvokeScriptTransaction>
 }
