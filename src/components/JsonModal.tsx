@@ -40,30 +40,38 @@ const Content = styled.div`
 
 const Title = styled.div`
   display: flex;
+  align-items: center;
+`
+
+const WrapperTitle = styled.div`
+  display: flex;
   font-size: 18px;
   justify-content: space-between;
   background: #F8F9FB;
-  padding: 20px 30px;
+  padding: 20px 25px;
+  border-radius: 4px;
 `
 
-const SaveButton = styled.div`
-  margin: 0 0 0 30px;
-  padding: 15px 25px;
-  background: #1F5AF6;
-  border-radius: 6px;
-  align-items: center;
-  text-align: center;
-  color: #F8F9FB;
-  width: max-content;
-  align-self: end;
+const Button = styled.div`
+  margin-left: 25px;
+  background: #7CA1FD;
+  border-radius: 4px;
+  min-width: 150px;
+  height: 40px;
+  color: white;
+  outline: none;
   cursor: pointer;
+  font-size: 14px;
+  line-height: 36px;
+  text-align: center;
 `
 
-const Wrapper = styled.div`
-  margin: 30px;
+const WrapperButtons = styled.div`
+  padding: 25px 25px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  border-top: 1px solid #dae1e9;
 `
 
 interface IProps {
@@ -86,42 +94,50 @@ export default class JsonModal extends React.Component<IProps> {
     };
 
     broadcast = async () => {
-        const path = await this.props.signerStore?.getNetworkByDapp()
-        await broadcast(this.props.data as SignedTransaction<InvokeScriptTransaction>, path!.server)
-        const txId = (this.props.data as any).id
-        const res = await waitForTx(txId, {apiBase: path!.server}) as any
-        const isFailed = res.applicationStatus && res.applicationStatus === 'script_execution_failed'
+        this.props.handleClose()
+        try {
+            const path = await this.props.signerStore?.getNetworkByDapp()
+            await broadcast(this.props.data as SignedTransaction<InvokeScriptTransaction>, path!.server)
+            const txId = (this.props.data as any).id
+            const res = await waitForTx(txId, {apiBase: path!.server}) as any
+            const isFailed = res.applicationStatus && res.applicationStatus === 'script_execution_failed'
 
-        const link = path ? getExplorerLink(path!.code, txId, 'tx') : undefined;
-        this.props.notificationStore!.notify(
-            isFailed
-                ? `Script execution failed`
-                : `Success`, {type: isFailed ? 'error' : 'success', link, linkTitle: 'View transaction'}
-        )
+            const link = path ? getExplorerLink(path!.code, txId, 'tx') : undefined;
+            this.props.notificationStore!.notify(
+                isFailed
+                    ? `Script execution failed`
+                    : `Success`, {type: isFailed ? 'error' : 'success', link, linkTitle: 'View transaction'}
+            )
+        } catch (e) {
+            this.props.notificationStore!.notify(
+                `Error: ${JSON.stringify(e)}`, {type: 'error'}
+            )
+        }
+
     }
 
     render() {
         return <Root>
             <Content>
-                <Title>
-                    <div>
+                <WrapperTitle>
+                    <Title>
                         JSON
                         <Copy onClick={this.handleCopy}/>
-                    </div>
+                    </Title>
                     <Close onClick={this.props.handleClose} style={{height: '30px', width: '30px'}}/>
-                </Title>
+                </WrapperTitle>
                 <ScrollBar>
                     <ReactJson src={this.props.data} displayDataTypes={false}
-                               style={{fontFamily: 'Roboto', fontSize: '12px', padding: '25px 35px'}} name={''}/>
+                               style={{fontFamily: 'Roboto', fontSize: '12px', padding: '25px 35px'}} name={false}/>
                 </ScrollBar>
-                <Wrapper>
-                    <SaveButton onClick={this.broadcast}>
-                        Invoke
-                    </SaveButton>
-                    <SaveButton onClick={this.props.handleClose}>
+                <WrapperButtons>
+                    <Button onClick={this.props.handleClose}>
                         Close
-                    </SaveButton>
-                </Wrapper>
+                    </Button>
+                    <Button onClick={this.broadcast}>
+                        Invoke
+                    </Button>
+                </WrapperButtons>
             </Content>
         </Root>
     }
