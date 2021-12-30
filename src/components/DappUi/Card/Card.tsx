@@ -15,7 +15,6 @@ import Select from '@components/Select';
 import {centerEllipsis} from '@components/Home/Account';
 import InputNumber from '@components/Input/InputNumber';
 import {ListArgComponent} from "@components/DappUi/ListArgComponent";
-import {ReactComponent as JsonIcon} from "@assets/icons/json.svg";
 import {isList} from '../helpers';
 import {
     Root,
@@ -32,7 +31,8 @@ import {
     Wrapper,
     Title,
     Anchor,
-    ButtonsWrapper
+    ButtonsWrapper,
+    JsonButton
 } from './Styled';
 
 import {IArgumentInput, IProps, IState} from './Card.interface'
@@ -231,7 +231,7 @@ export class Card extends React.Component<IProps, IState> {
                 <Title title={title.length >= 20 ? title : ''}>{title}</Title>
                 <ButtonsWrapper>
                     {(this.props.accountStore?.isAuthorized) ?
-                        <JsonIcon onClick={this.handleOpenJsonModal} style={{cursor: 'pointer'}}/> : null}
+                        <JsonButton onClick={this.handleOpenJsonModal} style={{cursor: 'pointer'}}>JSON</JsonButton> : null}
                     {this.state.transactionData && this.state.isJsonModalOpen ?
                         <JsonModal data={this.state.transactionData} handleClose={this.handleCloseModal}/> : null}
                     <Button onClick={this.handleCall} disabled={this.isInvalid}

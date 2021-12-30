@@ -55,6 +55,15 @@ line-height: 36px;
 text-align: center;
 color: #FFFFFF;
 `,
+    jsonButtonFont: css`
+font-family: Roboto;
+font-style: normal;
+font-weight: 500;
+font-size: 14px;
+line-height: 36px;
+text-align: center;
+color: black;
+`,
     callableFuncArgFont:css`
 font-family: Roboto;
 font-style: normal;
