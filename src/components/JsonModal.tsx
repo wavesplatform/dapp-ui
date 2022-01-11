@@ -33,7 +33,7 @@ const Content = styled.div`
   height: max-content;
   position: relative;
   width: 100%;
-  max-width: 720px;
+  max-width: 800px;
   max-height: 80vh;
   border-radius: 4px;
 `
