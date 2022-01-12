@@ -3,6 +3,7 @@ import { ICallableArgumentType, TCallableFuncArgumentsArray } from "@src/interfa
 
 import DappStore from "@stores/DappStore";
 import AccountStore from '@stores/AccountStore';
+import {InvokeScriptTransaction, SignedTransaction} from "@waves/ts-types";
 
 export interface IArgument {
     type: ICallableArgumentType,
@@ -32,4 +33,6 @@ export interface IState {
     args: { [name: string]: IArgument }
     payments: { assetId: string, tokens: string }[]
     address: string | null
+    isJsonModalOpen: boolean
+    transactionData: undefined | SignedTransaction<InvokeScriptTransaction>
 }

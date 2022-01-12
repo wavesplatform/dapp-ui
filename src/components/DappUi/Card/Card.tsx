@@ -1,25 +1,21 @@
 /** @jsx jsx **/
 import React from 'react';
-import { autorun } from 'mobx';
-import { inject, observer } from 'mobx-react';
+import {autorun} from 'mobx';
+import {inject, observer} from 'mobx-react';
 import Tooltip from 'rc-tooltip';
 import Decimal from "decimal.js";
-import { Option } from 'rc-select';
-import { css, jsx } from '@emotion/core';
-
-import { ICallableArgumentType } from "@src/interface";
+import {Option} from 'rc-select';
+import {css, jsx} from '@emotion/core';
+import {ICallableArgumentType} from "@src/interface";
 import Attach from '@src/assets/icons/Attach';
 import Close from '@src/assets/icons/Close';
-
-import { ArgumentInput } from '@components/DappUi/ArgumentInput';
+import {ArgumentInput} from '@components/DappUi/ArgumentInput';
 import Button from '@components/DappUi/Button';
 import Select from '@components/Select';
-import { centerEllipsis } from '@components/Home/Account';
+import {centerEllipsis} from '@components/Home/Account';
 import InputNumber from '@components/Input/InputNumber';
-import { ListArgComponent } from "@components/DappUi/ListArgComponent";
-
-import { isList  } from '../helpers';
-
+import {ListArgComponent} from "@components/DappUi/ListArgComponent";
+import {isList} from '../helpers';
 import {
     Root,
     FlexBlock,
@@ -35,10 +31,13 @@ import {
     Wrapper,
     Title,
     Anchor,
+    ButtonsWrapper,
+    JsonButton
 } from './Styled';
 
-import { IArgumentInput, IProps, IState } from './Card.interface'
-import { defaultValue, isValidArg } from './Card.helpers';
+import {IArgumentInput, IProps, IState} from './Card.interface'
+import {defaultValue, isValidArg} from './Card.helpers';
+import JsonModal from "@components/JsonModal";
 
 @inject('dappStore', 'accountStore')
 @observer
@@ -55,7 +54,9 @@ export class Card extends React.Component<IProps, IState> {
                 }
             }), {}),
         payments: [],
-        address: this.props.accountStore!.address
+        address: this.props.accountStore!.address,
+        isJsonModalOpen: false,
+        transactionData: undefined
     };
 
     componentDidMount() {
@@ -70,8 +71,8 @@ export class Card extends React.Component<IProps, IState> {
     }
 
     get isInvalid() {
-        const { args, payments } = this.state;
-        const { funcArgs } = this.props;
+        const {args, payments} = this.state;
+        const {funcArgs} = this.props;
         const invalidPayment = payments.some(({assetId, tokens}) => !assetId || !tokens);
         const invalidArgs = funcArgs.length !== Object.keys(args).length
             || Object.values(args).some((arg) => isValidArg(arg as IArgumentInput))
@@ -199,15 +200,43 @@ export class Card extends React.Component<IProps, IState> {
         dappStore!.callCallableFunction(address, func, args, this.state.payments.map(p => ({...p, tokens: +p.tokens})));
     };
 
+    handleOpenJsonModal = async () => {
+        try {
+            const {dappStore, address, funcName: func} = this.props;
+            const args = Object.values(this.state.args);
+            const data = await dappStore!.getTransactionJson(address, func, args, this.state.payments.map(p => ({
+                ...p,
+                tokens: +p.tokens
+            })));
+
+            this.setState({isJsonModalOpen: true})
+            this.setState({transactionData: data})
+
+
+        } catch (e) {
+            console.error(e)
+        }
+    };
+
+
+    handleCloseModal = () => this.setState({isJsonModalOpen: false})
+
     render() {
-        const { funcName: title, accountStore } = this.props;
-        const { args, payments } = this.state;
+        const {funcName: title, accountStore} = this.props;
+        const {args, payments} = this.state;
 
         return <Root>
             <Anchor id={title}/>
             <Header>
-                <Title title={title.length  >= 20 ? title : ''}>{title}</Title>
-                <Button onClick={this.handleCall} disabled={this.isInvalid}>Invoke</Button>
+                <Title title={title.length >= 20 ? title : ''}>{title}</Title>
+                <ButtonsWrapper>
+                    {(this.props.accountStore?.isAuthorized) ?
+                        <JsonButton onClick={this.handleOpenJsonModal} style={{cursor: 'pointer'}}>JSON</JsonButton> : null}
+                    {this.state.transactionData && this.state.isJsonModalOpen ?
+                        <JsonModal data={this.state.transactionData} handleClose={this.handleCloseModal}/> : null}
+                    <Button onClick={this.handleCall} disabled={this.isInvalid}
+                            style={{marginLeft: '10px'}}>Invoke</Button>
+                </ButtonsWrapper>
             </Header>
             {Object.keys(args).length > 0 &&
             <ArgumentsLayout>
@@ -230,7 +259,8 @@ export class Card extends React.Component<IProps, IState> {
                             :
                             <ArgumentItem key={i}>
                                 <ArgumentTitle>
-                                    <ArgumentTitleVarName title={argName.length >= 16 ? argName : ''}>{centerEllipsis(argName, 16)}:</ArgumentTitleVarName>
+                                    <ArgumentTitleVarName
+                                        title={argName.length >= 16 ? argName : ''}>{centerEllipsis(argName, 16)}:</ArgumentTitleVarName>
                                     &nbsp;
                                 </ArgumentTitle>
                                 <Wrapper>
@@ -267,7 +297,7 @@ export class Card extends React.Component<IProps, IState> {
                                 {Object.values(accountStore!.assets).map(({assetId, name}) =>
                                     <Option key={assetId} value={assetId}>
                                         <Tooltip placement="right" trigger={['hover']} overlay={<span>{assetId}</span>}>
-                                            <div title={assetId.length >= 6 ? name+centerEllipsis(assetId, 6) : ''}>
+                                            <div title={assetId.length >= 6 ? name + centerEllipsis(assetId, 6) : ''}>
                                                 {name}({centerEllipsis(assetId, 6)})
                                             </div>
                                         </Tooltip>

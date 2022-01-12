@@ -310,6 +310,7 @@ module.exports = function(webpackEnv) {
         }),
         ...(modules.webpackAliases || {}),
         '@src': path.resolve(__dirname, "../src"),
+        '@assets': path.resolve(__dirname, "../src/assets"),
         '@components': path.resolve(__dirname, "../src/components"),
         '@services': path.resolve(__dirname, "../src/services"),
         '@stores': path.resolve(__dirname, "../src/stores"),

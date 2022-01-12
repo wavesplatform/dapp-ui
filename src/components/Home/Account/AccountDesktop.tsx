@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { inject, observer } from 'mobx-react';
+import {inject, observer} from 'mobx-react';
 import React from 'react';
 import copyToClipboard from 'copy-to-clipboard';
 import { fonts } from '@src/styles';
@@ -28,19 +28,20 @@ interface IProps {
 }
 
 interface IState {
-    addressType: EAddressType
+    addressType: EAddressType,
+    isModalOpen: boolean
 }
 
 @inject('accountStore', 'historyStore', 'notificationStore', 'signerStore')
 @observer
 export default class AccountDesktop extends React.Component<IProps, IState> {
     // handleExit = () => window.location.reload();
-
     constructor(props: IProps) {
         super(props);
 
         this.state = {
-            addressType: EAddressType.WAVES
+            addressType: EAddressType.WAVES,
+            isModalOpen: false
         };
     }
 
