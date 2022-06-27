@@ -61,12 +61,6 @@ class SignerStore extends SubStore {
 
         const network = this.getNetworkByDapp();
 
-        // todo Remove after release metamask in mainnet
-        if (network.code === 'W') {
-            this.rootStore.notificationStore.notify('Network is not supported for Metamask', {type: 'error'});
-            return;
-        }
-
         this.signer = new Signer({NODE_URL: network.server});
         const provider = new ProviderMetamask({
             debug: true,
