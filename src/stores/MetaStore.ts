@@ -108,7 +108,7 @@ function convertFuncArgumentsRecordToArray(callableFuncTypes: Record<string, TCa
             return {
                 ...acc,
                 // [funcName]: Object.entries(args).reduce((acc, [name, type]) => {
-                [funcName]: Object.values(args).reduce((acc, [name, type]) => {
+                [funcName]: Object.values(args).reduce((acc, { name, type }) => {
                     return ([
                         ...acc,
                         { name, type }
