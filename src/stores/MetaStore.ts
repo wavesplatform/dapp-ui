@@ -60,6 +60,7 @@ class MetaStore extends SubStore {
         if (network) {
             this.server = network.server;
             this.byte = network.code;
+
             await getDappMeta(pathname, network.server).then(res => {
                 if (!('meta' in res)) {
                     this.isFailed = true;
@@ -101,21 +102,20 @@ async function getDappMeta(address: string, server: string): Promise<IScriptInfo
     return await (resp).json();
 };
 
-
 function convertFuncArgumentsRecordToArray(callableFuncTypes: Record<string, TCallableFuncArguments>) {
     return Object.entries(callableFuncTypes)
         .reduce((acc, [funcName, args]) => {
-            return ({
+            return {
                 ...acc,
-                [funcName]: Object.entries(args).reduce((acc, [name, type]) => {
+                // [funcName]: Object.entries(args).reduce((acc, [name, type]) => {
+                [funcName]: Object.values(args).reduce((acc, [name, type]) => {
                     return ([
                         ...acc,
                         { name, type }
                     ])
                 }, [] as TCallableFuncArgumentsArray)
-            })
+            };
         }, {} as ICallableFuncTypesArray)
 }
-
 
 export default MetaStore;
