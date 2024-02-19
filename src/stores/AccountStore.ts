@@ -51,7 +51,7 @@ class AccountStore extends SubStore {
             }))
         ];
 
-        const ids: any = assets.balances.filter(balance => balance.issueTransaction === null).map(x => x.assetId);
+        const ids: any = assets.balances.filter(balance => balance.issueTransaction == null).map(x => x.assetId);
         if (ids.length !== 0) {
             const assetDetails = await axios.post('/assets/details', {ids}, {baseURL: `${checkSlash(server)}`});
 
@@ -67,7 +67,7 @@ class AccountStore extends SubStore {
             });
         }
 
-        if ('balances' in assets && !assets.balances.some(x => x.issueTransaction === null)) {
+        if ('balances' in assets && !assets.balances.some(x => x.issueTransaction == null)) {
             this.rootStore.accountStore.assets = {
                 'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8},
                 ...assets.balances.reduce((acc, {assetId, issueTransaction: {name, decimals}}) =>
