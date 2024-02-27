@@ -7,6 +7,7 @@ import NotificationStore from "@stores/NotificationStore";
 import { Home } from "@components/Home";
 import HistoryStore from "@stores/HistoryStore";
 import SignDialog from '@components/SignDialog';
+import { Notices } from '@components';
 
 interface IProps {
     accountStore?: AccountStore
@@ -28,11 +29,16 @@ class App extends React.Component<IProps, IState> {
     };
 
     render() {
-        return <Router history={this.props.historyStore!.history}>
-            <Route exact path="/" component={Home}/>
-            <Route path="/:string" component={DappUi}/>
-            <SignDialog/>
-        </Router>
+        return (
+            <div>
+                <Notices />
+                <Router history={this.props.historyStore!.history}>
+                    <Route exact path="/" component={Home}/>
+                    <Route path="/:string" component={DappUi}/>
+                    <SignDialog/>
+                </Router>
+            </div>
+        );
     }
 }
 
