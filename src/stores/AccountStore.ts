@@ -8,7 +8,7 @@ import {RootStore} from '@stores/RootStore';
 import { ELoginType } from '@src/interface';
 
 import {SubStore} from './SubStore';
-import { balance } from '@waves/waves-transactions/dist/nodeInteraction';
+
 
 class AccountStore extends SubStore {
     @observable assets: { [name: string]: IAsset } = {'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8}};
@@ -104,7 +104,7 @@ class AccountStore extends SubStore {
             const network = Network.getNetworkByByte(byte);
 
             return network ? network : null;
-        } catch (e) {
+        } catch (e: any) {
             this.rootStore.notificationStore.notify(e.message, {type: 'error'});
         }
         return null;
