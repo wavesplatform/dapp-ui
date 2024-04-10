@@ -1,6 +1,4 @@
 import {action, autorun, computed, observable} from 'mobx';
-import axios from 'axios';
-
 import {base58Decode} from '@waves/ts-lib-crypto';
 import {IAsset} from '@stores/KeeperStore';
 import {checkSlash, INetwork, Network} from '@utils';
@@ -40,7 +38,7 @@ class AccountStore extends SubStore {
         const data = (await (resp).json());
 
         const assetsIds = data.balances.map((i: any) => !i.issueTransaction ? i.assetId : null).filter(Boolean);
-
+        
         if (assetsIds.length) {
             const pathAssets = `${checkSlash(server)}assets/details`;
             const respAssets = await fetch(pathAssets, { method: 'POST', body: JSON.stringify({ ids: assetsIds }), headers: { 'accept': 'application/json', 'Content-Type': 'application/json' } });
@@ -49,10 +47,10 @@ class AccountStore extends SubStore {
                 return acc;
             }, {});
             data.balances = data.balances
-            .map((balance: any) => ({ ...balance, issueTransaction: additionAsset[balance.assetId] }))
+            .map((balance: any) => ({ ...balance, issueTransaction: balance.issueTransaction || additionAsset[balance.assetId] }))
             .filter((balance: any) => { 
                 if (!balance.issueTransaction) {
-                    console.warn(`Not found asset for balance ${balance.assetId}`);
+                    console.warn(`Not found asset for balance ${balance.assetId}`, additionAsset[balance.assetId]);
                     return false;
                 }
                 return true;
@@ -72,23 +70,7 @@ class AccountStore extends SubStore {
             }))
         ];
 
-        const ids: any = assets.balances.filter(balance => balance.issueTransaction == null).map(x => x.assetId);
-        if (ids.length !== 0) {
-            const assetDetails = await axios.post('/assets/details', {ids}, {baseURL: `${checkSlash(server)}`});
-
-            assetDetails.data.forEach((assetDetails: any) => {
-                assets.balances
-                    .filter(x => x.assetId === assetDetails.assetId)
-                    .forEach(x => {
-                        x.issueTransaction = {
-                            name: assetDetails.name,
-                            decimals: assetDetails.decimals
-                        };
-                    });
-            });
-        }
-
-        if ('balances' in assets && !assets.balances.some(x => x.issueTransaction == null)) {
+        if ('balances' in assets) {
             this.rootStore.accountStore.assets = {
                 'WAVES': {name: 'WAVES', assetId: 'WAVES', decimals: 8},
                 ...assets.balances.reduce((acc, {assetId, issueTransaction: {name, decimals}}) =>
@@ -104,7 +86,7 @@ class AccountStore extends SubStore {
             const network = Network.getNetworkByByte(byte);
 
             return network ? network : null;
-        } catch (e: any) {
+        } catch (e) {
             this.rootStore.notificationStore.notify(e.message, {type: 'error'});
         }
         return null;
